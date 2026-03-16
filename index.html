@@ -80,6 +80,20 @@
       background: #1E4F9C;
       margin-left: 0.5rem;
     }
+    /* Loading spinner */
+    .loader {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top: 3px solid #ffffff;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
@@ -130,7 +144,7 @@
     </div>
   </header>
 
-  <!-- HERO SECTION -->
+    <!-- HERO SECTION -->
   <section class="mx-4 md:mx-8 mt-6 rounded-3xl overflow-hidden hero-bg relative">
     <div class="absolute inset-0 bg-metalic-gradient opacity-80 mix-blend-overlay"></div>
     <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between backdrop-blur-sm">
@@ -141,8 +155,12 @@
           <span>Jelajahi Produk</span> <i data-lucide="sparkles" class="w-5 h-5"></i>
         </button>
       </div>
-      <div class="mt-6 md:mt-0 w-44 h-44 rounded-full bg-white/5 backdrop-blur-2xl flex items-center justify-center border border-white/30 shadow-2xl">
-        <i data-lucide="indonesia" class="w-20 h-20 text-blue-300"></i>
+      
+      <!-- GAMBAR BULAT (HANYA INI) -->
+      <div class="mt-6 md:mt-0 w-44 h-44 rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl hover:scale-105 transition-transform duration-300">
+        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=200" 
+             alt="Belanja Online" 
+             class="w-full h-full object-cover">
       </div>
     </div>
   </section>
@@ -160,7 +178,12 @@
 
   <!-- PRODUK GRID -->
   <div class="mx-4 md:mx-8 mt-8">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid">
+      <div class="col-span-full text-center py-16">
+        <div class="loader"></div>
+        <p class="text-blue-200/70">Memuat produk...</p>
+      </div>
+    </div>
   </div>
 
   <!-- SELLER APPLICATION MODAL (PENGAJUAN PENJUAL) -->
@@ -226,13 +249,17 @@
         <!-- Pending Seller Applications -->
         <div class="glass-panel p-4">
           <h4 class="text-xl font-bold mb-3">Pengajuan Penjual Baru</h4>
-          <div id="pendingApplications" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          <div id="pendingApplications" class="space-y-2 max-h-60 overflow-y-auto">
+            <p class="text-blue-200/70">Memuat...</p>
+          </div>
         </div>
         
         <!-- Complaints -->
         <div class="glass-panel p-4">
           <h4 class="text-xl font-bold mb-3">Pengaduan Masuk</h4>
-          <div id="pendingComplaints" class="space-y-2 max-h-60 overflow-y-auto"></div>
+          <div id="pendingComplaints" class="space-y-2 max-h-60 overflow-y-auto">
+            <p class="text-blue-200/70">Memuat...</p>
+          </div>
         </div>
         
         <!-- Statistics -->
@@ -331,7 +358,9 @@
         <h2 class="text-2xl font-bold flex gap-2"><i data-lucide="shopping-bag"></i> Keranjangmu</h2>
         <button id="closeCart" class="p-2 rounded-full bg-[#1c3f6e] hover:bg-[#28579b]"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer"></div>
+      <div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer">
+        <div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div>
+      </div>
       <div class="border-t border-blue-400/30 pt-4 mt-2">
         <div class="flex justify-between text-xl font-bold mb-3"><span>Subtotal</span> <span id="cartSubtotal">Rp 0</span></div>
         
@@ -400,7 +429,17 @@
       // ==================== SUPABASE INIT ====================
       const supabaseUrl = 'https://mpgkhjzvvzcczsdczlca.supabase.co';
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZ2toanp2dnpjY3pzZGN6bGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjY2NDQsImV4cCI6MjA4OTI0MjY0NH0.HrRAnpdTAv86RO4nkPMV6NXYrM8MkrpajR7mKkZwfS8';
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+      
+      // Pastikan supabase sudah didefinisikan dengan benar
+      if (typeof window.supabase === 'undefined') {
+        console.error('Supabase client not loaded');
+        document.getElementById('productGrid').innerHTML = 
+          '<div class="col-span-full text-center py-16 text-2xl text-blue-200/60 glass-panel">❌ Gagal memuat koneksi database. Refresh halaman.</div>';
+        return;
+      }
+      
+      const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+      console.log('✅ Supabase initialized');
 
       // ==================== GLOBAL VARIABLES ====================
       let products = [];
@@ -431,72 +470,91 @@
 
       // ==================== CHECK USER & ROLE ====================
       async function checkUser() {
-        const { data: { user } } = await supabase.auth.getUser();
-        currentUser = user;
-        
-        if (user) {
-          // Cek role dari database (implementasi sederhana)
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
+        try {
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          currentUser = user;
+          
+          if (user) {
+            // Cek role dari database
+            const { data: profile } = await supabaseClient
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .maybeSingle();
+              
+            userRole = profile?.role || 'buyer';
             
-          userRole = profile?.role || 'buyer';
-          
-          // Update UI berdasarkan role
-          roleBadge.classList.remove('hidden');
-          roleBadge.textContent = userRole.toUpperCase();
-          
-          // Tampilkan button sesuai role
-          if (userRole === 'buyer') {
-            sellerApplyBtn.classList.remove('hidden');
-          } else if (userRole === 'seller') {
-            dashboardBtn.classList.remove('hidden');
-            complaintBtn.classList.remove('hidden');
-            dashboardBtn.innerHTML = '<i data-lucide="store" class="w-6 h-6"></i>';
-          } else if (userRole === 'admin') {
-            dashboardBtn.classList.remove('hidden');
-            dashboardBtn.innerHTML = '<i data-lucide="shield" class="w-6 h-6"></i>';
+            // Update UI berdasarkan role
+            if (roleBadge) {
+              roleBadge.classList.remove('hidden');
+              roleBadge.textContent = userRole.toUpperCase();
+            }
+            
+            // Tampilkan button sesuai role
+            if (userRole === 'buyer') {
+              sellerApplyBtn?.classList.remove('hidden');
+            } else if (userRole === 'seller') {
+              dashboardBtn?.classList.remove('hidden');
+              complaintBtn?.classList.remove('hidden');
+              if (dashboardBtn) dashboardBtn.innerHTML = '<i data-lucide="store" class="w-6 h-6"></i>';
+            } else if (userRole === 'admin') {
+              dashboardBtn?.classList.remove('hidden');
+              if (dashboardBtn) dashboardBtn.innerHTML = '<i data-lucide="shield" class="w-6 h-6"></i>';
+            }
+            
+            const loginFab = document.getElementById('loginFab');
+            if (loginFab) loginFab.innerHTML = '<i data-lucide="user-check" class="w-6 h-6"></i>';
+          } else {
+            userRole = 'guest';
+            roleBadge?.classList.add('hidden');
+            sellerApplyBtn?.classList.add('hidden');
+            dashboardBtn?.classList.add('hidden');
+            complaintBtn?.classList.add('hidden');
+            
+            const loginFab = document.getElementById('loginFab');
+            if (loginFab) loginFab.innerHTML = '<i data-lucide="user" class="w-6 h-6"></i>';
           }
           
-          const loginFab = document.getElementById('loginFab');
-          loginFab.innerHTML = '<i data-lucide="user-check" class="w-6 h-6"></i>';
-        } else {
-          userRole = 'guest';
-          roleBadge.classList.add('hidden');
-          sellerApplyBtn.classList.add('hidden');
-          dashboardBtn.classList.add('hidden');
-          complaintBtn.classList.add('hidden');
-          
-          const loginFab = document.getElementById('loginFab');
-          loginFab.innerHTML = '<i data-lucide="user" class="w-6 h-6"></i>';
+          lucide.createIcons();
+          return user;
+        } catch (error) {
+          console.error('Error checkUser:', error);
+          return null;
         }
-        
-        lucide.createIcons();
-        return user;
       }
 
       // ==================== LOAD PRODUCTS ====================
       async function loadProductsFromDB() {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*');
+        try {
+          const { data, error } = await supabaseClient
+            .from('products')
+            .select('*');
+            
+          if (error) {
+            console.error('Error loading products:', error);
+            productGrid.innerHTML = `<div class="col-span-full text-center py-16 text-2xl text-blue-200/60 glass-panel">❌ Gagal memuat produk: ${error.message}</div>`;
+            return;
+          }
           
-        if (error) {
-          console.error('Error loading products:', error);
-          return;
+          products = data || [];
+          console.log(`✅ Loaded ${products.length} products`);
+          renderProducts();
+        } catch (error) {
+          console.error('Error loadProductsFromDB:', error);
+          productGrid.innerHTML = `<div class="col-span-full text-center py-16 text-2xl text-blue-200/60 glass-panel">❌ Error koneksi database</div>`;
         }
-        
-        products = data;
-        renderProducts();
       }
 
       // ==================== RENDER PRODUCTS ====================
       function renderProducts() {
+        if (!products || products.length === 0) {
+          productGrid.innerHTML = `<div class="col-span-full text-center py-16 text-2xl text-blue-200/60 glass-panel">🛒 Belum ada produk</div>`;
+          return;
+        }
+
         const filtered = products.filter(p => {
           const matchCat = activeCategory === 'all' || p.kategori === activeCategory;
-          const matchSearch = p.nama.toLowerCase().includes(searchTerm.toLowerCase());
+          const matchSearch = p.nama?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
           return matchCat && matchSearch;
         });
 
@@ -507,14 +565,14 @@
 
         productGrid.innerHTML = filtered.map(p => `
           <div class="glass-panel p-4 flex flex-col hover-metallic transition-all" data-id="${p.id}" data-seller="${p.seller_id || 0}">
-            <img src="${p.gambar}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover border border-blue-300/40">
+            <img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover border border-blue-300/40" onerror="this.src='https://placehold.co/400x300/1e4f9c/white?text=Produk'">
             <div class="mt-3 flex justify-between items-start">
               <div>
                 <h3 class="font-bold text-lg">${p.nama}</h3>
-                <p class="text-xs text-blue-200/80">${p.kategori} • ⭐ ${p.rating || 0}</p>
+                <p class="text-xs text-blue-200/80">${p.kategori || 'Umum'} • ⭐ ${p.rating || 0}</p>
                 ${p.seller_name ? `<p class="text-xs text-blue-300">Penjual: ${p.seller_name}</p>` : ''}
               </div>
-              <span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm font-mono">Rp ${p.harga.toLocaleString('id-ID')}</span>
+              <span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm font-mono">Rp ${(p.harga || 0).toLocaleString('id-ID')}</span>
             </div>
             <div class="flex gap-2 mt-4">
               <button class="btn-tambah flex-1 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full hover-metallic flex items-center justify-center gap-2" data-id="${p.id}" data-nama="${p.nama}" data-harga="${p.harga}">
@@ -538,21 +596,36 @@
       function attachWAButtons() {
         document.querySelectorAll('.btn-wa').forEach(btn => {
           btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const phone = btn.dataset.seller;
             const popup = document.getElementById('whatsappPopup');
             const link = document.getElementById('whatsappLink');
-            link.href = `https://wa.me/${phone}`;
-            popup.classList.remove('hidden');
-            setTimeout(() => popup.classList.add('hidden'), 5000);
+            if (link) link.href = `https://wa.me/${phone}`;
+            if (popup) {
+              popup.classList.remove('hidden');
+              setTimeout(() => popup.classList.add('hidden'), 5000);
+            }
           });
+        });
+      }
+
+      // ==================== ATTACH ADD TO CART ====================
+      function attachAddToCart() {
+        document.querySelectorAll('.btn-tambah').forEach(btn => {
+          btn.removeEventListener('click', handleAddToCart);
+          btn.addEventListener('click', handleAddToCart);
         });
       }
 
       // ==================== HANDLE ADD TO CART ====================
       async function handleAddToCart(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const id = Number(e.currentTarget.dataset.id);
         
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         
         if (!user) {
           alert('Silakan login dulu untuk berbelanja');
@@ -560,7 +633,7 @@
           return;
         }
         
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('carts')
           .upsert({ 
             user_id: user.id, 
@@ -572,50 +645,60 @@
           
         if (!error) {
           loadCartFromDB();
+          alert('Produk ditambahkan ke keranjang!');
+        } else {
+          console.error('Error adding to cart:', error);
+          alert('Gagal menambahkan ke keranjang');
         }
       }
 
       // ==================== LOAD CART ====================
       async function loadCartFromDB() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          cart = [];
-          updateCartBadge();
-          renderCartModal();
-          return;
-        }
-        
-        const { data, error } = await supabase
-          .from('carts')
-          .select('*, products(*)')
-          .eq('user_id', user.id);
+        try {
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          if (!user) {
+            cart = [];
+            updateCartBadge();
+            renderCartModal();
+            return;
+          }
           
-        if (!error && data) {
-          cart = data.map(item => ({
-            id: item.product_id,
-            nama: item.products.nama,
-            harga: item.products.harga,
-            qty: item.quantity,
-            gambar: item.products.gambar
-          }));
-          renderCartModal();
-          updateCartBadge();
+          const { data, error } = await supabaseClient
+            .from('carts')
+            .select('*, products(*)')
+            .eq('user_id', user.id);
+            
+          if (!error && data) {
+            cart = data.map(item => ({
+              id: item.product_id,
+              nama: item.products?.nama || 'Produk',
+              harga: item.products?.harga || 0,
+              qty: item.quantity,
+              gambar: item.products?.gambar || ''
+            }));
+            renderCartModal();
+            updateCartBadge();
+          }
+        } catch (error) {
+          console.error('Error loadCartFromDB:', error);
         }
       }
 
       // ==================== UPDATE CART BADGE ====================
       function updateCartBadge() {
-        const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
+        const totalQty = cart.reduce((sum, i) => sum + (i.qty || 0), 0);
         if (totalQty > 0) {
-          cartBadge.classList.remove('hidden');
-          cartBadge.textContent = totalQty;
+          cartBadge?.classList.remove('hidden');
+          if (cartBadge) cartBadge.textContent = totalQty;
         } else {
-          cartBadge.classList.add('hidden');
+          cartBadge?.classList.add('hidden');
         }
       }
 
       // ==================== RENDER CART MODAL ====================
       function renderCartModal() {
+        if (!cartItemsContainer || !cartSubtotalSpan) return;
+        
         if (cart.length === 0) {
           cartItemsContainer.innerHTML = `<div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div>`;
           cartSubtotalSpan.textContent = 'Rp 0';
@@ -626,14 +709,14 @@
         let html = '';
         
         cart.forEach(item => {
-          subtotal += item.harga * item.qty;
+          subtotal += (item.harga || 0) * (item.qty || 0);
           html += `
             <div class="flex gap-3 items-center border-b border-blue-500/30 py-3">
               <div class="w-12 h-12 rounded bg-[#12315e] flex items-center justify-center text-xs">🛍️</div>
               <div class="flex-1">
                 <p class="font-semibold">${item.nama}</p>
                 <div class="flex items-center gap-2 text-sm">
-                  <span>${item.qty} x Rp ${item.harga.toLocaleString()}</span>
+                  <span>${item.qty} x Rp ${(item.harga || 0).toLocaleString()}</span>
                 </div>
               </div>
               <button class="remove-item text-red-300 p-1" data-id="${item.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -648,11 +731,13 @@
         // Remove item
         document.querySelectorAll('.remove-item').forEach(btn => {
           btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const id = Number(btn.dataset.id);
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             
             if (user) {
-              const { error } = await supabase
+              const { error } = await supabaseClient
                 .from('carts')
                 .delete()
                 .eq('user_id', user.id)
@@ -669,77 +754,92 @@
         document.querySelectorAll('.payment-method').forEach(btn => {
           btn.addEventListener('click', () => {
             selectedPayment = btn.dataset.method;
-            document.getElementById('selectedPayment').textContent = 
-              `Metode dipilih: ${selectedPayment}`;
+            const selectedPaymentEl = document.getElementById('selectedPayment');
+            if (selectedPaymentEl) {
+              selectedPaymentEl.textContent = `Metode dipilih: ${selectedPayment}`;
+            }
           });
         });
       }
 
       // ==================== LOGIN FUNCTION ====================
       async function login(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-        
-        if (error) {
-          loginMessage.textContent = 'Login gagal: ' + error.message;
-        } else {
-          loginMessage.textContent = 'Login berhasil!';
-          setTimeout(() => {
-            loginModal.classList.add('hidden');
-            loginModal.classList.remove('flex');
-            checkUser();
-            loadCartFromDB();
-          }, 1000);
+        try {
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+          
+          if (error) {
+            if (loginMessage) loginMessage.textContent = 'Login gagal: ' + error.message;
+          } else {
+            if (loginMessage) loginMessage.textContent = 'Login berhasil!';
+            setTimeout(() => {
+              loginModal?.classList.add('hidden');
+              loginModal?.classList.remove('flex');
+              checkUser();
+              loadCartFromDB();
+            }, 1000);
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          if (loginMessage) loginMessage.textContent = 'Terjadi kesalahan';
         }
       }
 
       // ==================== REGISTER FUNCTION ====================
       async function register(email, password) {
-        const { data, error } = await supabase.auth.signUp({
-          email: email,
-          password: password
-        });
-        
-        if (error) {
-          loginMessage.textContent = 'Registrasi gagal: ' + error.message;
-        } else {
-          // Create profile
-          await supabase.from('profiles').insert({
-            id: data.user.id,
+        try {
+          const { data, error } = await supabaseClient.auth.signUp({
             email: email,
-            role: 'buyer'
+            password: password
           });
-          loginMessage.textContent = 'Registrasi berhasil! Cek email untuk verifikasi.';
+          
+          if (error) {
+            if (loginMessage) loginMessage.textContent = 'Registrasi gagal: ' + error.message;
+          } else {
+            // Create profile
+            if (data?.user) {
+              await supabaseClient.from('profiles').insert({
+                id: data.user.id,
+                email: email,
+                role: 'buyer'
+              });
+            }
+            if (loginMessage) loginMessage.textContent = 'Registrasi berhasil! Cek email untuk verifikasi.';
+          }
+        } catch (error) {
+          console.error('Register error:', error);
+          if (loginMessage) loginMessage.textContent = 'Terjadi kesalahan';
         }
       }
 
       // ==================== OPEN LOGIN MODAL ====================
       function openLoginModal() {
-        loginModal.classList.remove('hidden');
-        loginModal.classList.add('flex');
-        loginMessage.textContent = '';
+        loginModal?.classList.remove('hidden');
+        loginModal?.classList.add('flex');
+        if (loginMessage) loginMessage.textContent = '';
       }
 
       // ==================== SELLER APPLICATION ====================
       async function submitSellerApplication() {
-        const fullName = document.getElementById('sellerFullName').value;
-        const nik = document.getElementById('sellerNIK').value;
-        const bank = document.getElementById('sellerBank').value;
-        const account = document.getElementById('sellerAccount').value;
-        const accountName = document.getElementById('sellerAccountName').value;
-        const phone = document.getElementById('sellerPhone').value;
-        const email = document.getElementById('sellerEmail').value;
+        const fullName = document.getElementById('sellerFullName')?.value;
+        const nik = document.getElementById('sellerNIK')?.value;
+        const bank = document.getElementById('sellerBank')?.value;
+        const account = document.getElementById('sellerAccount')?.value;
+        const accountName = document.getElementById('sellerAccountName')?.value;
+        const phone = document.getElementById('sellerPhone')?.value;
+        const email = document.getElementById('sellerEmail')?.value;
         
         if (!fullName || !nik || !bank || !account || !accountName || !phone || !email) {
-          document.getElementById('sellerApplyMessage').textContent = 'Semua field harus diisi!';
+          const msgEl = document.getElementById('sellerApplyMessage');
+          if (msgEl) msgEl.textContent = 'Semua field harus diisi!';
           return;
         }
         
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('seller_applications')
           .insert({
             user_id: user.id,
@@ -753,133 +853,153 @@
             status: 'pending'
           });
           
+        const msgEl = document.getElementById('sellerApplyMessage');
         if (error) {
-          document.getElementById('sellerApplyMessage').textContent = 'Gagal mengajukan: ' + error.message;
+          if (msgEl) msgEl.textContent = 'Gagal mengajukan: ' + error.message;
         } else {
-          document.getElementById('sellerApplyMessage').textContent = 'Pengajuan berhasil! Menunggu verifikasi admin.';
+          if (msgEl) msgEl.textContent = 'Pengajuan berhasil! Menunggu verifikasi admin.';
           setTimeout(() => {
-            document.getElementById('sellerApplyModal').classList.add('hidden');
+            document.getElementById('sellerApplyModal')?.classList.add('hidden');
           }, 2000);
         }
       }
 
       // ==================== INIT ====================
       async function init() {
-        lucide.createIcons();
-        await checkUser();
-        await loadProductsFromDB();
-        await loadCartFromDB();
-        
-        // Set kategori active
-        document.querySelector('.category-btn[data-cat="all"]').classList.add('category-active');
-        
-        // Hide modals
-        cartModal.classList.add('hidden');
-        loginModal.classList.add('hidden');
-        
-        // Event Listeners
-        document.querySelectorAll('.category-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
-            btn.classList.add('category-active');
-            activeCategory = btn.dataset.cat;
+        try {
+          lucide.createIcons();
+          await checkUser();
+          await loadProductsFromDB();
+          await loadCartFromDB();
+          
+          // Set kategori active
+          document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
+          
+          // Hide modals
+          cartModal?.classList.add('hidden');
+          loginModal?.classList.add('hidden');
+          
+          // Event Listeners
+          document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
+              btn.classList.add('category-active');
+              activeCategory = btn.dataset.cat;
+              renderProducts();
+            });
+          });
+
+          searchInput?.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
             renderProducts();
           });
-        });
 
-        searchInput.addEventListener('input', (e) => {
-          searchTerm = e.target.value;
-          renderProducts();
-        });
+          cartIcon?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            cartModal?.classList.remove('hidden');
+            renderCartModal();
+          });
+          
+          document.getElementById('closeCart')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
+          document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
 
-        cartIcon.addEventListener('click', () => {
-          cartModal.classList.remove('hidden');
-          renderCartModal();
-        });
-        
-        document.getElementById('closeCart').addEventListener('click', () => cartModal.classList.add('hidden'));
-        document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal.classList.add('hidden'));
+          // Login triggers
+          document.getElementById('loginFab')?.addEventListener('click', openLoginModal);
+          document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            openLoginModal();
+          });
 
-        // Login triggers
-        document.getElementById('loginFab')?.addEventListener('click', openLoginModal);
-        document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
-          e.preventDefault();
-          openLoginModal();
-        });
+          document.getElementById('closeLogin')?.addEventListener('click', () => {
+            loginModal?.classList.add('hidden');
+            loginModal?.classList.remove('flex');
+          });
+          
+          document.getElementById('loginOverlay')?.addEventListener('click', () => {
+            loginModal?.classList.add('hidden');
+            loginModal?.classList.remove('flex');
+          });
 
-        document.getElementById('closeLogin')?.addEventListener('click', () => {
-          loginModal.classList.add('hidden');
-          loginModal.classList.remove('flex');
-        });
-        
-        document.getElementById('loginOverlay')?.addEventListener('click', () => {
-          loginModal.classList.add('hidden');
-          loginModal.classList.remove('flex');
-        });
+          document.getElementById('loginBtn')?.addEventListener('click', () => {
+            const email = loginEmail?.value;
+            const password = loginPassword?.value;
+            if (email && password) {
+              login(email, password);
+            } else {
+              if (loginMessage) loginMessage.textContent = 'Email dan password harus diisi';
+            }
+          });
 
-        document.getElementById('loginBtn')?.addEventListener('click', () => {
-          const email = loginEmail.value;
-          const password = loginPassword.value;
-          if (email && password) {
-            login(email, password);
-          } else {
-            loginMessage.textContent = 'Email dan password harus diisi';
-          }
-        });
+          document.getElementById('registerBtn')?.addEventListener('click', () => {
+            const email = loginEmail?.value;
+            const password = loginPassword?.value;
+            if (email && password) {
+              register(email, password);
+            } else {
+              if (loginMessage) loginMessage.textContent = 'Email dan password harus diisi';
+            }
+          });
 
-        document.getElementById('registerBtn')?.addEventListener('click', () => {
-          const email = loginEmail.value;
-          const password = loginPassword.value;
-          if (email && password) {
-            register(email, password);
-          } else {
-            loginMessage.textContent = 'Email dan password harus diisi';
-          }
-        });
+          // Seller Application
+          sellerApplyBtn?.addEventListener('click', () => {
+            document.getElementById('sellerApplyModal')?.classList.remove('hidden');
+            document.getElementById('sellerApplyModal')?.classList.add('flex');
+          });
 
-        // Seller Application
-        sellerApplyBtn?.addEventListener('click', () => {
-          document.getElementById('sellerApplyModal').classList.remove('hidden');
-          document.getElementById('sellerApplyModal').classList.add('flex');
-        });
+          document.getElementById('closeSellerApply')?.addEventListener('click', () => {
+            document.getElementById('sellerApplyModal')?.classList.add('hidden');
+            document.getElementById('sellerApplyModal')?.classList.remove('flex');
+          });
 
-        document.getElementById('closeSellerApply')?.addEventListener('click', () => {
-          document.getElementById('sellerApplyModal').classList.add('hidden');
-          document.getElementById('sellerApplyModal').classList.remove('flex');
-        });
+          document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication);
 
-        document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication);
+          // Complaint
+          complaintBtn?.addEventListener('click', () => {
+            document.getElementById('complaintModal')?.classList.remove('hidden');
+            document.getElementById('complaintModal')?.classList.add('flex');
+          });
 
-        // Complaint
-        complaintBtn?.addEventListener('click', () => {
-          document.getElementById('complaintModal').classList.remove('hidden');
-          document.getElementById('complaintModal').classList.add('flex');
-        });
+          document.getElementById('closeComplaint')?.addEventListener('click', () => {
+            document.getElementById('complaintModal')?.classList.add('hidden');
+            document.getElementById('complaintModal')?.classList.remove('flex');
+          });
 
-        document.getElementById('closeComplaint')?.addEventListener('click', () => {
-          document.getElementById('complaintModal').classList.add('hidden');
-          document.getElementById('complaintModal').classList.remove('flex');
-        });
+          document.getElementById('submitComplaint')?.addEventListener('click', () => {
+            alert('Pengaduan terkirim ke admin: shofiankurniady@gmail.com');
+            document.getElementById('complaintModal')?.classList.add('hidden');
+          });
 
-        document.getElementById('submitComplaint')?.addEventListener('click', () => {
-          alert('Pengaduan terkirim ke admin: shofiankurniady@gmail.com');
-          document.getElementById('complaintModal').classList.add('hidden');
-        });
+          document.getElementById('explorePromo')?.addEventListener('click', () => {
+            document.getElementById('productGrid')?.scrollIntoView({ behavior: 'smooth' });
+          });
 
-        document.getElementById('explorePromo').addEventListener('click', () => {
-          document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth' });
-        });
+          console.log('✅ App initialized successfully');
+        } catch (error) {
+          console.error('Error during initialization:', error);
+        }
       }
 
-      init();
+      // Jalankan init setelah semuanya siap
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
     })();
   </script>
   
   <!-- Fallback lucide refresh -->
   <script>
     setInterval(() => {
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }, 300);
+      if (typeof lucide !== 'undefined') {
+        try {
+          lucide.createIcons();
+        } catch (e) {
+          // Ignore errors
+        }
+      }
+    }, 1000);
   </script>
 </body>
 </html>
