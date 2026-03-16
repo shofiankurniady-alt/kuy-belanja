@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-  <title>Kuy Belanja · dengan Database Supabase</title>
+  <title>Kuy Belanja · Marketplace Indonesia</title>
   <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -73,77 +72,258 @@
       right: -10px;
       border: 2px solid #0f2b50;
     }
+    /* Role badge */
+    .role-badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: #1E4F9C;
+      margin-left: 0.5rem;
+    }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
 
-  <!-- HEADER (sama persis dengan kode Anda) -->
+  <!-- HEADER dengan Role-Based Navigation -->
   <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
     <div class="flex flex-wrap items-center justify-between gap-3">
+      <!-- logo -->
       <div class="flex items-center gap-2">
         <span class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent drop-shadow-md">KUY BELANJA</span>
+        <span id="roleBadge" class="role-badge hidden"></span>
       </div>
+
+      <!-- search bar -->
       <div class="order-3 md:order-none w-full md:w-1/3 lg:w-1/2 flex justify-center">
         <div class="relative w-full max-w-md">
-          <input type="text" id="searchInput" placeholder="Cari produk elektronik, fashion ..." 
+          <input type="text" id="searchInput" placeholder="Cari makanan, pakaian, elektronik..." 
                  class="w-full py-2.5 pl-5 pr-10 rounded-full bg-[#0b2042] border border-[#2f6ab0] text-white placeholder-blue-200/60 focus:outline-none focus:ring-2 focus:ring-[#4791ff] glass-panel-navy">
           <i data-lucide="search" class="absolute right-4 top-3 text-blue-300 w-4 h-4"></i>
         </div>
       </div>
-      <div class="relative cursor-pointer group" id="cartIcon">
-        <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
-          <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
+
+      <!-- navigation icons -->
+      <div class="flex items-center gap-3">
+        <!-- Seller Application Button (untuk user biasa) -->
+        <button id="sellerApplyBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+          <i data-lucide="store" class="w-6 h-6 text-white"></i>
+        </button>
+        
+        <!-- Dashboard Button (untuk seller & admin) -->
+        <button id="dashboardBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+          <i data-lucide="layout-dashboard" class="w-6 h-6 text-white"></i>
+        </button>
+        
+        <!-- Complaint Button (untuk seller) -->
+        <button id="complaintBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+          <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
+        </button>
+        
+        <!-- Cart -->
+        <div class="relative cursor-pointer group" id="cartIcon">
+          <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+            <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
+          </div>
+          <span id="cartBadge" class="cart-badge hidden">0</span>
         </div>
-        <span id="cartBadge" class="cart-badge hidden">0</span>
       </div>
     </div>
   </header>
 
-  <!-- HERO SECTION (sama) -->
+  <!-- HERO SECTION -->
   <section class="mx-4 md:mx-8 mt-6 rounded-3xl overflow-hidden hero-bg relative">
     <div class="absolute inset-0 bg-metalic-gradient opacity-80 mix-blend-overlay"></div>
     <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between backdrop-blur-sm">
       <div>
-        <h1 class="text-4xl md:text-6xl font-black leading-tight drop-xl">Belanja <span class="text-[#B8E2FF]">Metalik</span><br>Masa Kini</h1>
-        <p class="text-lg md:text-xl text-blue-100 mt-3 max-w-lg">Gadget, fashion, elektronik — semua dalam genggaman dengan sentuhan glass futuristik.</p>
+        <h1 class="text-4xl md:text-6xl font-black leading-tight drop-xl">Belanja <span class="text-[#B8E2FF]">Semua Kebutuhan</span><br>Indonesia</h1>
+        <p class="text-lg md:text-xl text-blue-100 mt-3 max-w-lg">Makanan, Pakaian Adat, Elektronik — semua ada di Kuy Belanja.</p>
         <button class="mt-6 bg-[#0B2F60] border-2 border-[#6DA5FF] px-10 py-4 rounded-full text-xl font-semibold hover-metallic flex items-center gap-3 mx-auto md:mx-0" id="explorePromo">
-          <span>Jelajahi Promo</span> <i data-lucide="sparkles" class="w-5 h-5"></i>
+          <span>Jelajahi Produk</span> <i data-lucide="sparkles" class="w-5 h-5"></i>
         </button>
       </div>
       <div class="mt-6 md:mt-0 w-44 h-44 rounded-full bg-white/5 backdrop-blur-2xl flex items-center justify-center border border-white/30 shadow-2xl">
-        <i data-lucide="zap" class="w-20 h-20 text-blue-300"></i>
+        <i data-lucide="indonesia" class="w-20 h-20 text-blue-300"></i>
       </div>
     </div>
   </section>
 
-  <!-- FILTER & PRODUCT GRID (sama) -->
+  <!-- KATEGORI UTAMA -->
   <div class="mx-4 md:mx-8 mt-8">
     <div class="flex flex-wrap gap-3 justify-center md:justify-start" id="categoryContainer">
       <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="all">Semua</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Makanan">Makanan</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Pakaian">Pakaian</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Celana">Celana</button>
       <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Elektronik">Elektronik</button>
-      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Fashion">Fashion</button>
-      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Gadget">Gadget</button>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6" id="productGrid"></div>
   </div>
 
-  <!-- FOOTER (sama) -->
-  <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80">
-    <div class="flex gap-6 flex-wrap justify-center">
-      <a href="#" class="hover:text-white" id="bantuanLink">Bantuan</a>
-      <a href="#" class="hover:text-white">Pengiriman</a>
-      <a href="#" class="hover:text-white">Pengembalian</a>
-    </div>
-    <div class="flex gap-4 my-3 md:my-0">
-      <i data-lucide="credit-card" class="w-5 h-5"></i>
-      <i data-lucide="landmark" class="w-5 h-5"></i>
-      <i data-lucide="wallet" class="w-5 h-5"></i>
-      <span class="text-xs"> Visa / Mastercard / QR</span>
-    </div>
-    <div>© 2026 Kuy Belanja · metalic glass</div>
-  </footer>
+  <!-- PRODUK GRID -->
+  <div class="mx-4 md:mx-8 mt-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid"></div>
+  </div>
 
-  <!-- MODAL KERANJANG (sama) -->
+  <!-- SELLER APPLICATION MODAL (PENGAJUAN PENJUAL) -->
+  <div id="sellerApplyModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sellerApplyOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto">
+      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="store"></i> Daftar Jadi Penjual</h3>
+      
+      <div class="space-y-3">
+        <input type="text" id="sellerFullName" placeholder="Nama Lengkap (sesuai KTP)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerNIK" placeholder="NIK (sesuai KTP)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerBank" placeholder="Bank Penerima (BCA/Mandiri/BNI/dll)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerAccount" placeholder="Nomor Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerAccountName" placeholder="Nama Pemilik Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerPhone" placeholder="Nomor WhatsApp" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="email" id="sellerEmail" placeholder="Email" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        
+        <div class="text-sm text-yellow-300 mt-2" id="sellerApplyMessage"></div>
+        
+        <div class="flex gap-2">
+          <button id="submitSellerApply" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Ajukan</button>
+          <button id="closeSellerApply" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLAINT MODAL (PENGADUAN SELLER KE ADMIN) -->
+  <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="alert-circle"></i> Pengaduan ke Admin</h3>
+      
+      <div class="space-y-3">
+        <select id="complaintType" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+          <option value="technical">Kendala Teknis</option>
+          <option value="payment">Masalah Pembayaran</option>
+          <option value="buyer">Masalah dengan Pembeli</option>
+          <option value="other">Lainnya</option>
+        </select>
+        
+        <textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
+        
+        <div class="text-sm text-yellow-300" id="complaintMessage">
+          Email admin: shofiankurniady@gmail.com
+        </div>
+        
+        <div class="flex gap-2">
+          <button id="submitComplaint" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Kirim</button>
+          <button id="closeComplaint" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD MODAL -->
+  <div id="adminDashboardModal" class="fixed inset-0 z-[400] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="adminDashboardOverlay"></div>
+    <div class="relative glass-panel w-[90%] max-w-4xl p-6 text-white max-h-[90vh] overflow-y-auto">
+      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="shield"></i> Admin Dashboard</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Pending Seller Applications -->
+        <div class="glass-panel p-4">
+          <h4 class="text-xl font-bold mb-3">Pengajuan Penjual Baru</h4>
+          <div id="pendingApplications" class="space-y-2 max-h-60 overflow-y-auto"></div>
+        </div>
+        
+        <!-- Complaints -->
+        <div class="glass-panel p-4">
+          <h4 class="text-xl font-bold mb-3">Pengaduan Masuk</h4>
+          <div id="pendingComplaints" class="space-y-2 max-h-60 overflow-y-auto"></div>
+        </div>
+        
+        <!-- Statistics -->
+        <div class="glass-panel p-4 md:col-span-2">
+          <h4 class="text-xl font-bold mb-3">Statistik</h4>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div class="text-3xl font-bold" id="totalUsers">0</div>
+              <div class="text-sm">Pengguna</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold" id="totalSellers">0</div>
+              <div class="text-sm">Penjual</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold" id="totalProducts">0</div>
+              <div class="text-sm">Produk</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <button id="closeAdminDashboard" class="absolute top-3 right-3 text-blue-300">
+        <i data-lucide="x-circle"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SELLER DASHBOARD MODAL -->
+  <div id="sellerDashboardModal" class="fixed inset-0 z-[400] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="sellerDashboardOverlay"></div>
+    <div class="relative glass-panel w-[90%] max-w-4xl p-6 text-white max-h-[90vh] overflow-y-auto">
+      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="store"></i> Seller Dashboard</h3>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="glass-panel p-3 text-center">
+          <div class="text-2xl font-bold" id="sellerStock">0</div>
+          <div class="text-xs">Stok</div>
+        </div>
+        <div class="glass-panel p-3 text-center">
+          <div class="text-2xl font-bold" id="sellerSold">0</div>
+          <div class="text-xs">Terjual</div>
+        </div>
+        <div class="glass-panel p-3 text-center">
+          <div class="text-2xl font-bold" id="sellerOrders">0</div>
+          <div class="text-xs">Pesanan</div>
+        </div>
+        <div class="glass-panel p-3 text-center">
+          <div class="text-2xl font-bold" id="sellerBalance">Rp 0</div>
+          <div class="text-xs">Saldo</div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Komentar Pembeli -->
+        <div class="glass-panel p-4">
+          <h4 class="text-lg font-bold mb-3">Komentar Pembeli</h4>
+          <div id="sellerReviews" class="space-y-2 max-h-60 overflow-y-auto">
+            <p class="text-blue-200/70">Belum ada komentar</p>
+          </div>
+        </div>
+        
+        <!-- Pengaduan ke Admin -->
+        <div class="glass-panel p-4">
+          <h4 class="text-lg font-bold mb-3">Pengaduan ke Admin</h4>
+          <button id="sellerComplaintBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full hover-metallic mb-3">
+            Buat Pengaduan Baru
+          </button>
+          <div id="sellerComplaints" class="space-y-2 max-h-40 overflow-y-auto">
+            <p class="text-blue-200/70">Belum ada pengaduan</p>
+          </div>
+        </div>
+      </div>
+      
+      <button id="closeSellerDashboard" class="absolute top-3 right-3 text-blue-300">
+        <i data-lucide="x-circle"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- WHATSAPP POPUP (untuk pembeli) -->
+  <div id="whatsappPopup" class="fixed bottom-24 right-6 z-50 hidden">
+    <div class="glass-panel p-4 w-64">
+      <p class="text-sm mb-2">Hubungi penjual via WhatsApp</p>
+      <a id="whatsappLink" href="#" target="_blank" class="block bg-green-600 text-center py-2 rounded-full hover-metallic">
+        <i data-lucide="message-circle" class="w-4 h-4 inline mr-1"></i> Chat Now
+      </a>
+    </div>
+  </div>
+
+  <!-- MODAL KERANJANG -->
   <div id="cartModal" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[100] hidden transition-all duration-300 ease-out">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cartOverlay"></div>
     <div class="relative glass-panel w-full h-full ml-auto p-5 flex flex-col text-white border-l-2 border-blue-400/30 shadow-2xl">
@@ -151,17 +331,32 @@
         <h2 class="text-2xl font-bold flex gap-2"><i data-lucide="shopping-bag"></i> Keranjangmu</h2>
         <button id="closeCart" class="p-2 rounded-full bg-[#1c3f6e] hover:bg-[#28579b]"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer">
-        <div class="text-center text-blue-200/70 mt-10">Belanja dulu yuk ✨</div>
-      </div>
+      <div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer"></div>
       <div class="border-t border-blue-400/30 pt-4 mt-2">
         <div class="flex justify-between text-xl font-bold mb-3"><span>Subtotal</span> <span id="cartSubtotal">Rp 0</span></div>
-        <button class="w-full bg-[#1e4f9c] py-3 rounded-full border border-blue-300 font-semibold hover-metallic flex items-center justify-center gap-2"><i data-lucide="credit-card"></i> Checkout</button>
+        
+        <!-- PAYMENT METHODS -->
+        <div class="mb-3">
+          <p class="text-sm mb-2">Metode Pembayaran:</p>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="BCA">🏦 BCA</button>
+            <button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="MANDIRI">🏦 Mandiri</button>
+            <button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="BNI">🏦 BNI</button>
+            <button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="GOPAY">📱 GoPay</button>
+            <button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="OVO">📱 OVO</button>
+            <button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="DANA">📱 DANA</button>
+          </div>
+          <div id="selectedPayment" class="text-xs text-yellow-300 mt-2"></div>
+        </div>
+        
+        <button class="w-full bg-[#1e4f9c] py-3 rounded-full border border-blue-300 font-semibold hover-metallic flex items-center justify-center gap-2" id="checkoutBtn">
+          <i data-lucide="credit-card"></i> Checkout
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL LOGIN/REGISTER (sama) -->
+  <!-- MODAL LOGIN/REGISTER -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
@@ -177,24 +372,42 @@
     </div>
   </div>
 
-  <!-- FAB LOGIN (sama) -->
+  <!-- FAB LOGIN -->
   <div style="position: fixed; bottom: 20px; right: 20px; z-index: 60;">
     <button id="loginFab" class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic">
       <i data-lucide="user" class="w-6 h-6"></i>
     </button>
   </div>
 
+  <!-- FOOTER -->
+  <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80">
+    <div class="flex gap-6 flex-wrap justify-center">
+      <a href="#" class="hover:text-white" id="bantuanLink">Bantuan</a>
+      <a href="#" class="hover:text-white">Pengiriman</a>
+      <a href="#" class="hover:text-white">Syarat Penjual</a>
+    </div>
+    <div class="flex gap-4 my-3 md:my-0">
+      <i data-lucide="credit-card" class="w-5 h-5"></i>
+      <i data-lucide="landmark" class="w-5 h-5"></i>
+      <i data-lucide="wallet" class="w-5 h-5"></i>
+      <span class="text-xs">BCA / Mandiri / BNI / GoPay / OVO / DANA</span>
+    </div>
+    <div>© 2026 Kuy Belanja · Marketplace Indonesia</div>
+  </footer>
+
   <script>
     (function() {
       // ==================== SUPABASE INIT ====================
       const supabaseUrl = 'https://mpgkhjzvvzcczsdczlca.supabase.co';
-      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZ2toanp2dnpjY3pzZGN6bGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjY2NDQsImV4cCI6MjA4OTI0MjY0NH0.HrRAnpdTAv86RO4nkPMV6NXYrM8MkrpajR7mKkZwfS8'; // <-- GANTI DENGAN ANON KEY ANDA
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZ2toanp2dnpjY3pzZGN6bGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjY2NDQsImV4cCI6MjA4OTI0MjY0NH0.HrRAnpdTAv86RO4nkPMV6NXYrM8MkrpajR7mKkZwfS8';
       const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
       // ==================== GLOBAL VARIABLES ====================
-      let products = []; // akan diisi dari database
+      let products = [];
       let cart = [];
       let currentUser = null;
+      let userRole = 'guest'; // 'guest', 'buyer', 'seller', 'admin'
+      let selectedPayment = null;
 
       // DOM Elements
       const cartBadge = document.getElementById('cartBadge');
@@ -208,29 +421,63 @@
       const loginEmail = document.getElementById('loginEmail');
       const loginPassword = document.getElementById('loginPassword');
       const loginMessage = document.getElementById('loginMessage');
+      const roleBadge = document.getElementById('roleBadge');
+      const sellerApplyBtn = document.getElementById('sellerApplyBtn');
+      const dashboardBtn = document.getElementById('dashboardBtn');
+      const complaintBtn = document.getElementById('complaintBtn');
       
       let activeCategory = 'all';
       let searchTerm = '';
 
-      // ==================== CEK SESSION USER ====================
+      // ==================== CHECK USER & ROLE ====================
       async function checkUser() {
         const { data: { user } } = await supabase.auth.getUser();
         currentUser = user;
+        
         if (user) {
-          console.log('User logged in:', user.email);
-          // Update tampilan login (opsional)
+          // Cek role dari database (implementasi sederhana)
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+            
+          userRole = profile?.role || 'buyer';
+          
+          // Update UI berdasarkan role
+          roleBadge.classList.remove('hidden');
+          roleBadge.textContent = userRole.toUpperCase();
+          
+          // Tampilkan button sesuai role
+          if (userRole === 'buyer') {
+            sellerApplyBtn.classList.remove('hidden');
+          } else if (userRole === 'seller') {
+            dashboardBtn.classList.remove('hidden');
+            complaintBtn.classList.remove('hidden');
+            dashboardBtn.innerHTML = '<i data-lucide="store" class="w-6 h-6"></i>';
+          } else if (userRole === 'admin') {
+            dashboardBtn.classList.remove('hidden');
+            dashboardBtn.innerHTML = '<i data-lucide="shield" class="w-6 h-6"></i>';
+          }
+          
           const loginFab = document.getElementById('loginFab');
           loginFab.innerHTML = '<i data-lucide="user-check" class="w-6 h-6"></i>';
         } else {
-          console.log('No user logged in');
+          userRole = 'guest';
+          roleBadge.classList.add('hidden');
+          sellerApplyBtn.classList.add('hidden');
+          dashboardBtn.classList.add('hidden');
+          complaintBtn.classList.add('hidden');
+          
           const loginFab = document.getElementById('loginFab');
           loginFab.innerHTML = '<i data-lucide="user" class="w-6 h-6"></i>';
         }
+        
         lucide.createIcons();
         return user;
       }
 
-      // ==================== AMBIL PRODUK DARI DATABASE ====================
+      // ==================== LOAD PRODUCTS ====================
       async function loadProductsFromDB() {
         const { data, error } = await supabase
           .from('products')
@@ -245,7 +492,7 @@
         renderProducts();
       }
 
-      // ==================== RENDER PRODUK ====================
+      // ==================== RENDER PRODUCTS ====================
       function renderProducts() {
         const filtered = products.filter(p => {
           const matchCat = activeCategory === 'all' || p.kategori === activeCategory;
@@ -259,40 +506,52 @@
         }
 
         productGrid.innerHTML = filtered.map(p => `
-          <div class="glass-panel p-4 flex flex-col hover-metallic transition-all" data-id="${p.id}">
+          <div class="glass-panel p-4 flex flex-col hover-metallic transition-all" data-id="${p.id}" data-seller="${p.seller_id || 0}">
             <img src="${p.gambar}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover border border-blue-300/40">
             <div class="mt-3 flex justify-between items-start">
               <div>
                 <h3 class="font-bold text-lg">${p.nama}</h3>
-                <p class="text-xs text-blue-200/80">${p.kategori} • ⭐ ${p.rating}</p>
+                <p class="text-xs text-blue-200/80">${p.kategori} • ⭐ ${p.rating || 0}</p>
+                ${p.seller_name ? `<p class="text-xs text-blue-300">Penjual: ${p.seller_name}</p>` : ''}
               </div>
               <span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm font-mono">Rp ${p.harga.toLocaleString('id-ID')}</span>
             </div>
-            <button class="btn-tambah mt-4 w-full bg-[#1e4f9c] border border-blue-300 py-2 rounded-full hover-metallic flex items-center justify-center gap-2" data-id="${p.id}" data-nama="${p.nama}" data-harga="${p.harga}">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah
-            </button>
+            <div class="flex gap-2 mt-4">
+              <button class="btn-tambah flex-1 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full hover-metallic flex items-center justify-center gap-2" data-id="${p.id}" data-nama="${p.nama}" data-harga="${p.harga}">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah
+              </button>
+              ${userRole === 'buyer' ? `
+                <button class="btn-wa w-10 bg-green-600 rounded-full flex items-center justify-center hover-metallic" data-seller="${p.seller_phone || '628123456789'}">
+                  <i data-lucide="message-circle" class="w-5 h-5"></i>
+                </button>
+              ` : ''}
+            </div>
           </div>
         `).join('');
         
         lucide.createIcons();
         attachAddToCart();
+        attachWAButtons();
       }
 
-      // ==================== ATTACH ADD TO CART ====================
-      function attachAddToCart() {
-        document.querySelectorAll('.btn-tambah').forEach(btn => {
-          btn.removeEventListener('click', handleAddToCart);
-          btn.addEventListener('click', handleAddToCart);
+      // ==================== ATTACH WA BUTTONS ====================
+      function attachWAButtons() {
+        document.querySelectorAll('.btn-wa').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const phone = btn.dataset.seller;
+            const popup = document.getElementById('whatsappPopup');
+            const link = document.getElementById('whatsappLink');
+            link.href = `https://wa.me/${phone}`;
+            popup.classList.remove('hidden');
+            setTimeout(() => popup.classList.add('hidden'), 5000);
+          });
         });
       }
 
-      // ==================== HANDLE ADD TO CART (dengan database) ====================
+      // ==================== HANDLE ADD TO CART ====================
       async function handleAddToCart(e) {
         const id = Number(e.currentTarget.dataset.id);
-        const nama = e.currentTarget.dataset.nama;
-        const harga = Number(e.currentTarget.dataset.harga);
         
-        // Cek apakah user sudah login
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
@@ -301,7 +560,6 @@
           return;
         }
         
-        // Simpan ke database
         const { error } = await supabase
           .from('carts')
           .upsert({ 
@@ -313,14 +571,11 @@
           });
           
         if (!error) {
-          loadCartFromDB(); // ambil ulang data keranjang
-        } else {
-          console.error('Error adding to cart:', error);
-          alert('Gagal menambahkan ke keranjang');
+          loadCartFromDB();
         }
       }
 
-      // ==================== AMBIL KERANJANG DARI DATABASE ====================
+      // ==================== LOAD CART ====================
       async function loadCartFromDB() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
@@ -348,7 +603,7 @@
         }
       }
 
-      // ==================== UPDATE BADGE ====================
+      // ==================== UPDATE CART BADGE ====================
       function updateCartBadge() {
         const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
         if (totalQty > 0) {
@@ -359,7 +614,7 @@
         }
       }
 
-      // ==================== RENDER MODAL KERANJANG ====================
+      // ==================== RENDER CART MODAL ====================
       function renderCartModal() {
         if (cart.length === 0) {
           cartItemsContainer.innerHTML = `<div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div>`;
@@ -390,7 +645,7 @@
         cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
         lucide.createIcons();
 
-        // Hapus item dari keranjang
+        // Remove item
         document.querySelectorAll('.remove-item').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const id = Number(btn.dataset.id);
@@ -409,9 +664,18 @@
             }
           });
         });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedPayment = btn.dataset.method;
+            document.getElementById('selectedPayment').textContent = 
+              `Metode dipilih: ${selectedPayment}`;
+          });
+        });
       }
 
-      // ==================== FUNGSI LOGIN ====================
+      // ==================== LOGIN FUNCTION ====================
       async function login(email, password) {
         const { data, error } = await supabase.auth.signInWithPassword({
           email: email,
@@ -431,7 +695,7 @@
         }
       }
 
-      // ==================== FUNGSI REGISTER ====================
+      // ==================== REGISTER FUNCTION ====================
       async function register(email, password) {
         const { data, error } = await supabase.auth.signUp({
           email: email,
@@ -441,6 +705,12 @@
         if (error) {
           loginMessage.textContent = 'Registrasi gagal: ' + error.message;
         } else {
+          // Create profile
+          await supabase.from('profiles').insert({
+            id: data.user.id,
+            email: email,
+            role: 'buyer'
+          });
           loginMessage.textContent = 'Registrasi berhasil! Cek email untuk verifikasi.';
         }
       }
@@ -452,35 +722,53 @@
         loginMessage.textContent = '';
       }
 
-      // ==================== SUBSCRIBE REALTIME ====================
-      async function subscribeToCart() {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+      // ==================== SELLER APPLICATION ====================
+      async function submitSellerApplication() {
+        const fullName = document.getElementById('sellerFullName').value;
+        const nik = document.getElementById('sellerNIK').value;
+        const bank = document.getElementById('sellerBank').value;
+        const account = document.getElementById('sellerAccount').value;
+        const accountName = document.getElementById('sellerAccountName').value;
+        const phone = document.getElementById('sellerPhone').value;
+        const email = document.getElementById('sellerEmail').value;
         
-        supabase
-          .channel('cart-changes')
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'carts',
-              filter: `user_id=eq.${user.id}`
-            },
-            () => {
-              loadCartFromDB(); // update otomatis!
-            }
-          )
-          .subscribe();
+        if (!fullName || !nik || !bank || !account || !accountName || !phone || !email) {
+          document.getElementById('sellerApplyMessage').textContent = 'Semua field harus diisi!';
+          return;
+        }
+        
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const { error } = await supabase
+          .from('seller_applications')
+          .insert({
+            user_id: user.id,
+            full_name: fullName,
+            nik: nik,
+            bank_name: bank,
+            bank_account: account,
+            bank_account_name: accountName,
+            phone: phone,
+            email: email,
+            status: 'pending'
+          });
+          
+        if (error) {
+          document.getElementById('sellerApplyMessage').textContent = 'Gagal mengajukan: ' + error.message;
+        } else {
+          document.getElementById('sellerApplyMessage').textContent = 'Pengajuan berhasil! Menunggu verifikasi admin.';
+          setTimeout(() => {
+            document.getElementById('sellerApplyModal').classList.add('hidden');
+          }, 2000);
+        }
       }
 
-      // ==================== INITIALIZATION ====================
+      // ==================== INIT ====================
       async function init() {
         lucide.createIcons();
         await checkUser();
         await loadProductsFromDB();
         await loadCartFromDB();
-        await subscribeToCart();
         
         // Set kategori active
         document.querySelector('.category-btn[data-cat="all"]').classList.add('category-active');
@@ -488,82 +776,101 @@
         // Hide modals
         cartModal.classList.add('hidden');
         loginModal.classList.add('hidden');
-      }
+        
+        // Event Listeners
+        document.querySelectorAll('.category-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
+            btn.classList.add('category-active');
+            activeCategory = btn.dataset.cat;
+            renderProducts();
+          });
+        });
 
-      // ==================== EVENT LISTENERS ====================
-
-      // Filter kategori
-      document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
-          btn.classList.add('category-active');
-          activeCategory = btn.dataset.cat;
+        searchInput.addEventListener('input', (e) => {
+          searchTerm = e.target.value;
           renderProducts();
         });
-      });
 
-      // Search realtime
-      searchInput.addEventListener('input', (e) => {
-        searchTerm = e.target.value;
-        renderProducts();
-      });
+        cartIcon.addEventListener('click', () => {
+          cartModal.classList.remove('hidden');
+          renderCartModal();
+        });
+        
+        document.getElementById('closeCart').addEventListener('click', () => cartModal.classList.add('hidden'));
+        document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal.classList.add('hidden'));
 
-      // Cart modal toggle
-      cartIcon.addEventListener('click', () => {
-        cartModal.classList.remove('hidden');
-        renderCartModal();
-      });
-      
-      document.getElementById('closeCart').addEventListener('click', () => cartModal.classList.add('hidden'));
-      document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal.classList.add('hidden'));
+        // Login triggers
+        document.getElementById('loginFab')?.addEventListener('click', openLoginModal);
+        document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          openLoginModal();
+        });
 
-      // Login modal triggers
-      document.getElementById('loginFab')?.addEventListener('click', openLoginModal);
-      
-      document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        openLoginModal();
-      });
+        document.getElementById('closeLogin')?.addEventListener('click', () => {
+          loginModal.classList.add('hidden');
+          loginModal.classList.remove('flex');
+        });
+        
+        document.getElementById('loginOverlay')?.addEventListener('click', () => {
+          loginModal.classList.add('hidden');
+          loginModal.classList.remove('flex');
+        });
 
-      // Close login modal
-      document.getElementById('closeLogin')?.addEventListener('click', () => {
-        loginModal.classList.add('hidden');
-        loginModal.classList.remove('flex');
-      });
-      
-      document.getElementById('loginOverlay')?.addEventListener('click', () => {
-        loginModal.classList.add('hidden');
-        loginModal.classList.remove('flex');
-      });
+        document.getElementById('loginBtn')?.addEventListener('click', () => {
+          const email = loginEmail.value;
+          const password = loginPassword.value;
+          if (email && password) {
+            login(email, password);
+          } else {
+            loginMessage.textContent = 'Email dan password harus diisi';
+          }
+        });
 
-      // Login button
-      document.getElementById('loginBtn')?.addEventListener('click', () => {
-        const email = loginEmail.value;
-        const password = loginPassword.value;
-        if (email && password) {
-          login(email, password);
-        } else {
-          loginMessage.textContent = 'Email dan password harus diisi';
-        }
-      });
+        document.getElementById('registerBtn')?.addEventListener('click', () => {
+          const email = loginEmail.value;
+          const password = loginPassword.value;
+          if (email && password) {
+            register(email, password);
+          } else {
+            loginMessage.textContent = 'Email dan password harus diisi';
+          }
+        });
 
-      // Register button
-      document.getElementById('registerBtn')?.addEventListener('click', () => {
-        const email = loginEmail.value;
-        const password = loginPassword.value;
-        if (email && password) {
-          register(email, password);
-        } else {
-          loginMessage.textContent = 'Email dan password harus diisi';
-        }
-      });
+        // Seller Application
+        sellerApplyBtn?.addEventListener('click', () => {
+          document.getElementById('sellerApplyModal').classList.remove('hidden');
+          document.getElementById('sellerApplyModal').classList.add('flex');
+        });
 
-      // Explore promo button
-      document.getElementById('explorePromo').addEventListener('click', () => {
-        document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth' });
-      });
+        document.getElementById('closeSellerApply')?.addEventListener('click', () => {
+          document.getElementById('sellerApplyModal').classList.add('hidden');
+          document.getElementById('sellerApplyModal').classList.remove('flex');
+        });
 
-      // Jalankan init
+        document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication);
+
+        // Complaint
+        complaintBtn?.addEventListener('click', () => {
+          document.getElementById('complaintModal').classList.remove('hidden');
+          document.getElementById('complaintModal').classList.add('flex');
+        });
+
+        document.getElementById('closeComplaint')?.addEventListener('click', () => {
+          document.getElementById('complaintModal').classList.add('hidden');
+          document.getElementById('complaintModal').classList.remove('flex');
+        });
+
+        document.getElementById('submitComplaint')?.addEventListener('click', () => {
+          alert('Pengaduan terkirim ke admin: shofiankurniady@gmail.com');
+          document.getElementById('complaintModal').classList.add('hidden');
+        });
+
+        document.getElementById('explorePromo').addEventListener('click', () => {
+          document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth' });
+        });
+      }
+
       init();
     })();
   </script>
@@ -575,407 +882,4 @@
     }, 300);
   </script>
 </body>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-  <title>Kuy Belanja · metalik glass 2026</title>
-  <!-- Tailwind via CDN + basic layer (tanpa eksternal compile) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons (ikon terbaru) -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Font sederhana (opsional) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-  <style>
-    /* Custom: gradasi metalik biru, efek glassmorphism, hover metallic */
-    * { font-family: 'Inter', system-ui, sans-serif; }
-    .bg-metalic-gradient {
-      background: linear-gradient(145deg, #0B1E4A 0%, #0A2F6C 30%, #1E4F9C 70%, #1479EA 100%);
-      background-size: 300% 300%;
-      animation: floatGrad 10s ease infinite;
-    }
-    @keyframes floatGrad {
-      0% { background-position: 0% 50% }
-      50% { background-position: 100% 50% }
-      100% { background-position: 0% 50% }
-    }
-    /* glassmorphism kuat (untuk card, modal, sidebar) */
-    .glass-panel {
-      background: rgba(10, 30, 60, 0.25);
-      backdrop-filter: blur(12px) saturate(180%);
-      -webkit-backdrop-filter: blur(12px) saturate(180%);
-      border: 1px solid rgba(100, 180, 255, 0.25);
-      border-radius: 1.5rem;
-      box-shadow: 0 20px 35px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(70, 160, 255, 0.2) inset;
-    }
-    .glass-panel-navy {
-      background: rgba(8, 20, 48, 0.5);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(30, 100, 200, 0.4);
-    }
-    /* efek metallic pada tombol / kartu saat hover */
-    .hover-metallic {
-      transition: all 0.2s ease;
-    }
-    .hover-metallic:hover {
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.2), 0 8px 20px -5px #1E4F9C, 0 0 15px #5F9FFF;
-      border-color: #AAD0FF;
-      transform: scale(1.02) translateY(-3px);
-      background: rgba(20, 50, 100, 0.5);
-    }
-    /* kategori active */
-    .category-active {
-      background: #1E4F9C !important;
-      color: white !important;
-      border-color: #7FB4FF !important;
-      box-shadow: 0 0 12px #3E7AD0;
-    }
-    /* custom scroll */
-    .scroll-cart::-webkit-scrollbar { width: 6px; }
-    .scroll-cart::-webkit-scrollbar-track { background: #112244; border-radius: 20px; }
-    .scroll-cart::-webkit-scrollbar-thumb { background: #2F66B5; border-radius: 20px; }
-    body { background: #071126; } /* deep navy fallback */
-    .hero-bg {
-      background: radial-gradient(circle at 30% 30%, #12458c, #05122e);
-    }
-    /* badge notification */
-    .cart-badge {
-      background: #E53E3E;
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0.15rem 0.45rem;
-      border-radius: 999px;
-      position: absolute;
-      top: -8px;
-      right: -10px;
-      border: 2px solid #0f2b50;
-    }
-  </style>
-</head>
-<body class="bg-metalic-gradient text-white antialiased">
-
-  <!-- sticky header / navbar (glass) -->
-  <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <!-- logo -->
-      <div class="flex items-center gap-2">
-        <span class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent drop-shadow-md">KUY BELANJA</span>
-      </div>
-
-      <!-- search bar real-time -->
-      <div class="order-3 md:order-none w-full md:w-1/3 lg:w-1/2 flex justify-center">
-        <div class="relative w-full max-w-md">
-          <input type="text" id="searchInput" placeholder="Cari produk elektronik, fashion ..." 
-                 class="w-full py-2.5 pl-5 pr-10 rounded-full bg-[#0b2042] border border-[#2f6ab0] text-white placeholder-blue-200/60 focus:outline-none focus:ring-2 focus:ring-[#4791ff] glass-panel-navy">
-          <i data-lucide="search" class="absolute right-4 top-3 text-blue-300 w-4 h-4"></i>
-        </div>
-      </div>
-
-      <!-- cart icon with badge -->
-      <div class="relative cursor-pointer group" id="cartIcon">
-        <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
-          <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
-        </div>
-        <span id="cartBadge" class="cart-badge hidden">0</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- hero section (animated gradasi + CTA) -->
-  <section class="mx-4 md:mx-8 mt-6 rounded-3xl overflow-hidden hero-bg relative">
-    <div class="absolute inset-0 bg-metalic-gradient opacity-80 mix-blend-overlay"></div>
-    <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between backdrop-blur-sm">
-      <div>
-        <h1 class="text-4xl md:text-6xl font-black leading-tight drop-xl">Belanja <span class="text-[#B8E2FF]">Metalik</span><br>Masa Kini</h1>
-        <p class="text-lg md:text-xl text-blue-100 mt-3 max-w-lg">Gadget, fashion, elektronik — semua dalam genggaman dengan sentuhan glass futuristik.</p>
-        <button class="mt-6 bg-[#0B2F60] border-2 border-[#6DA5FF] px-10 py-4 rounded-full text-xl font-semibold hover-metallic flex items-center gap-3 mx-auto md:mx-0" id="explorePromo">
-          <span>Jelajahi Promo</span> <i data-lucide="sparkles" class="w-5 h-5"></i>
-        </button>
-      </div>
-      <div class="mt-6 md:mt-0 w-44 h-44 rounded-full bg-white/5 backdrop-blur-2xl flex items-center justify-center border border-white/30 shadow-2xl">
-        <i data-lucide="zap" class="w-20 h-20 text-blue-300"></i>
-      </div>
-    </div>
-  </section>
-
-  <!-- filter kategori (pill) dan container produk -->
-  <div class="mx-4 md:mx-8 mt-8">
-    <!-- kategori chips -->
-    <div class="flex flex-wrap gap-3 justify-center md:justify-start" id="categoryContainer">
-      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="all">Semua</button>
-      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Elektronik">Elektronik</button>
-      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Fashion">Fashion</button>
-      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Gadget">Gadget</button>
-    </div>
-
-    <!-- grid produk -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6" id="productGrid"></div>
-  </div>
-
-  <!-- Footer (dengan payment icon sederhana) -->
-  <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80">
-    <div class="flex gap-6 flex-wrap justify-center">
-      <a href="#" class="hover:text-white">Bantuan</a>
-      <a href="#" class="hover:text-white">Pengiriman</a>
-      <a href="#" class="hover:text-white">Pengembalian</a>
-    </div>
-    <div class="flex gap-4 my-3 md:my-0">
-      <i data-lucide="credit-card" class="w-5 h-5"></i>
-      <i data-lucide="landmark" class="w-5 h-5"></i>
-      <i data-lucide="wallet" class="w-5 h-5"></i>
-      <span class="text-xs"> Visa / Mastercard / QR</span>
-    </div>
-    <div>© 2026 Kuy Belanja · metalic glass</div>
-  </footer>
-
-  <!-- MODAL KERANJANG (sidebar kanan) dengan efek glass -->
-  <div id="cartModal" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[100] hidden transition-all duration-300 ease-out">
-    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cartOverlay"></div>
-    <div class="relative glass-panel w-full h-full ml-auto p-5 flex flex-col text-white border-l-2 border-blue-400/30 shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold flex gap-2"><i data-lucide="shopping-bag"></i> Keranjangmu</h2>
-        <button id="closeCart" class="p-2 rounded-full bg-[#1c3f6e] hover:bg-[#28579b]"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-      <div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer">
-        <!-- akan diisi js -->
-        <div class="text-center text-blue-200/70 mt-10">Belanja dulu yuk ✨</div>
-      </div>
-      <div class="border-t border-blue-400/30 pt-4 mt-2">
-        <div class="flex justify-between text-xl font-bold mb-3"><span>Subtotal</span> <span id="cartSubtotal">Rp 0</span></div>
-        <button class="w-full bg-[#1e4f9c] py-3 rounded-full border border-blue-300 font-semibold hover-metallic flex items-center justify-center gap-2"><i data-lucide="credit-card"></i> Checkout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL LOGIN/REGISTER sederhana (popup) -->
-  <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
-    <div class="relative glass-panel w-96 p-6 text-white">
-      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Login / Daftar</h3>
-      <input type="text" placeholder="Email atau username" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white">
-      <input type="password" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-      <div class="flex gap-2">
-        <button class="flex-1 bg-[#316bc7] py-2 rounded-full hover-metallic">Masuk</button>
-        <button class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Daftar</button>
-      </div>
-      <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button>
-    </div>
-  </div>
-
-  <script>
-    (function() {
-      // ----- inisialisasi lucide icons
-      lucide.createIcons();
-
-      // ----- DATABASE PRODUK (array of object)
-      const products = [
-        { id: 1, nama: 'Smartphone X200', harga: 4200000, gambar: 'https://placehold.co/400x300/0a2a55/white?text=SmartX', kategori: 'Gadget', rating: 4.5 },
-        { id: 2, nama: 'Kemeja Flanel Metal', harga: 275000, gambar: 'https://placehold.co/400x300/1e3f70/white?text=Kemeja', kategori: 'Fashion', rating: 4.0 },
-        { id: 3, nama: 'TV LED 43"', harga: 3750000, gambar: 'https://placehold.co/400x300/0e3860/white?text=TV+LED', kategori: 'Elektronik', rating: 4.7 },
-        { id: 4, nama: 'Smartwatch Z5', harga: 1250000, gambar: 'https://placehold.co/400x300/184b80/white?text=Watch', kategori: 'Gadget', rating: 4.3 },
-        { id: 5, nama: 'Sepatu Running Pro', harga: 549000, gambar: 'https://placehold.co/400x300/224488/white?text=Sepatu', kategori: 'Fashion', rating: 4.2 },
-        { id: 6, nama: 'Air Fryer Digital', harga: 899000, gambar: 'https://placehold.co/400x300/0f3e68/white?text=Fryer', kategori: 'Elektronik', rating: 4.6 },
-        { id: 7, nama: 'Laptop Ultralight', harga: 12500000, gambar: 'https://placehold.co/400x300/103a60/white?text=Laptop', kategori: 'Gadget', rating: 4.8 },
-        { id: 8, nama: 'Jaket Denim Navy', harga: 429000, gambar: 'https://placehold.co/400x300/1e4670/white?text=Jaket', kategori: 'Fashion', rating: 4.4 }
-      ];
-
-      // ----- keranjang state & badge
-      let cart = [];
-      const cartBadge = document.getElementById('cartBadge');
-      const cartIcon = document.getElementById('cartIcon');
-      const cartModal = document.getElementById('cartModal');
-      const cartItemsContainer = document.getElementById('cartItemsContainer');
-      const cartSubtotalSpan = document.getElementById('cartSubtotal');
-
-      // ----- render produk
-      const productGrid = document.getElementById('productGrid');
-      const searchInput = document.getElementById('searchInput');
-      let activeCategory = 'all';
-      let searchTerm = '';
-
-      function renderProducts() {
-        const filtered = products.filter(p => {
-          const matchCat = activeCategory === 'all' || p.kategori === activeCategory;
-          const matchSearch = p.nama.toLowerCase().includes(searchTerm.toLowerCase());
-          return matchCat && matchSearch;
-        });
-
-        if (filtered.length === 0) {
-          productGrid.innerHTML = `<div class="col-span-full text-center py-16 text-2xl text-blue-200/60 glass-panel">🛒 Produk tidak ditemukan</div>`;
-          return;
-        }
-
-        productGrid.innerHTML = filtered.map(p => `
-          <div class="glass-panel p-4 flex flex-col hover-metallic transition-all" data-id="${p.id}">
-            <img src="${p.gambar}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover border border-blue-300/40">
-            <div class="mt-3 flex justify-between items-start">
-              <div>
-                <h3 class="font-bold text-lg">${p.nama}</h3>
-                <p class="text-xs text-blue-200/80">${p.kategori} • ⭐ ${p.rating}</p>
-              </div>
-              <span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm font-mono">Rp ${p.harga.toLocaleString('id-ID')}</span>
-            </div>
-            <button class="btn-tambah mt-4 w-full bg-[#1e4f9c] border border-blue-300 py-2 rounded-full hover-metallic flex items-center justify-center gap-2" data-id="${p.id}" data-nama="${p.nama}" data-harga="${p.harga}">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah
-            </button>
-          </div>
-        `).join('');
-        lucide.createIcons(); // refresh icon
-        attachAddToCart(); // event listener ke tombol tambah
-      }
-
-      // attach ke setiap tombol tambah
-      function attachAddToCart() {
-        document.querySelectorAll('.btn-tambah').forEach(btn => {
-          btn.removeEventListener('click', handleAddToCart);
-          btn.addEventListener('click', handleAddToCart);
-        });
-      }
-
-      function handleAddToCart(e) {
-        const id = Number(e.currentTarget.dataset.id);
-        const nama = e.currentTarget.dataset.nama;
-        const harga = Number(e.currentTarget.dataset.harga);
-        const existing = cart.find(item => item.id === id);
-        if (existing) {
-          existing.qty += 1;
-        } else {
-          cart.push({ id, nama, harga, qty: 1, gambar: products.find(p => p.id === id)?.gambar || '' });
-        }
-        updateCartBadge();
-        renderCartModal();
-        // sedikit animasi (opsional)
-      }
-
-      function updateCartBadge() {
-        const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
-        if (totalQty > 0) {
-          cartBadge.classList.remove('hidden');
-          cartBadge.textContent = totalQty;
-        } else {
-          cartBadge.classList.add('hidden');
-        }
-      }
-
-      // render modal keranjang
-      function renderCartModal() {
-        if (cart.length === 0) {
-          cartItemsContainer.innerHTML = `<div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div>`;
-          cartSubtotalSpan.textContent = 'Rp 0';
-          return;
-        }
-        let subtotal = 0;
-        let html = '';
-        cart.forEach((item, idx) => {
-          subtotal += item.harga * item.qty;
-          html += `
-            <div class="flex gap-3 items-center border-b border-blue-500/30 py-3">
-              <div class="w-12 h-12 rounded bg-[#12315e] flex items-center justify-center text-xs">🛍️</div>
-              <div class="flex-1">
-                <p class="font-semibold">${item.nama}</p>
-                <div class="flex items-center gap-2 text-sm">
-                  <span>${item.qty} x Rp ${item.harga.toLocaleString()}</span>
-                </div>
-              </div>
-              <button class="remove-item text-red-300 p-1" data-id="${item.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            </div>
-          `;
-        });
-        cartItemsContainer.innerHTML = html;
-        cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
-        lucide.createIcons();
-
-        // hapus item
-        document.querySelectorAll('.remove-item').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const id = Number(btn.dataset.id);
-            cart = cart.filter(i => i.id !== id);
-            updateCartBadge();
-            renderCartModal();
-            if (cart.length === 0) cartModal.classList.add('hidden');
-          });
-        });
-      }
-
-      // ----- filter & search realtime
-      document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
-          btn.classList.add('category-active');
-          activeCategory = btn.dataset.cat;
-          renderProducts();
-        });
-      });
-      searchInput.addEventListener('input', (e) => {
-        searchTerm = e.target.value;
-        renderProducts();
-      });
-
-      // cart modal toggle
-      cartIcon.addEventListener('click', () => {
-        cartModal.classList.remove('hidden');
-        renderCartModal();
-      });
-      document.getElementById('closeCart').addEventListener('click', () => cartModal.classList.add('hidden'));
-      document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal.classList.add('hidden'));
-
-      // login modal (muncul via footer bantuan sederhana? kita tambah tombol login di header atau footer)
-      // biar ada akses, kita tambahkan tombol login di pojok header kanan? lebih baik dari footer
-      const loginModal = document.getElementById('loginModal');
-      // kita buat link "Bantuan" jadi trigger login (sementara)
-      document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        loginModal.classList.remove('hidden');
-        loginModal.classList.add('flex');
-      });
-      document.getElementById('closeLogin')?.addEventListener('click', () => {
-        loginModal.classList.add('hidden');
-        loginModal.classList.remove('flex');
-      });
-      document.getElementById('loginOverlay')?.addEventListener('click', () => {
-        loginModal.classList.add('hidden');
-        loginModal.classList.remove('flex');
-      });
-
-      // tombol jelajahi promo (scroll ke produk)
-      document.getElementById('explorePromo').addEventListener('click', () => {
-        document.getElementById('productGrid').scrollIntoView({ behavior: 'smooth' });
-      });
-
-      // inisialisasi pertama
-      renderProducts();
-      document.querySelector('.category-btn[data-cat="all"]').classList.add('category-active');
-
-      // extra: supaya cart tidak tampil awal
-      cartModal.classList.add('hidden');
-      loginModal.classList.add('hidden');
-
-      // update badge saat refresh (kosong)
-      updateCartBadge();
-    })();
-  </script>
-  <!-- beberapa ikon tambahan footer dan lainnya di-render ulang jika diperlukan -->
-  <script>
-    // panggil lagi lucide setelah konten dinamis (misal setelah render cart)
-    setInterval(() => { // simple fallback untuk dynamic icon (tidak mengganggu)
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }, 300);
-  </script>
-  <!-- tombol login kecil di header (opsional) tambahan: tanpa merusak layout, kita tambah setelah cart icon -->
-  <div style="position: fixed; bottom: 20px; right: 20px; z-index: 60;">
-    <button id="loginFab" class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic">
-      <i data-lucide="user" class="w-6 h-6"></i>
-    </button>
-  </div>
-  <script>
-    document.getElementById('loginFab')?.addEventListener('click', ()=> {
-      loginModal.classList.remove('hidden');
-      loginModal.classList.add('flex');
-    });
-  </script>
-</body>
->>>>>>> e3b5849b1b75682f771b1af583bd515ebf0cdec6
 </html>
