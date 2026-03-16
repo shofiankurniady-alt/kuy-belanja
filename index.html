@@ -72,7 +72,6 @@
       right: -10px;
       border: 2px solid #0f2b50;
     }
-    /* Role badge */
     .role-badge {
       font-size: 0.7rem;
       padding: 0.15rem 0.5rem;
@@ -80,7 +79,6 @@
       background: #1E4F9C;
       margin-left: 0.5rem;
     }
-    /* Loading spinner */
     .loader {
       border: 3px solid rgba(255,255,255,0.3);
       border-radius: 50%;
@@ -94,20 +92,21 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    .tab-active {
+      border-bottom: 2px solid #3B82F6;
+      color: white !important;
+    }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
 
-  <!-- HEADER dengan Role-Based Navigation -->
+  <!-- HEADER (sama seperti sebelumnya) -->
   <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <!-- logo -->
       <div class="flex items-center gap-2">
         <span class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent drop-shadow-md">KUY BELANJA</span>
         <span id="roleBadge" class="role-badge hidden"></span>
       </div>
-
-      <!-- search bar -->
       <div class="order-3 md:order-none w-full md:w-1/3 lg:w-1/2 flex justify-center">
         <div class="relative w-full max-w-md">
           <input type="text" id="searchInput" placeholder="Cari makanan, pakaian, elektronik..." 
@@ -115,25 +114,16 @@
           <i data-lucide="search" class="absolute right-4 top-3 text-blue-300 w-4 h-4"></i>
         </div>
       </div>
-
-      <!-- navigation icons -->
       <div class="flex items-center gap-3">
-        <!-- Seller Application Button (untuk user biasa) -->
         <button id="sellerApplyBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="store" class="w-6 h-6 text-white"></i>
         </button>
-        
-        <!-- Dashboard Button (untuk seller & admin) -->
         <button id="dashboardBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="layout-dashboard" class="w-6 h-6 text-white"></i>
         </button>
-        
-        <!-- Complaint Button (untuk seller) -->
         <button id="complaintBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
         </button>
-        
-        <!-- Cart -->
         <div class="relative cursor-pointer group" id="cartIcon">
           <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
             <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
@@ -144,7 +134,7 @@
     </div>
   </header>
 
-    <!-- HERO SECTION -->
+  <!-- HERO SECTION -->
   <section class="mx-4 md:mx-8 mt-6 rounded-3xl overflow-hidden hero-bg relative">
     <div class="absolute inset-0 bg-metalic-gradient opacity-80 mix-blend-overlay"></div>
     <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between backdrop-blur-sm">
@@ -155,12 +145,8 @@
           <span>Jelajahi Produk</span> <i data-lucide="sparkles" class="w-5 h-5"></i>
         </button>
       </div>
-      
-      <!-- GAMBAR BULAT (HANYA INI) -->
       <div class="mt-6 md:mt-0 w-44 h-44 rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl hover:scale-105 transition-transform duration-300">
-        <img src="https://i.imgur.com/zduxmnN.png" 
-             alt="Belanja Online" 
-             class="w-full h-full object-cover">
+        <img src="https://i.imgur.com/zduxmnN.png" alt="Belanja Online" class="w-full h-full object-cover">
       </div>
     </div>
   </section>
@@ -186,23 +172,20 @@
     </div>
   </div>
 
-  <!-- SELLER APPLICATION MODAL (PENGAJUAN PENJUAL) -->
+  <!-- SELLER APPLICATION MODAL -->
   <div id="sellerApplyModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sellerApplyOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto">
       <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="store"></i> Daftar Jadi Penjual</h3>
-      
       <div class="space-y-3">
         <input type="text" id="sellerFullName" placeholder="Nama Lengkap (sesuai KTP)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="text" id="sellerNIK" placeholder="NIK (sesuai KTP)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-        <input type="text" id="sellerBank" placeholder="Bank Penerima (BCA/Mandiri/BNI/dll)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerBank" placeholder="Bank Penerima" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="text" id="sellerAccount" placeholder="Nomor Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="text" id="sellerAccountName" placeholder="Nama Pemilik Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="text" id="sellerPhone" placeholder="Nomor WhatsApp" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="email" id="sellerEmail" placeholder="Email" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-        
         <div class="text-sm text-yellow-300 mt-2" id="sellerApplyMessage"></div>
-        
         <div class="flex gap-2">
           <button id="submitSellerApply" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Ajukan</button>
           <button id="closeSellerApply" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button>
@@ -211,12 +194,11 @@
     </div>
   </div>
 
-  <!-- COMPLAINT MODAL (PENGADUAN SELLER KE ADMIN) -->
+  <!-- COMPLAINT MODAL -->
   <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
       <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="alert-circle"></i> Pengaduan ke Admin</h3>
-      
       <div class="space-y-3">
         <select id="complaintType" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
           <option value="technical">Kendala Teknis</option>
@@ -224,129 +206,13 @@
           <option value="buyer">Masalah dengan Pembeli</option>
           <option value="other">Lainnya</option>
         </select>
-        
         <textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
-        
-        <div class="text-sm text-yellow-300" id="complaintMessage">
-          Email admin: shofiankurniady@gmail.com
-        </div>
-        
+        <div class="text-sm text-yellow-300" id="complaintMessage">Email admin: shofiankurniady@gmail.com</div>
         <div class="flex gap-2">
           <button id="submitComplaint" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Kirim</button>
           <button id="closeComplaint" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- ADMIN DASHBOARD MODAL -->
-  <div id="adminDashboardModal" class="fixed inset-0 z-[400] hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="adminDashboardOverlay"></div>
-    <div class="relative glass-panel w-[90%] max-w-4xl p-6 text-white max-h-[90vh] overflow-y-auto">
-      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="shield"></i> Admin Dashboard</h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Pending Seller Applications -->
-        <div class="glass-panel p-4">
-          <h4 class="text-xl font-bold mb-3">Pengajuan Penjual Baru</h4>
-          <div id="pendingApplications" class="space-y-2 max-h-60 overflow-y-auto">
-            <p class="text-blue-200/70">Memuat...</p>
-          </div>
-        </div>
-        
-        <!-- Complaints -->
-        <div class="glass-panel p-4">
-          <h4 class="text-xl font-bold mb-3">Pengaduan Masuk</h4>
-          <div id="pendingComplaints" class="space-y-2 max-h-60 overflow-y-auto">
-            <p class="text-blue-200/70">Memuat...</p>
-          </div>
-        </div>
-        
-        <!-- Statistics -->
-        <div class="glass-panel p-4 md:col-span-2">
-          <h4 class="text-xl font-bold mb-3">Statistik</h4>
-          <div class="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div class="text-3xl font-bold" id="totalUsers">0</div>
-              <div class="text-sm">Pengguna</div>
-            </div>
-            <div>
-              <div class="text-3xl font-bold" id="totalSellers">0</div>
-              <div class="text-sm">Penjual</div>
-            </div>
-            <div>
-              <div class="text-3xl font-bold" id="totalProducts">0</div>
-              <div class="text-sm">Produk</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <button id="closeAdminDashboard" class="absolute top-3 right-3 text-blue-300">
-        <i data-lucide="x-circle"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- SELLER DASHBOARD MODAL -->
-  <div id="sellerDashboardModal" class="fixed inset-0 z-[400] hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="sellerDashboardOverlay"></div>
-    <div class="relative glass-panel w-[90%] max-w-4xl p-6 text-white max-h-[90vh] overflow-y-auto">
-      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="store"></i> Seller Dashboard</h3>
-      
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="glass-panel p-3 text-center">
-          <div class="text-2xl font-bold" id="sellerStock">0</div>
-          <div class="text-xs">Stok</div>
-        </div>
-        <div class="glass-panel p-3 text-center">
-          <div class="text-2xl font-bold" id="sellerSold">0</div>
-          <div class="text-xs">Terjual</div>
-        </div>
-        <div class="glass-panel p-3 text-center">
-          <div class="text-2xl font-bold" id="sellerOrders">0</div>
-          <div class="text-xs">Pesanan</div>
-        </div>
-        <div class="glass-panel p-3 text-center">
-          <div class="text-2xl font-bold" id="sellerBalance">Rp 0</div>
-          <div class="text-xs">Saldo</div>
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Komentar Pembeli -->
-        <div class="glass-panel p-4">
-          <h4 class="text-lg font-bold mb-3">Komentar Pembeli</h4>
-          <div id="sellerReviews" class="space-y-2 max-h-60 overflow-y-auto">
-            <p class="text-blue-200/70">Belum ada komentar</p>
-          </div>
-        </div>
-        
-        <!-- Pengaduan ke Admin -->
-        <div class="glass-panel p-4">
-          <h4 class="text-lg font-bold mb-3">Pengaduan ke Admin</h4>
-          <button id="sellerComplaintBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full hover-metallic mb-3">
-            Buat Pengaduan Baru
-          </button>
-          <div id="sellerComplaints" class="space-y-2 max-h-40 overflow-y-auto">
-            <p class="text-blue-200/70">Belum ada pengaduan</p>
-          </div>
-        </div>
-      </div>
-      
-      <button id="closeSellerDashboard" class="absolute top-3 right-3 text-blue-300">
-        <i data-lucide="x-circle"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- WHATSAPP POPUP (untuk pembeli) -->
-  <div id="whatsappPopup" class="fixed bottom-24 right-6 z-50 hidden">
-    <div class="glass-panel p-4 w-64">
-      <p class="text-sm mb-2">Hubungi penjual via WhatsApp</p>
-      <a id="whatsappLink" href="#" target="_blank" class="block bg-green-600 text-center py-2 rounded-full hover-metallic">
-        <i data-lucide="message-circle" class="w-4 h-4 inline mr-1"></i> Chat Now
-      </a>
     </div>
   </div>
 
@@ -363,8 +229,6 @@
       </div>
       <div class="border-t border-blue-400/30 pt-4 mt-2">
         <div class="flex justify-between text-xl font-bold mb-3"><span>Subtotal</span> <span id="cartSubtotal">Rp 0</span></div>
-        
-        <!-- PAYMENT METHODS -->
         <div class="mb-3">
           <p class="text-sm mb-2">Metode Pembayaran:</p>
           <div class="grid grid-cols-3 gap-2">
@@ -377,7 +241,6 @@
           </div>
           <div id="selectedPayment" class="text-xs text-yellow-300 mt-2"></div>
         </div>
-        
         <button class="w-full bg-[#1e4f9c] py-3 rounded-full border border-blue-300 font-semibold hover-metallic flex items-center justify-center gap-2" id="checkoutBtn">
           <i data-lucide="credit-card"></i> Checkout
         </button>
@@ -385,18 +248,101 @@
     </div>
   </div>
 
-  <!-- MODAL LOGIN/REGISTER -->
+  <!-- MODAL LOGIN/REGISTER BARU DENGAN 3 TAB -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
-    <div class="relative glass-panel w-96 p-6 text-white">
-      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Login / Daftar</h3>
-      <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white">
-      <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-      <div class="flex gap-2">
-        <button class="flex-1 bg-[#316bc7] py-2 rounded-full hover-metallic" id="loginBtn">Masuk</button>
-        <button class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic" id="registerBtn">Daftar</button>
+    <div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto">
+      
+      <!-- Tabs -->
+      <div class="flex border-b border-blue-400/30 mb-6">
+        <button class="tab-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button>
+        <button class="tab-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button>
+        <button class="tab-btn flex-1 py-2 text-center text-blue-300" data-tab="forgot">Lupa</button>
       </div>
-      <div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div>
+      
+      <!-- LOGIN TAB -->
+      <div id="loginTab" class="tab-content">
+        <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Masuk ke Akun</h3>
+        
+        <!-- Google Login -->
+        <button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full hover-metallic flex items-center justify-center gap-3 mb-3">
+          <img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google
+        </button>
+        
+        <!-- WhatsApp Login -->
+        <button id="whatsappLoginBtn" class="w-full bg-green-600 text-white py-3 rounded-full hover-metallic flex items-center justify-center gap-3 mb-4">
+          <i data-lucide="message-circle"></i> Login dengan WhatsApp
+        </button>
+        
+        <div class="relative my-4">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-blue-400/30"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-[#122b50] text-blue-300">Atau</span>
+          </div>
+        </div>
+        
+        <!-- Manual Login -->
+        <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white">
+        <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        
+        <button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="loginBtn">Masuk</button>
+        
+        <div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div>
+      </div>
+      
+      <!-- REGISTER TAB -->
+      <div id="registerTab" class="tab-content hidden">
+        <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3>
+        
+        <div class="mb-3">
+          <label class="block text-sm mb-1">Metode Registrasi</label>
+          <select id="registerMethod" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+            <option value="email">Email</option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+        </div>
+        
+        <div id="emailRegister">
+          <input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        </div>
+        
+        <div id="whatsappRegister" class="hidden">
+          <input type="text" id="regWhatsapp" placeholder="Nomor WhatsApp (628xxx)" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        </div>
+        
+        <input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        
+        <button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic" id="registerBtn">Daftar</button>
+        <div id="registerMessage" class="text-sm text-center mt-2 text-yellow-300"></div>
+      </div>
+      
+      <!-- FORGOT PASSWORD TAB -->
+      <div id="forgotTab" class="tab-content hidden">
+        <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="key"></i> Reset Password</h3>
+        
+        <div class="mb-3">
+          <label class="block text-sm mb-1">Reset via</label>
+          <select id="resetMethod" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+            <option value="email">Email</option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+        </div>
+        
+        <div id="emailReset">
+          <input type="email" id="resetEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        </div>
+        
+        <div id="whatsappReset" class="hidden">
+          <input type="text" id="resetWhatsapp" placeholder="Nomor WhatsApp" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        </div>
+        
+        <button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="resetBtn">Kirim Reset Link</button>
+        <div id="resetMessage" class="text-sm text-center mt-2 text-yellow-300"></div>
+      </div>
+      
       <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button>
     </div>
   </div>
@@ -430,7 +376,6 @@
       const supabaseUrl = 'https://mpgkhjzvvzcczsdczlca.supabase.co';
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZ2toanp2dnpjY3pzZGN6bGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjY2NDQsImV4cCI6MjA4OTI0MjY0NH0.HrRAnpdTAv86RO4nkPMV6NXYrM8MkrpajR7mKkZwfS8';
       
-      // Pastikan supabase sudah didefinisikan dengan benar
       if (typeof window.supabase === 'undefined') {
         console.error('Supabase client not loaded');
         document.getElementById('productGrid').innerHTML = 
@@ -445,7 +390,7 @@
       let products = [];
       let cart = [];
       let currentUser = null;
-      let userRole = 'guest'; // 'guest', 'buyer', 'seller', 'admin'
+      let userRole = 'guest';
       let selectedPayment = null;
 
       // DOM Elements
@@ -457,16 +402,181 @@
       const productGrid = document.getElementById('productGrid');
       const searchInput = document.getElementById('searchInput');
       const loginModal = document.getElementById('loginModal');
-      const loginEmail = document.getElementById('loginEmail');
-      const loginPassword = document.getElementById('loginPassword');
       const loginMessage = document.getElementById('loginMessage');
       const roleBadge = document.getElementById('roleBadge');
       const sellerApplyBtn = document.getElementById('sellerApplyBtn');
       const dashboardBtn = document.getElementById('dashboardBtn');
       const complaintBtn = document.getElementById('complaintBtn');
       
+      // Login tab elements
+      const loginTab = document.getElementById('loginTab');
+      const registerTab = document.getElementById('registerTab');
+      const forgotTab = document.getElementById('forgotTab');
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const loginEmail = document.getElementById('loginEmail');
+      const loginPassword = document.getElementById('loginPassword');
+      const loginBtn = document.getElementById('loginBtn');
+      
+      // Register elements
+      const registerMethod = document.getElementById('registerMethod');
+      const emailRegister = document.getElementById('emailRegister');
+      const whatsappRegister = document.getElementById('whatsappRegister');
+      const regEmail = document.getElementById('regEmail');
+      const regWhatsapp = document.getElementById('regWhatsapp');
+      const regPassword = document.getElementById('regPassword');
+      const regConfirmPassword = document.getElementById('regConfirmPassword');
+      const registerBtn = document.getElementById('registerBtn');
+      const registerMessage = document.getElementById('registerMessage');
+      
+      // Reset elements
+      const resetMethod = document.getElementById('resetMethod');
+      const emailReset = document.getElementById('emailReset');
+      const whatsappReset = document.getElementById('whatsappReset');
+      const resetEmail = document.getElementById('resetEmail');
+      const resetWhatsapp = document.getElementById('resetWhatsapp');
+      const resetBtn = document.getElementById('resetBtn');
+      const resetMessage = document.getElementById('resetMessage');
+      
       let activeCategory = 'all';
       let searchTerm = '';
+
+      // ==================== TAB SWITCHING ====================
+      function switchTab(tabId) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(tabId + 'Tab').classList.remove('hidden');
+        
+        // Update tab buttons
+        tabBtns.forEach(btn => {
+          btn.classList.remove('font-bold', 'text-white');
+          btn.classList.add('text-blue-300');
+        });
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add('font-bold', 'text-white');
+      }
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          switchTab(btn.dataset.tab);
+        });
+      });
+
+      // Toggle register method
+      registerMethod.addEventListener('change', () => {
+        if (registerMethod.value === 'email') {
+          emailRegister.classList.remove('hidden');
+          whatsappRegister.classList.add('hidden');
+        } else {
+          emailRegister.classList.add('hidden');
+          whatsappRegister.classList.remove('hidden');
+        }
+      });
+
+      // Toggle reset method
+      resetMethod.addEventListener('change', () => {
+        if (resetMethod.value === 'email') {
+          emailReset.classList.remove('hidden');
+          whatsappReset.classList.add('hidden');
+        } else {
+          emailReset.classList.add('hidden');
+          whatsappReset.classList.remove('hidden');
+        }
+      });
+
+      // ==================== GOOGLE LOGIN ====================
+      document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
+        try {
+          const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin
+            }
+          });
+          
+          if (error) {
+            alert('Gagal login dengan Google: ' + error.message);
+          }
+        } catch (error) {
+          console.error('Google login error:', error);
+          alert('Gagal login dengan Google');
+        }
+      });
+
+      // ==================== WHATSAPP LOGIN (OTP) ====================
+      document.getElementById('whatsappLoginBtn')?.addEventListener('click', async () => {
+        const phone = prompt('Masukkan nomor WhatsApp Anda (contoh: 628123456789):');
+        if (!phone) return;
+        
+        // Generate random OTP
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        
+        // Simpan OTP di session storage (sementara)
+        sessionStorage.setItem('whatsapp_otp', otp);
+        sessionStorage.setItem('whatsapp_phone', phone);
+        
+        // Buat pesan WhatsApp
+        const message = `Kode OTP Anda untuk login Kuy Belanja adalah: ${otp}. Jangan berikan kode ini kepada siapa pun.`;
+        
+        // Buka WhatsApp
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        
+        // Tanyakan OTP
+        const userOtp = prompt('Masukkan kode OTP yang telah dikirim ke WhatsApp Anda:');
+        
+        if (userOtp && userOtp === otp.toString()) {
+          // OTP benar, cek apakah user sudah terdaftar
+          const { data: existingUser } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('phone', phone)
+            .maybeSingle();
+          
+          if (existingUser) {
+            // Login dengan password (untuk sementara pakai alert)
+            alert('Login via WhatsApp akan segera diimplementasikan penuh. Untuk sekarang, gunakan login email.');
+          } else {
+            alert('Nomor WhatsApp belum terdaftar. Silakan daftar terlebih dahulu.');
+            switchTab('register');
+            registerMethod.value = 'whatsapp';
+            emailRegister.classList.add('hidden');
+            whatsappRegister.classList.remove('hidden');
+            document.getElementById('regWhatsapp').value = phone;
+          }
+        } else {
+          alert('Kode OTP salah!');
+        }
+      });
+
+      // ==================== FORGOT PASSWORD ====================
+      resetBtn?.addEventListener('click', async () => {
+        const method = resetMethod.value;
+        
+        if (method === 'email') {
+          const email = resetEmail?.value;
+          if (!email) {
+            resetMessage.textContent = 'Email harus diisi!';
+            return;
+          }
+          
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/reset-password',
+          });
+          
+          if (error) {
+            resetMessage.textContent = 'Gagal: ' + error.message;
+          } else {
+            resetMessage.textContent = 'Link reset password telah dikirim ke email Anda.';
+          }
+        } else {
+          const phone = resetWhatsapp?.value;
+          if (!phone) {
+            resetMessage.textContent = 'Nomor WhatsApp harus diisi!';
+            return;
+          }
+          
+          // Simulasi reset via WhatsApp
+          resetMessage.textContent = 'Fitur reset via WhatsApp akan segera hadir! Untuk sementara gunakan reset via email.';
+        }
+      });
 
       // ==================== CHECK USER & ROLE ====================
       async function checkUser() {
@@ -475,7 +585,6 @@
           currentUser = user;
           
           if (user) {
-            // Cek role dari database
             const { data: profile } = await supabaseClient
               .from('profiles')
               .select('role')
@@ -484,13 +593,11 @@
               
             userRole = profile?.role || 'buyer';
             
-            // Update UI berdasarkan role
             if (roleBadge) {
               roleBadge.classList.remove('hidden');
               roleBadge.textContent = userRole.toUpperCase();
             }
             
-            // Tampilkan button sesuai role
             if (userRole === 'buyer') {
               sellerApplyBtn?.classList.remove('hidden');
             } else if (userRole === 'seller') {
@@ -728,7 +835,6 @@
         cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
         lucide.createIcons();
 
-        // Remove item
         document.querySelectorAll('.remove-item').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -750,7 +856,6 @@
           });
         });
 
-        // Payment method selection
         document.querySelectorAll('.payment-method').forEach(btn => {
           btn.addEventListener('click', () => {
             selectedPayment = btn.dataset.method;
@@ -796,9 +901,8 @@
           });
           
           if (error) {
-            if (loginMessage) loginMessage.textContent = 'Registrasi gagal: ' + error.message;
+            if (registerMessage) registerMessage.textContent = 'Registrasi gagal: ' + error.message;
           } else {
-            // Create profile
             if (data?.user) {
               await supabaseClient.from('profiles').insert({
                 id: data.user.id,
@@ -806,11 +910,12 @@
                 role: 'buyer'
               });
             }
-            if (loginMessage) loginMessage.textContent = 'Registrasi berhasil! Cek email untuk verifikasi.';
+            if (registerMessage) registerMessage.textContent = 'Registrasi berhasil! Cek email untuk verifikasi.';
+            setTimeout(() => switchTab('login'), 2000);
           }
         } catch (error) {
           console.error('Register error:', error);
-          if (loginMessage) loginMessage.textContent = 'Terjadi kesalahan';
+          if (registerMessage) registerMessage.textContent = 'Terjadi kesalahan';
         }
       }
 
@@ -819,6 +924,7 @@
         loginModal?.classList.remove('hidden');
         loginModal?.classList.add('flex');
         if (loginMessage) loginMessage.textContent = '';
+        switchTab('login');
       }
 
       // ==================== SELLER APPLICATION ====================
@@ -872,10 +978,8 @@
           await loadProductsFromDB();
           await loadCartFromDB();
           
-          // Set kategori active
           document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
           
-          // Hide modals
           cartModal?.classList.add('hidden');
           loginModal?.classList.add('hidden');
           
@@ -904,7 +1008,6 @@
           document.getElementById('closeCart')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
           document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
 
-          // Login triggers
           document.getElementById('loginFab')?.addEventListener('click', openLoginModal);
           document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
             e.preventDefault();
@@ -921,7 +1024,7 @@
             loginModal?.classList.remove('flex');
           });
 
-          document.getElementById('loginBtn')?.addEventListener('click', () => {
+          loginBtn?.addEventListener('click', () => {
             const email = loginEmail?.value;
             const password = loginPassword?.value;
             if (email && password) {
@@ -931,17 +1034,27 @@
             }
           });
 
-          document.getElementById('registerBtn')?.addEventListener('click', () => {
-            const email = loginEmail?.value;
-            const password = loginPassword?.value;
-            if (email && password) {
+          registerBtn?.addEventListener('click', () => {
+            const method = registerMethod.value;
+            if (method === 'email') {
+              const email = regEmail?.value;
+              const password = regPassword?.value;
+              const confirm = regConfirmPassword?.value;
+              
+              if (!email || !password || !confirm) {
+                registerMessage.textContent = 'Semua field harus diisi!';
+                return;
+              }
+              if (password !== confirm) {
+                registerMessage.textContent = 'Password tidak cocok!';
+                return;
+              }
               register(email, password);
             } else {
-              if (loginMessage) loginMessage.textContent = 'Email dan password harus diisi';
+              registerMessage.textContent = 'Registrasi via WhatsApp akan segera hadir! Gunakan email untuk sekarang.';
             }
           });
 
-          // Seller Application
           sellerApplyBtn?.addEventListener('click', () => {
             document.getElementById('sellerApplyModal')?.classList.remove('hidden');
             document.getElementById('sellerApplyModal')?.classList.add('flex');
@@ -954,7 +1067,6 @@
 
           document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication);
 
-          // Complaint
           complaintBtn?.addEventListener('click', () => {
             document.getElementById('complaintModal')?.classList.remove('hidden');
             document.getElementById('complaintModal')?.classList.add('flex');
@@ -980,7 +1092,6 @@
         }
       }
 
-      // Jalankan init setelah semuanya siap
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
@@ -995,9 +1106,7 @@
       if (typeof lucide !== 'undefined') {
         try {
           lucide.createIcons();
-        } catch (e) {
-          // Ignore errors
-        }
+        } catch (e) {}
       }
     }, 1000);
   </script>
