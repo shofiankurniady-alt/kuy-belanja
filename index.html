@@ -60,7 +60,7 @@
     .hero-bg {
       background: radial-gradient(circle at 30% 30%, #12458c, #05122e);
     }
-    .cart-badge {
+    .cart-badge, .notif-badge {
       background: #E53E3E;
       color: white;
       font-size: 0.7rem;
@@ -96,17 +96,69 @@
       border-bottom: 2px solid #3B82F6;
       color: white !important;
     }
+    /* Verified badge */
+    .verified-badge {
+      background: #10B981;
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .buyer-badge {
+      background: #8B5CF6;
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .profile-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 0.5rem;
+      width: 280px;
+      z-index: 100;
+      display: none;
+    }
+    .profile-dropdown.show {
+      display: block;
+    }
+    .notification-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 0.5rem;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .notification-dropdown.show {
+      display: block;
+    }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
 
-  <!-- HEADER -->
+  <!-- HEADER dengan Profil & Notifikasi -->
   <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
     <div class="flex flex-wrap items-center justify-between gap-3">
+      <!-- logo -->
       <div class="flex items-center gap-2">
-        <span class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent drop-shadow-md">KUY BELANJA</span>
+        <a href="/" class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent drop-shadow-md hover:opacity-80 transition">
+          KUY BELANJA
+        </a>
         <span id="roleBadge" class="role-badge hidden"></span>
       </div>
+
+      <!-- search bar -->
       <div class="order-3 md:order-none w-full md:w-1/3 lg:w-1/2 flex justify-center">
         <div class="relative w-full max-w-md">
           <input type="text" id="searchInput" placeholder="Cari makanan, pakaian, elektronik..." 
@@ -114,21 +166,110 @@
           <i data-lucide="search" class="absolute right-4 top-3 text-blue-300 w-4 h-4"></i>
         </div>
       </div>
+
+      <!-- navigation icons -->
       <div class="flex items-center gap-3">
+        <!-- Seller Application Button (untuk user biasa) -->
         <button id="sellerApplyBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="store" class="w-6 h-6 text-white"></i>
         </button>
+        
+        <!-- Dashboard Button (untuk seller & admin) -->
         <button id="dashboardBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="layout-dashboard" class="w-6 h-6 text-white"></i>
         </button>
+        
+        <!-- Complaint Button (untuk seller) -->
         <button id="complaintBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
         </button>
+
+        <!-- Messages / Notifications -->
+        <div class="relative">
+          <button id="notificationBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic relative">
+            <i data-lucide="bell" class="w-6 h-6 text-white"></i>
+            <span id="notifBadge" class="notif-badge hidden">0</span>
+          </button>
+          
+          <!-- Notification Dropdown -->
+          <div id="notificationDropdown" class="notification-dropdown glass-panel p-4">
+            <h4 class="font-bold mb-3 flex items-center gap-2">
+              <i data-lucide="bell-ring"></i> Notifikasi
+            </h4>
+            <div id="notificationList" class="space-y-3 max-h-60 overflow-y-auto">
+              <div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div>
+            </div>
+            <div class="border-t border-blue-400/30 mt-3 pt-3 text-center">
+              <button id="markAllReadBtn" class="text-xs text-blue-300 hover:text-white">Tandai semua dibaca</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Cart -->
         <div class="relative cursor-pointer group" id="cartIcon">
           <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
             <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
           </div>
           <span id="cartBadge" class="cart-badge hidden">0</span>
+        </div>
+
+        <!-- Profile Icon with Dropdown -->
+        <div class="relative">
+          <button id="profileBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+            <i data-lucide="user" class="w-6 h-6 text-white"></i>
+          </button>
+          
+          <!-- Profile Dropdown -->
+          <div id="profileDropdown" class="profile-dropdown glass-panel p-4">
+            <div class="flex items-center gap-3 border-b border-blue-400/30 pb-3 mb-3">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-2xl font-bold" id="profileAvatar">
+                U
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-bold truncate" id="profileName">Pengunjung</div>
+                <div class="text-xs text-blue-300 truncate" id="profileEmail"></div>
+                <div id="profileBadge" class="mt-1"></div>
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <a href="/profile.html" class="flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition">
+                <i data-lucide="user" class="w-4 h-4"></i>
+                <span>Profil Saya</span>
+              </a>
+              <a href="/orders.html" class="flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition">
+                <i data-lucide="package" class="w-4 h-4"></i>
+                <span>Pesanan Saya</span>
+              </a>
+              <a href="/wishlist.html" class="flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+                <span>Wishlist</span>
+              </a>
+              
+              <!-- Seller Application Link (untuk buyer) -->
+              <div id="sellerApplyLink" class="hidden">
+                <button id="sellerApplyFromProfile" class="w-full flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition text-left">
+                  <i data-lucide="store" class="w-4 h-4"></i>
+                  <span>Daftar Jadi Penjual</span>
+                </button>
+              </div>
+              
+              <!-- Seller Dashboard Link (untuk seller) -->
+              <div id="sellerDashboardLink" class="hidden">
+                <button id="sellerDashboardFromProfile" class="w-full flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition text-left">
+                  <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                  <span>Dashboard Penjual</span>
+                </button>
+              </div>
+              
+              <hr class="border-blue-400/30 my-2">
+              
+              <button id="logoutBtn" class="w-full flex items-center gap-3 p-2 hover:bg-red-600/30 rounded-lg transition text-red-300">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span>Keluar</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -194,25 +335,13 @@
     </div>
   </div>
 
-  <!-- COMPLAINT MODAL -->
-  <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div>
+  <!-- NOTIFICATION DETAIL MODAL -->
+  <div id="notificationModal" class="fixed inset-0 z-[400] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="notificationOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
-      <h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="alert-circle"></i> Pengaduan ke Admin</h3>
-      <div class="space-y-3">
-        <select id="complaintType" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-          <option value="technical">Kendala Teknis</option>
-          <option value="payment">Masalah Pembayaran</option>
-          <option value="buyer">Masalah dengan Pembeli</option>
-          <option value="other">Lainnya</option>
-        </select>
-        <textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
-        <div class="text-sm text-yellow-300" id="complaintMessage">Email admin: shofiankurniady@gmail.com</div>
-        <div class="flex gap-2">
-          <button id="submitComplaint" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Kirim</button>
-          <button id="closeComplaint" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button>
-        </div>
-      </div>
+      <h3 class="text-2xl font-bold mb-4" id="notificationModalTitle">Detail Notifikasi</h3>
+      <div id="notificationModalContent" class="mb-4"></div>
+      <button id="closeNotificationModal" class="w-full bg-[#1e4f9c] py-2 rounded-full hover-metallic">Tutup</button>
     </div>
   </div>
 
@@ -372,9 +501,9 @@
     </div>
   </div>
 
-  <!-- FAB LOGIN -->
-  <div style="position: fixed; bottom: 20px; right: 20px; z-index: 60;">
-    <button id="loginFab" class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic">
+  <!-- FAB LOGIN (untuk guest) -->
+  <div id="loginFab" style="position: fixed; bottom: 20px; right: 20px; z-index: 60;" class="hidden">
+    <button class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic">
       <i data-lucide="user" class="w-6 h-6"></i>
     </button>
   </div>
@@ -420,7 +549,9 @@
       let cart = [];
       let currentUser = null;
       let userRole = 'guest';
+      let userProfile = null;
       let selectedPayment = null;
+      let notifications = [];
 
       // DOM Elements
       const cartBadge = document.getElementById('cartBadge');
@@ -438,6 +569,28 @@
       const complaintBtn = document.getElementById('complaintBtn');
       const whatsappPopup = document.getElementById('whatsappPopup');
       const whatsappLink = document.getElementById('whatsappLink');
+      const loginFab = document.getElementById('loginFab');
+      
+      // Profile elements
+      const profileBtn = document.getElementById('profileBtn');
+      const profileDropdown = document.getElementById('profileDropdown');
+      const profileName = document.getElementById('profileName');
+      const profileEmail = document.getElementById('profileEmail');
+      const profileBadge = document.getElementById('profileBadge');
+      const profileAvatar = document.getElementById('profileAvatar');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const sellerApplyLink = document.getElementById('sellerApplyLink');
+      const sellerDashboardLink = document.getElementById('sellerDashboardLink');
+      
+      // Notification elements
+      const notificationBtn = document.getElementById('notificationBtn');
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const notificationList = document.getElementById('notificationList');
+      const notifBadge = document.getElementById('notifBadge');
+      const markAllReadBtn = document.getElementById('markAllReadBtn');
+      const notificationModal = document.getElementById('notificationModal');
+      const notificationModalTitle = document.getElementById('notificationModalTitle');
+      const notificationModalContent = document.getElementById('notificationModalContent');
       
       // Login tab elements
       const loginTab = document.getElementById('loginTab');
@@ -596,6 +749,197 @@
         }
       }
 
+      // ==================== NOTIFICATION FUNCTIONS ====================
+
+      // Load notifications from database
+      async function loadNotifications() {
+        if (!currentUser) return;
+        
+        try {
+          const { data, error } = await supabaseClient
+            .from('notifications')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false })
+            .limit(20);
+            
+          if (!error && data) {
+            notifications = data;
+            renderNotifications();
+          }
+        } catch (error) {
+          console.error('Error loading notifications:', error);
+        }
+      }
+
+      // Render notifications in dropdown
+      function renderNotifications() {
+        if (!notificationList) return;
+        
+        const unreadCount = notifications.filter(n => !n.is_read).length;
+        
+        // Update badge
+        if (unreadCount > 0) {
+          notifBadge.classList.remove('hidden');
+          notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+        } else {
+          notifBadge.classList.add('hidden');
+        }
+        
+        if (notifications.length === 0) {
+          notificationList.innerHTML = '<div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div>';
+          return;
+        }
+        
+        notificationList.innerHTML = notifications.map(n => `
+          <div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer hover:opacity-80 transition notification-item" data-id="${n.id}">
+            <div class="flex items-start gap-2">
+              <i data-lucide="${n.icon || 'bell'}" class="w-4 h-4 mt-1 flex-shrink-0"></i>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">${n.title || 'Notifikasi'}</p>
+                <p class="text-xs text-blue-300 truncate">${n.message || ''}</p>
+                <p class="text-xs text-blue-400/70 mt-1">${new Date(n.created_at).toLocaleDateString('id-ID')}</p>
+              </div>
+              ${!n.is_read ? '<span class="w-2 h-2 bg-blue-400 rounded-full"></span>' : ''}
+            </div>
+          </div>
+        `).join('');
+        
+        lucide.createIcons();
+        
+        // Add click handlers
+        document.querySelectorAll('.notification-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const id = item.dataset.id;
+            const notification = notifications.find(n => n.id == id);
+            if (notification) {
+              showNotificationDetail(notification);
+              markAsRead(id);
+            }
+          });
+        });
+      }
+
+      // Mark notification as read
+      async function markAsRead(id) {
+        if (!currentUser) return;
+        
+        const { error } = await supabaseClient
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('id', id);
+          
+        if (!error) {
+          const notif = notifications.find(n => n.id == id);
+          if (notif) notif.is_read = true;
+          renderNotifications();
+        }
+      }
+
+      // Mark all as read
+      async function markAllAsRead() {
+        if (!currentUser || notifications.length === 0) return;
+        
+        const { error } = await supabaseClient
+          .from('notifications')
+          .update({ is_read: true })
+          .eq('user_id', currentUser.id)
+          .eq('is_read', false);
+          
+        if (!error) {
+          notifications.forEach(n => n.is_read = true);
+          renderNotifications();
+        }
+      }
+
+      // Show notification detail in modal
+      function showNotificationDetail(notification) {
+        notificationModalTitle.textContent = notification.title || 'Detail Notifikasi';
+        notificationModalContent.innerHTML = `
+          <p class="mb-4">${notification.message || ''}</p>
+          <p class="text-xs text-blue-300">${new Date(notification.created_at).toLocaleString('id-ID')}</p>
+        `;
+        notificationModal.classList.remove('hidden');
+        notificationModal.classList.add('flex');
+      }
+
+      // Create a new notification
+      async function createNotification(userId, title, message, type = 'info', icon = 'bell') {
+        const { error } = await supabaseClient
+          .from('notifications')
+          .insert({
+            user_id: userId,
+            title: title,
+            message: message,
+            type: type,
+            icon: icon,
+            is_read: false
+          });
+          
+        if (!error && currentUser && userId === currentUser.id) {
+          loadNotifications();
+        }
+      }
+
+      // ==================== PROFILE FUNCTIONS ====================
+
+      // Toggle profile dropdown
+      function toggleProfileDropdown() {
+        profileDropdown.classList.toggle('show');
+        if (notificationDropdown) notificationDropdown.classList.remove('show');
+      }
+
+      // Update profile UI
+      async function updateProfileUI() {
+        if (!currentUser) {
+          // Guest mode
+          profileName.textContent = 'Pengunjung';
+          profileEmail.textContent = '';
+          profileBadge.innerHTML = '';
+          profileAvatar.textContent = 'G';
+          sellerApplyLink.classList.add('hidden');
+          sellerDashboardLink.classList.add('hidden');
+          loginFab.classList.remove('hidden');
+          return;
+        }
+        
+        // Get profile from database
+        const { data } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+          
+        userProfile = data || { email: currentUser.email, role: 'buyer' };
+        userRole = userProfile.role || 'buyer';
+        
+        // Update avatar
+        const firstLetter = (userProfile.full_name || currentUser.email || 'U').charAt(0).toUpperCase();
+        profileAvatar.textContent = firstLetter;
+        
+        // Update name and email
+        profileName.textContent = userProfile.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
+        profileEmail.textContent = currentUser.email || '';
+        
+        // Update badge based on role
+        if (userRole === 'seller') {
+          profileBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
+          sellerApplyLink.classList.add('hidden');
+          sellerDashboardLink.classList.remove('hidden');
+        } else if (userRole === 'admin') {
+          profileBadge.innerHTML = '<span class="verified-badge"><i data-lucide="shield" class="w-3 h-3"></i> Admin</span>';
+          sellerApplyLink.classList.add('hidden');
+          sellerDashboardLink.classList.remove('hidden');
+        } else {
+          profileBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Raja Pembeli</span><p class="text-xs text-blue-300 mt-1">Silakan verifikasi untuk menjadi penjual</p>';
+          sellerApplyLink.classList.remove('hidden');
+          sellerDashboardLink.classList.add('hidden');
+        }
+        
+        lucide.createIcons();
+        loginFab.classList.add('hidden');
+      }
+
       // ==================== TAB SWITCHING ====================
       function switchTab(tabId) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
@@ -729,19 +1073,23 @@
           currentUser = user;
           
           if (user) {
+            // Get profile
             const { data: profile } = await supabaseClient
               .from('profiles')
-              .select('role')
+              .select('*')
               .eq('id', user.id)
               .maybeSingle();
               
-            userRole = profile?.role || 'buyer';
+            userProfile = profile || { role: 'buyer' };
+            userRole = userProfile.role || 'buyer';
             
+            // Update role badge
             if (roleBadge) {
               roleBadge.classList.remove('hidden');
               roleBadge.textContent = userRole.toUpperCase();
             }
             
+            // Tampilkan button sesuai role
             if (userRole === 'buyer') {
               sellerApplyBtn?.classList.remove('hidden');
             } else if (userRole === 'seller') {
@@ -753,8 +1101,12 @@
               if (dashboardBtn) dashboardBtn.innerHTML = '<i data-lucide="shield" class="w-6 h-6"></i>';
             }
             
-            const loginFab = document.getElementById('loginFab');
-            if (loginFab) loginFab.innerHTML = '<i data-lucide="user-check" class="w-6 h-6"></i>';
+            // Update profile UI
+            await updateProfileUI();
+            
+            // Load notifications
+            await loadNotifications();
+            
           } else {
             userRole = 'guest';
             roleBadge?.classList.add('hidden');
@@ -762,8 +1114,8 @@
             dashboardBtn?.classList.add('hidden');
             complaintBtn?.classList.add('hidden');
             
-            const loginFab = document.getElementById('loginFab');
-            if (loginFab) loginFab.innerHTML = '<i data-lucide="user" class="w-6 h-6"></i>';
+            // Update profile UI for guest
+            await updateProfileUI();
           }
           
           lucide.createIcons();
@@ -1082,6 +1434,14 @@
         switchTab('login');
       }
 
+      // ==================== LOGOUT ====================
+      async function logout() {
+        const { error } = await supabaseClient.auth.signOut();
+        if (!error) {
+          location.reload();
+        }
+      }
+
       // ==================== SELLER APPLICATION ====================
       async function submitSellerApplication() {
         const fullName = document.getElementById('sellerFullName')?.value;
@@ -1119,6 +1479,18 @@
           if (msgEl) msgEl.textContent = 'Gagal mengajukan: ' + error.message;
         } else {
           if (msgEl) msgEl.textContent = 'Pengajuan berhasil! Menunggu verifikasi admin.';
+          
+          // Create notification for user
+          if (user) {
+            await createNotification(
+              user.id,
+              'Pengajuan Penjual Diterima',
+              'Pengajuan Anda sebagai penjual telah kami terima dan sedang menunggu verifikasi admin. Kami akan memberi tahu Anda jika sudah disetujui.',
+              'info',
+              'store'
+            );
+          }
+          
           setTimeout(() => {
             document.getElementById('sellerApplyModal')?.classList.add('hidden');
           }, 2000);
@@ -1138,6 +1510,57 @@
           cartModal?.classList.add('hidden');
           loginModal?.classList.add('hidden');
           
+          // Profile dropdown toggle
+          profileBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleProfileDropdown();
+          });
+
+          // Notification dropdown toggle
+          notificationBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('show');
+            profileDropdown.classList.remove('show');
+          });
+
+          // Close dropdowns when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!profileBtn?.contains(e.target)) {
+              profileDropdown?.classList.remove('show');
+            }
+            if (!notificationBtn?.contains(e.target)) {
+              notificationDropdown?.classList.remove('show');
+            }
+          });
+
+          // Logout
+          logoutBtn?.addEventListener('click', logout);
+
+          // Mark all as read
+          markAllReadBtn?.addEventListener('click', markAllAsRead);
+
+          // Close notification modal
+          document.getElementById('closeNotificationModal')?.addEventListener('click', () => {
+            notificationModal.classList.add('hidden');
+          });
+          document.getElementById('notificationOverlay')?.addEventListener('click', () => {
+            notificationModal.classList.add('hidden');
+          });
+
+          // Seller application from profile
+          document.getElementById('sellerApplyFromProfile')?.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
+            document.getElementById('sellerApplyModal')?.classList.remove('hidden');
+            document.getElementById('sellerApplyModal')?.classList.add('flex');
+          });
+
+          // Seller dashboard from profile
+          document.getElementById('sellerDashboardFromProfile')?.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
+            // Redirect to seller dashboard (bisa buat nanti)
+            alert('Fitur dashboard penjual akan segera hadir!');
+          });
+
           // Event Listeners
           document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1158,12 +1581,15 @@
             e.stopPropagation();
             cartModal?.classList.remove('hidden');
             renderCartModal();
+            profileDropdown.classList.remove('show');
+            notificationDropdown.classList.remove('show');
           });
           
           document.getElementById('closeCart')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
           document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
 
-          document.getElementById('loginFab')?.addEventListener('click', openLoginModal);
+          // Login triggers
+          loginFab?.addEventListener('click', openLoginModal);
           document.querySelector('footer a:first-child')?.addEventListener('click', (e) => {
             e.preventDefault();
             openLoginModal();
@@ -1189,7 +1615,7 @@
             }
           });
 
-          // ==================== REGISTER BUTTON (FIX) ====================
+          // ==================== REGISTER BUTTON ====================
           registerBtn?.addEventListener('click', () => {
             const method = registerMethod.value;
             

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Saya · Kuy Belanja</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    .bg-metalic-gradient {
+      background: linear-gradient(145deg, #0B1E4A 0%, #0A2F6C 30%, #1E4F9C 70%, #1479EA 100%);
+    }
+    .glass-panel {
+      background: rgba(10, 30, 60, 0.25);
+      backdrop-filter: blur(12px) saturate(180%);
+      border: 1px solid rgba(100, 180, 255, 0.25);
+      border-radius: 1.5rem;
+    }
+  </style>
+</head>
+<body class="bg-metalic-gradient text-white min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+      <a href="/" class="inline-flex items-center gap-2 text-blue-300 hover:text-white mb-6">
+        <i data-lucide="arrow-left"></i> Kembali ke Beranda
+      </a>
+      
+      <div class="glass-panel p-8">
+        <h1 class="text-3xl font-bold mb-6">Profil Saya</h1>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- Avatar Section -->
+          <div class="text-center">
+            <div class="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-4xl font-bold mb-4" id="profileAvatar">
+              U
+            </div>
+            <div id="profileBadge" class="mb-4"></div>
+            <button id="changeAvatarBtn" class="text-sm text-blue-300 hover:text-white">Ganti Foto</button>
+          </div>
+          
+          <!-- Form Section -->
+          <div class="md:col-span-2 space-y-4">
+            <div>
+              <label class="block text-sm mb-1">Nama Lengkap</label>
+              <input type="text" id="fullName" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white">
+            </div>
+            
+            <div>
+              <label class="block text-sm mb-1">Email</label>
+              <input type="email" id="email" readonly class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white opacity-70">
+            </div>
+            
+            <div>
+              <label class="block text-sm mb-1">Nomor WhatsApp</label>
+              <input type="text" id="phone" placeholder="Belum diisi" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white">
+            </div>
+            
+            <div>
+              <label class="block text-sm mb-1">Bio / Deskripsi</label>
+              <textarea id="bio" rows="3" placeholder="Ceritakan tentang diri Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"></textarea>
+            </div>
+            
+            <div class="flex gap-3 pt-4">
+              <button id="saveProfileBtn" class="bg-[#1e4f9c] px-6 py-2 rounded-full hover-metallic">Simpan Perubahan</button>
+              <button id="changePasswordBtn" class="border border-blue-400 px-6 py-2 rounded-full hover-metallic">Ubah Password</button>
+            </div>
+            
+            <div id="profileMessage" class="text-sm text-yellow-300 mt-2"></div>
+          </div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-blue-400/30">
+          <div class="text-center">
+            <div class="text-2xl font-bold" id="statOrders">0</div>
+            <div class="text-sm">Pesanan</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold" id="statWishlist">0</div>
+            <div class="text-sm">Wishlist</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold" id="statReviews">0</div>
+            <div class="text-sm">Ulasan</div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold" id="statMemberSince">-</div>
+            <div class="text-sm">Member Sejak</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://mpgkhjzvvzcczsdczlca.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZ2toanp2dnpjY3pzZGN6bGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjY2NDQsImV4cCI6MjA4OTI0MjY0NH0.HrRAnpdTAv86RO4nkPMV6NXYrM8MkrpajR7mKkZwfS8'
+    );
+    
+    lucide.createIcons();
+    
+    // Load profile data
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = '/';
+        return;
+      }
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) {
+        document.getElementById('fullName').value = profile.full_name || '';
+        document.getElementById('email').value = user.email;
+        document.getElementById('phone').value = profile.phone || '';
+        document.getElementById('bio').value = profile.bio || '';
+        
+        // Avatar
+        const firstLetter = (profile.full_name || user.email || 'U').charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').textContent = firstLetter;
+        
+        // Badge
+        const badgeEl = document.getElementById('profileBadge');
+        if (profile.role === 'seller') {
+          badgeEl.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
+        } else if (profile.role === 'admin') {
+          badgeEl.innerHTML = '<span class="verified-badge"><i data-lucide="shield" class="w-3 h-3"></i> Admin</span>';
+        } else {
+          badgeEl.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Raja Pembeli</span>';
+        }
+        lucide.createIcons();
+        
+        // Stats
+        document.getElementById('statMemberSince').textContent = 
+          new Date(user.created_at).toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+      }
+    }
+    
+    // Save profile
+    document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const updates = {
+        full_name: document.getElementById('fullName').value,
+        phone: document.getElementById('phone').value,
+        bio: document.getElementById('bio').value,
+        updated_at: new Date()
+      };
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id);
+      
+      if (error) {
+        document.getElementById('profileMessage').textContent = 'Gagal menyimpan: ' + error.message;
+      } else {
+        document.getElementById('profileMessage').textContent = 'Profil berhasil diperbarui!';
+        setTimeout(() => document.getElementById('profileMessage').textContent = '', 3000);
+      }
+    });
+    
+    loadProfile();
+  </script>
+</body>
+</html>
