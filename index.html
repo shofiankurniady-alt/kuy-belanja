@@ -100,7 +100,7 @@
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
 
-  <!-- HEADER (sama seperti sebelumnya) -->
+  <!-- HEADER -->
   <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
@@ -216,6 +216,16 @@
     </div>
   </div>
 
+  <!-- WHATSAPP POPUP -->
+  <div id="whatsappPopup" class="fixed bottom-24 right-6 z-50 hidden">
+    <div class="glass-panel p-4 w-64">
+      <p class="text-sm mb-2">Hubungi penjual via WhatsApp</p>
+      <a id="whatsappLink" href="#" target="_blank" class="block bg-green-600 text-center py-2 rounded-full hover-metallic">
+        <i data-lucide="message-circle" class="w-4 h-4 inline mr-1"></i> Chat Now
+      </a>
+    </div>
+  </div>
+
   <!-- MODAL KERANJANG -->
   <div id="cartModal" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[100] hidden transition-all duration-300 ease-out">
     <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cartOverlay"></div>
@@ -248,7 +258,7 @@
     </div>
   </div>
 
-  <!-- MODAL LOGIN/REGISTER BARU DENGAN 3 TAB -->
+  <!-- MODAL LOGIN/REGISTER DENGAN 3 TAB -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto">
@@ -290,6 +300,21 @@
         <button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="loginBtn">Masuk</button>
         
         <div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div>
+
+        <!-- OTP Form (akan muncul setelah request OTP) -->
+        <div id="otpForm" class="hidden mt-4 border-t border-blue-400/30 pt-4">
+          <p class="text-sm mb-2 text-center">Masukkan kode OTP 6 digit yang dikirim via WhatsApp:</p>
+          <div class="flex gap-2">
+            <input type="text" id="otpCode" maxlength="6" placeholder="123456" 
+                   class="flex-1 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white text-center text-xl tracking-widest">
+            <button id="verifyOtpBtn" class="bg-green-600 px-4 rounded-full hover-metallic whitespace-nowrap">Verifikasi</button>
+          </div>
+          <input type="hidden" id="otpPhone">
+          <p class="text-xs text-blue-300 mt-2 text-center">
+            Kode berlaku 5 menit. 
+            <button id="resendOtpBtn" class="text-yellow-300 hover:underline">Kirim ulang</button>
+          </p>
+        </div>
       </div>
       
       <!-- REGISTER TAB -->
@@ -336,7 +361,7 @@
         </div>
         
         <div id="whatsappReset" class="hidden">
-          <input type="text" id="resetWhatsapp" placeholder="Nomor WhatsApp" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+          <input type="text" id="resetWhatsapp" placeholder="Nomor WhatsApp (628xxx)" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         </div>
         
         <button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="resetBtn">Kirim Reset Link</button>
@@ -386,6 +411,10 @@
       const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
       console.log('✅ Supabase initialized');
 
+      // ==================== FONNTE CONFIG ====================
+      const FONNTE_API_KEY = 'XJXbK7Vd6PowzWbodARRaaoBCcW';
+      const FONNTE_BASE_URL = 'https://api.fonnte.com';
+
       // ==================== GLOBAL VARIABLES ====================
       let products = [];
       let cart = [];
@@ -407,6 +436,8 @@
       const sellerApplyBtn = document.getElementById('sellerApplyBtn');
       const dashboardBtn = document.getElementById('dashboardBtn');
       const complaintBtn = document.getElementById('complaintBtn');
+      const whatsappPopup = document.getElementById('whatsappPopup');
+      const whatsappLink = document.getElementById('whatsappLink');
       
       // Login tab elements
       const loginTab = document.getElementById('loginTab');
@@ -437,21 +468,147 @@
       const resetBtn = document.getElementById('resetBtn');
       const resetMessage = document.getElementById('resetMessage');
       
+      // OTP elements
+      const otpForm = document.getElementById('otpForm');
+      const otpCode = document.getElementById('otpCode');
+      const otpPhone = document.getElementById('otpPhone');
+      const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+      const resendOtpBtn = document.getElementById('resendOtpBtn');
+      
       let activeCategory = 'all';
       let searchTerm = '';
 
+      // ==================== FUNGSI OTP WHATSAPP ====================
+
+      // Generate random OTP 6 digit
+      function generateOTP() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+      }
+
+      // Kirim OTP via Fonnte
+      async function sendOTPviaWA(phone, otp) {
+        try {
+          const response = await fetch(FONNTE_BASE_URL + '/send', {
+            method: 'POST',
+            headers: {
+              'Authorization': FONNTE_API_KEY
+            },
+            body: new URLSearchParams({
+              target: phone,
+              message: `🔐 *Kode Verifikasi Kuy Belanja*\n\nHalo! Berikut kode OTP Anda:\n\n*${otp}*\n\nKode ini berlaku selama 5 menit. Jangan berikan kode ini kepada siapa pun, termasuk petugas kami.\n\nAbaikan pesan ini jika Anda tidak meminta kode verifikasi.`,
+              countryCode: '62'
+            })
+          });
+          
+          const result = await response.json();
+          console.log('Fonnte response:', result);
+          return result;
+        } catch (error) {
+          console.error('Error sending OTP via Fonnte:', error);
+          return { status: false, reason: error.message };
+        }
+      }
+
+      // Request OTP
+      async function requestOTP(phone) {
+        // Validasi nomor (harus format 62xxx)
+        let formattedPhone = phone;
+        if (!formattedPhone.startsWith('62')) {
+          formattedPhone = '62' + formattedPhone.replace(/^0+/, '');
+        }
+        
+        const otp = generateOTP();
+        
+        // Simpan OTP di sessionStorage beserta timestamp
+        sessionStorage.setItem('otp_' + formattedPhone, otp);
+        sessionStorage.setItem('otp_time_' + formattedPhone, Date.now().toString());
+        
+        // Kirim via Fonnte
+        const result = await sendOTPviaWA(formattedPhone, otp);
+        
+        if (result.status) {
+          alert('✅ Kode OTP telah dikirim via WhatsApp!');
+          // Tampilkan form input OTP
+          showOTPForm(formattedPhone);
+        } else {
+          alert('❌ Gagal kirim OTP: ' + (result.reason || 'Unknown error'));
+        }
+      }
+
+      // Verifikasi OTP
+      function verifyOTP(phone, userOtp) {
+        const storedOtp = sessionStorage.getItem('otp_' + phone);
+        const otpTime = sessionStorage.getItem('otp_time_' + phone);
+        
+        // Cek apakah OTP ada
+        if (!storedOtp || !otpTime) {
+          alert('Kode OTP tidak ditemukan. Minta kode baru.');
+          return false;
+        }
+        
+        // Cek apakah OTP masih berlaku (5 menit = 300000 ms)
+        if (Date.now() - parseInt(otpTime) > 5 * 60 * 1000) {
+          alert('⏰ Kode OTP sudah kadaluarsa. Minta kode baru.');
+          sessionStorage.removeItem('otp_' + phone);
+          sessionStorage.removeItem('otp_time_' + phone);
+          return false;
+        }
+        
+        // Verifikasi kode
+        if (userOtp === storedOtp) {
+          alert('✅ Verifikasi berhasil!');
+          sessionStorage.removeItem('otp_' + phone);
+          sessionStorage.removeItem('otp_time_' + phone);
+          return true;
+        } else {
+          alert('❌ Kode OTP salah!');
+          return false;
+        }
+      }
+
+      // Tampilkan form input OTP
+      function showOTPForm(phone) {
+        otpPhone.value = phone;
+        otpForm.classList.remove('hidden');
+        otpCode.value = '';
+        otpCode.focus();
+      }
+
+      // Cek user berdasarkan nomor WhatsApp
+      async function checkUserByPhone(phone) {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('*')
+          .eq('phone', phone)
+          .maybeSingle();
+        
+        if (data) {
+          alert(`Selamat datang kembali, ${data.email || 'pengguna'}!`);
+          location.reload();
+        } else {
+          alert('Nomor WhatsApp belum terdaftar. Silakan daftar.');
+          switchTab('register');
+          registerMethod.value = 'whatsapp';
+          emailRegister.classList.add('hidden');
+          whatsappRegister.classList.remove('hidden');
+          document.getElementById('regWhatsapp').value = phone;
+          otpForm.classList.add('hidden');
+        }
+      }
+
       // ==================== TAB SWITCHING ====================
       function switchTab(tabId) {
-        // Hide all tabs
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
         document.getElementById(tabId + 'Tab').classList.remove('hidden');
         
-        // Update tab buttons
         tabBtns.forEach(btn => {
           btn.classList.remove('font-bold', 'text-white');
           btn.classList.add('text-blue-300');
         });
         document.querySelector(`[data-tab="${tabId}"]`).classList.add('font-bold', 'text-white');
+        
+        // Sembunyikan OTP form saat pindah tab
+        if (otpForm) otpForm.classList.add('hidden');
       }
 
       tabBtns.forEach(btn => {
@@ -502,47 +659,33 @@
       });
 
       // ==================== WHATSAPP LOGIN (OTP) ====================
-      document.getElementById('whatsappLoginBtn')?.addEventListener('click', async () => {
+      document.getElementById('whatsappLoginBtn')?.addEventListener('click', () => {
         const phone = prompt('Masukkan nomor WhatsApp Anda (contoh: 628123456789):');
-        if (!phone) return;
+        if (phone) {
+          requestOTP(phone);
+        }
+      });
+
+      // Verifikasi OTP
+      verifyOtpBtn?.addEventListener('click', () => {
+        const phone = otpPhone.value;
+        const otp = otpCode.value;
         
-        // Generate random OTP
-        const otp = Math.floor(100000 + Math.random() * 900000);
+        if (otp.length !== 6) {
+          alert('Kode OTP harus 6 digit!');
+          return;
+        }
         
-        // Simpan OTP di session storage (sementara)
-        sessionStorage.setItem('whatsapp_otp', otp);
-        sessionStorage.setItem('whatsapp_phone', phone);
-        
-        // Buat pesan WhatsApp
-        const message = `Kode OTP Anda untuk login Kuy Belanja adalah: ${otp}. Jangan berikan kode ini kepada siapa pun.`;
-        
-        // Buka WhatsApp
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
-        
-        // Tanyakan OTP
-        const userOtp = prompt('Masukkan kode OTP yang telah dikirim ke WhatsApp Anda:');
-        
-        if (userOtp && userOtp === otp.toString()) {
-          // OTP benar, cek apakah user sudah terdaftar
-          const { data: existingUser } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('phone', phone)
-            .maybeSingle();
-          
-          if (existingUser) {
-            // Login dengan password (untuk sementara pakai alert)
-            alert('Login via WhatsApp akan segera diimplementasikan penuh. Untuk sekarang, gunakan login email.');
-          } else {
-            alert('Nomor WhatsApp belum terdaftar. Silakan daftar terlebih dahulu.');
-            switchTab('register');
-            registerMethod.value = 'whatsapp';
-            emailRegister.classList.add('hidden');
-            whatsappRegister.classList.remove('hidden');
-            document.getElementById('regWhatsapp').value = phone;
-          }
-        } else {
-          alert('Kode OTP salah!');
+        if (verifyOTP(phone, otp)) {
+          checkUserByPhone(phone);
+        }
+      });
+
+      // Kirim ulang OTP
+      resendOtpBtn?.addEventListener('click', () => {
+        const phone = otpPhone.value;
+        if (phone) {
+          requestOTP(phone);
         }
       });
 
@@ -558,7 +701,7 @@
           }
           
           const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/reset-password',
+            redirectTo: 'https://kuy-belanja.vercel.app/reset-password',
           });
           
           if (error) {
@@ -573,8 +716,9 @@
             return;
           }
           
-          // Simulasi reset via WhatsApp
-          resetMessage.textContent = 'Fitur reset via WhatsApp akan segera hadir! Untuk sementara gunakan reset via email.';
+          // Untuk reset via WhatsApp, kita bisa gunakan OTP juga
+          requestOTP(phone);
+          resetMessage.textContent = 'Kode OTP telah dikirim via WhatsApp. Gunakan kode tersebut untuk verifikasi.';
         }
       });
 
@@ -706,12 +850,10 @@
             e.preventDefault();
             e.stopPropagation();
             const phone = btn.dataset.seller;
-            const popup = document.getElementById('whatsappPopup');
-            const link = document.getElementById('whatsappLink');
-            if (link) link.href = `https://wa.me/${phone}`;
-            if (popup) {
-              popup.classList.remove('hidden');
-              setTimeout(() => popup.classList.add('hidden'), 5000);
+            if (whatsappLink) whatsappLink.href = `https://wa.me/${phone}`;
+            if (whatsappPopup) {
+              whatsappPopup.classList.remove('hidden');
+              setTimeout(() => whatsappPopup.classList.add('hidden'), 5000);
             }
           });
         });
@@ -892,8 +1034,8 @@
         }
       }
 
-      // ==================== REGISTER FUNCTION ====================
-      async function register(email, password) {
+      // ==================== REGISTER FUNCTION (UPDATE) ====================
+      async function register(email, password, phone = null) {
         try {
           const { data, error } = await supabaseClient.auth.signUp({
             email: email,
@@ -904,11 +1046,15 @@
             if (registerMessage) registerMessage.textContent = 'Registrasi gagal: ' + error.message;
           } else {
             if (data?.user) {
-              await supabaseClient.from('profiles').insert({
+              const profileData = {
                 id: data.user.id,
                 email: email,
                 role: 'buyer'
-              });
+              };
+              if (phone) {
+                profileData.phone = phone;
+              }
+              await supabaseClient.from('profiles').insert(profileData);
             }
             if (registerMessage) registerMessage.textContent = 'Registrasi berhasil! Cek email untuk verifikasi.';
             setTimeout(() => switchTab('login'), 2000);
@@ -924,6 +1070,7 @@
         loginModal?.classList.remove('hidden');
         loginModal?.classList.add('flex');
         if (loginMessage) loginMessage.textContent = '';
+        if (otpForm) otpForm.classList.add('hidden');
         switchTab('login');
       }
 
@@ -1051,7 +1198,28 @@
               }
               register(email, password);
             } else {
-              registerMessage.textContent = 'Registrasi via WhatsApp akan segera hadir! Gunakan email untuk sekarang.';
+              const phone = regWhatsapp?.value;
+              const password = regPassword?.value;
+              const confirm = regConfirmPassword?.value;
+              
+              if (!phone || !password || !confirm) {
+                registerMessage.textContent = 'Semua field harus diisi!';
+                return;
+              }
+              if (password !== confirm) {
+                registerMessage.textContent = 'Password tidak cocok!';
+                return;
+              }
+              
+              // Format nomor
+              let formattedPhone = phone;
+              if (!formattedPhone.startsWith('62')) {
+                formattedPhone = '62' + formattedPhone.replace(/^0+/, '');
+              }
+              
+              // Daftar dengan email palsu
+              const fakeEmail = `user_${formattedPhone}@temp.kuybelanja.com`;
+              register(fakeEmail, password, formattedPhone);
             }
           });
 
