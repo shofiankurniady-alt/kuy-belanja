@@ -57,11 +57,19 @@
     .role-badge { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 999px; background: #1E4F9C; margin-left: 0.5rem; }
     .loader { border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 3px solid #ffffff; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .profile-dropdown, .notification-dropdown { position: absolute; right: 0; top: 100%; margin-top: 0.5rem; width: 280px; z-index: 100; display: none; }
-    .profile-dropdown.show, .notification-dropdown.show { display: block; }
-    .notification-dropdown { width: 320px; max-height: 400px; overflow-y: auto; }
+    .notification-dropdown { position: absolute; right: 0; top: 100%; margin-top: 0.5rem; width: 320px; max-height: 400px; overflow-y: auto; z-index: 100; display: none; }
+    .notification-dropdown.show { display: block; }
     .verified-badge { background: #10B981; color: white; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.25rem; }
     .buyer-badge { background: #8B5CF6; color: white; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.25rem; }
+    
+    /* Profile Sidebar - Instagram Style */
+    #profileSidebar {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateX(100%);
+    }
+    #profileSidebar.active {
+      transform: translateX(0);
+    }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
@@ -95,20 +103,6 @@
         <div class="relative cursor-pointer group" id="cartIcon"><div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic"><i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i></div><span id="cartBadge" class="cart-badge hidden">0</span></div>
         <div class="relative">
           <button id="profileBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic"><i data-lucide="user" class="w-6 h-6 text-white"></i></button>
-          <div id="profileDropdown" class="profile-dropdown glass-panel p-4">
-            <div class="flex items-center gap-3 border-b border-blue-400/30 pb-3 mb-3">
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-2xl font-bold" id="profileAvatar">U</div>
-              <div class="flex-1 min-w-0"><div class="font-bold truncate" id="profileName">Pengunjung</div><div class="text-xs text-blue-300 truncate" id="profileEmail"></div><div id="profileBadge" class="mt-1"></div></div>
-            </div>
-            <div class="space-y-2">
-              <a href="/profile.html" class="flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition"><i data-lucide="user" class="w-4 h-4"></i><span>Profil Saya</span></a>
-              <a href="/orders.html" class="flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition"><i data-lucide="package" class="w-4 h-4"></i><span>Pesanan Saya</span></a>
-              <div id="sellerApplyLink" class="hidden"><button id="sellerApplyFromProfile" class="w-full flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition text-left"><i data-lucide="store" class="w-4 h-4"></i><span>Daftar Jadi Penjual</span></button></div>
-              <div id="sellerDashboardLink" class="hidden"><button id="sellerDashboardFromProfile" class="w-full flex items-center gap-3 p-2 hover:bg-[#1e4f9c] rounded-lg transition text-left"><i data-lucide="layout-dashboard" class="w-4 h-4"></i><span>Dashboard Penjual</span></button></div>
-              <hr class="border-blue-400/30 my-2">
-              <button id="logoutBtn" class="w-full flex items-center gap-3 p-2 hover:bg-red-600/30 rounded-lg transition text-red-300"><i data-lucide="log-out" class="w-4 h-4"></i><span>Keluar</span></button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -141,26 +135,56 @@
   <!-- CART MODAL -->
   <div id="cartModal" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[100] hidden transition-all duration-300 ease-out"><div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cartOverlay"></div><div class="relative glass-panel w-full h-full ml-auto p-5 flex flex-col text-white border-l-2 border-blue-400/30 shadow-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold flex gap-2"><i data-lucide="shopping-bag"></i> Keranjangmu</h2><button id="closeCart" class="p-2 rounded-full bg-[#1c3f6e] hover:bg-[#28579b]"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer"><div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div></div><div class="border-t border-blue-400/30 pt-4 mt-2"><div class="flex justify-between text-xl font-bold mb-3"><span>Subtotal</span> <span id="cartSubtotal">Rp 0</span></div><div class="mb-3"><p class="text-sm mb-2">Metode Pembayaran:</p><div class="grid grid-cols-3 gap-2"><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="BCA">🏦 BCA</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="MANDIRI">🏦 Mandiri</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="BNI">🏦 BNI</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="GOPAY">📱 GoPay</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="OVO">📱 OVO</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="DANA">📱 DANA</button></div><div id="selectedPayment" class="text-xs text-yellow-300 mt-2"></div></div><button class="w-full bg-[#1e4f9c] py-3 rounded-full border border-blue-300 font-semibold hover-metallic flex items-center justify-center gap-2" id="checkoutBtn"><i data-lucide="credit-card"></i> Checkout</button></div></div></div>
 
-  <!-- MODAL LOGIN/REGISTER (HANYA GOOGLE + EMAIL) -->
+  <!-- LOGIN MODAL -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div><div class="relative glass-panel w-96 p-6 text-white"><div class="flex border-b border-blue-400/30 mb-6"><button class="tab-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button><button class="tab-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button><button class="tab-btn flex-1 py-2 text-center text-blue-300" data-tab="forgot">Lupa</button></div>
-    
-    <!-- LOGIN TAB -->
-    <div id="loginTab" class="tab-content"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Masuk ke Akun</h3>
-      <button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full hover-metallic flex items-center justify-center gap-3 mb-4"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google</button>
-      <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau</span></div></div>
-      <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="loginBtn">Masuk</button><div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div>
-    </div>
-    
-    <!-- REGISTER TAB -->
+    <div id="loginTab" class="tab-content"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Masuk ke Akun</h3><button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full hover-metallic flex items-center justify-center gap-3 mb-4"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google</button><div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau</span></div></div><input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="loginBtn">Masuk</button><div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div>
     <div id="registerTab" class="tab-content hidden"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3><input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic" id="registerBtn">Daftar</button><div id="registerMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div>
-    
-    <!-- FORGOT PASSWORD TAB -->
     <div id="forgotTab" class="tab-content hidden"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="key"></i> Reset Password</h3><input type="email" id="resetEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="resetBtn">Kirim Reset Link</button><div id="resetMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div>
-    
     <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button></div></div>
 
   <!-- FAB LOGIN -->
   <div id="loginFab" style="position: fixed; bottom: 20px; right: 20px; z-index: 60;" class="hidden"><button class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic"><i data-lucide="user" class="w-6 h-6"></i></button></div>
+
+  <!-- INSTAGRAM-STYLE PROFILE SIDEBAR (SLIDE FROM RIGHT) -->
+  <div id="profileSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[500] transition-transform duration-300 ease-out">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="profileSidebarOverlay"></div>
+    <div class="relative glass-panel w-full h-full ml-auto flex flex-col overflow-y-auto">
+      <div class="flex justify-between items-center p-4 border-b border-blue-400/30">
+        <h2 class="text-xl font-bold">Profil</h2>
+        <button id="closeProfileSidebar" class="p-2 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <!-- Cover Photo -->
+      <div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
+        <div class="absolute -bottom-12 left-4">
+          <div class="w-24 h-24 rounded-full border-4 border-white bg-[#0f284a] flex items-center justify-center text-3xl font-bold overflow-hidden">
+            <img id="sidebarAvatar" src="https://placehold.co/96x96/1e4f9c/white?text=U" class="w-full h-full object-cover">
+          </div>
+        </div>
+        <button id="changeCoverBtn" class="absolute top-2 right-2 bg-black/50 p-1 rounded-full hover:bg-black/70"><i data-lucide="camera" class="w-4 h-4"></i></button>
+      </div>
+      <div class="h-14"></div>
+      <div class="px-4">
+        <div class="flex justify-between items-start">
+          <div><h3 id="sidebarName" class="text-xl font-bold">Pengguna</h3><p id="sidebarUsername" class="text-sm text-blue-300">@pengguna</p></div>
+          <button id="editProfileBtn" class="px-4 py-1.5 text-sm border border-blue-400 rounded-full hover:bg-[#1e4f9c] transition">Edit Profil</button>
+        </div>
+        <div id="sidebarBio" class="mt-3 text-sm"><p class="text-blue-200/80">Belum ada bio</p></div>
+        <div class="flex gap-6 mt-4 py-3 border-y border-blue-400/30">
+          <div class="text-center"><div id="statPosts" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Postingan</div></div>
+          <div class="text-center"><div id="statFollowers" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Pengikut</div></div>
+          <div class="text-center"><div id="statFollowing" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Mengikuti</div></div>
+        </div>
+        <div id="sidebarBadge" class="mt-3"></div>
+        <div id="sidebarSellerApply" class="mt-3 hidden"><button id="sidebarSellerApplyBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 py-2 rounded-full text-sm font-semibold hover:opacity-90">Jadi Penjual</button></div>
+        <div id="sidebarDashboard" class="mt-3 hidden"><button id="sidebarDashboardBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full text-sm font-semibold hover:bg-[#2f6bc9]">Dashboard Penjual</button></div>
+      </div>
+      <div class="mt-6 px-4"><h4 class="text-sm font-semibold mb-3 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> Produk Saya</h4><div id="userProductsGrid" class="grid grid-cols-3 gap-1"><div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div></div></div>
+      <div class="mt-auto p-4 border-t border-blue-400/30"><button id="sidebarLogoutBtn" class="w-full bg-red-600/30 text-red-300 py-2 rounded-full hover:bg-red-600/50 transition flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar</button></div>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="editProfileModal" class="fixed inset-0 z-[600] hidden items-center justify-center"><div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="editProfileOverlay"></div><div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user"></i> Edit Profil</h3><div class="space-y-4"><div><label class="text-sm text-blue-300">Nama</label><input type="text" id="editFullName" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Username</label><input type="text" id="editUsername" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Bio</label><textarea id="editBio" rows="3" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></textarea></div><div><label class="text-sm text-blue-300">Foto Profil</label><input type="file" id="editAvatar" accept="image/*" class="w-full text-sm text-blue-300"></div><div class="flex gap-2 pt-2"><button id="saveProfileChanges" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Simpan</button><button id="closeEditProfile" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Batal</button></div><div id="editProfileMessage" class="text-sm text-yellow-300 text-center"></div></div></div></div>
 
   <!-- FOOTER -->
   <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80"><div class="flex gap-6 flex-wrap justify-center"><a href="#" class="hover:text-white" id="bantuanLink">Bantuan</a><a href="#" class="hover:text-white">Pengiriman</a><a href="#" class="hover:text-white">Syarat Penjual</a></div><div class="flex gap-4 my-3 md:my-0"><i data-lucide="credit-card" class="w-5 h-5"></i><i data-lucide="landmark" class="w-5 h-5"></i><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-xs">BCA / Mandiri / BNI / GoPay / OVO / DANA</span></div><div>© 2026 Kuy Belanja · Marketplace Indonesia</div></footer>
@@ -207,16 +231,31 @@
       const whatsappLink = document.getElementById('whatsappLink');
       const loginFab = document.getElementById('loginFab');
       
-      // Profile elements
-      const profileBtn = document.getElementById('profileBtn');
-      const profileDropdown = document.getElementById('profileDropdown');
-      const profileName = document.getElementById('profileName');
-      const profileEmail = document.getElementById('profileEmail');
-      const profileBadge = document.getElementById('profileBadge');
-      const profileAvatar = document.getElementById('profileAvatar');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const sellerApplyLink = document.getElementById('sellerApplyLink');
-      const sellerDashboardLink = document.getElementById('sellerDashboardLink');
+      // Profile sidebar elements
+      const profileSidebar = document.getElementById('profileSidebar');
+      const closeProfileSidebar = document.getElementById('closeProfileSidebar');
+      const profileSidebarOverlay = document.getElementById('profileSidebarOverlay');
+      const editProfileModal = document.getElementById('editProfileModal');
+      const editProfileOverlay = document.getElementById('editProfileOverlay');
+      const closeEditProfile = document.getElementById('closeEditProfile');
+      const editProfileBtn = document.getElementById('editProfileBtn');
+      const saveProfileChanges = document.getElementById('saveProfileChanges');
+      const sidebarAvatar = document.getElementById('sidebarAvatar');
+      const sidebarName = document.getElementById('sidebarName');
+      const sidebarUsername = document.getElementById('sidebarUsername');
+      const sidebarBio = document.getElementById('sidebarBio');
+      const sidebarBadge = document.getElementById('sidebarBadge');
+      const sidebarSellerApply = document.getElementById('sidebarSellerApply');
+      const sidebarDashboard = document.getElementById('sidebarDashboard');
+      const userProductsGrid = document.getElementById('userProductsGrid');
+      const statPosts = document.getElementById('statPosts');
+      const statFollowers = document.getElementById('statFollowers');
+      const statFollowing = document.getElementById('statFollowing');
+      const editFullName = document.getElementById('editFullName');
+      const editUsername = document.getElementById('editUsername');
+      const editBio = document.getElementById('editBio');
+      const editAvatar = document.getElementById('editAvatar');
+      const editProfileMessage = document.getElementById('editProfileMessage');
       
       // Notification elements
       const notificationBtn = document.getElementById('notificationBtn');
@@ -253,9 +292,7 @@
         document.querySelector(`[data-tab="${tabId}"]`).classList.add('font-bold', 'text-white');
       }
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-      });
+      tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
       // ==================== GOOGLE LOGIN ====================
       document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
@@ -265,10 +302,7 @@
             options: { redirectTo: window.location.origin }
           });
           if (error) alert('Gagal login dengan Google: ' + error.message);
-        } catch (error) {
-          console.error('Google login error:', error);
-          alert('Gagal login dengan Google');
-        }
+        } catch (error) { alert('Gagal login dengan Google'); }
       });
 
       // ==================== FORGOT PASSWORD ====================
@@ -297,7 +331,7 @@
             else if (userRole === 'seller') { dashboardBtn?.classList.remove('hidden'); complaintBtn?.classList.remove('hidden'); if(dashboardBtn) dashboardBtn.innerHTML = '<i data-lucide="store" class="w-6 h-6"></i>'; }
             else if (userRole === 'admin') { dashboardBtn?.classList.remove('hidden'); if(dashboardBtn) dashboardBtn.innerHTML = '<i data-lucide="shield" class="w-6 h-6"></i>'; }
             
-            await updateProfileUI();
+            await updateSidebarUI();
             await loadNotifications();
           } else {
             userRole = 'guest';
@@ -305,53 +339,114 @@
             sellerApplyBtn?.classList.add('hidden');
             dashboardBtn?.classList.add('hidden');
             complaintBtn?.classList.add('hidden');
-            await updateProfileUI();
+            await updateSidebarUI();
           }
           lucide.createIcons();
           return user;
         } catch (error) { console.error('Error checkUser:', error); return null; }
       }
 
-      // ==================== UPDATE PROFILE UI ====================
-      async function updateProfileUI() {
+      // ==================== SIDEBAR FUNCTIONS ====================
+      function openProfileSidebar() {
+        profileSidebar.classList.add('active');
+        loadUserProducts();
+        document.body.style.overflow = 'hidden';
+      }
+      function closeProfileSidebarFunc() {
+        profileSidebar.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      function openEditProfileModal() {
+        editFullName.value = userProfile?.full_name || '';
+        editUsername.value = userProfile?.username || currentUser?.email?.split('@')[0] || '';
+        editBio.value = userProfile?.bio || '';
+        editProfileModal.classList.remove('hidden');
+        editProfileModal.classList.add('flex');
+      }
+
+      async function updateSidebarUI() {
         if (!currentUser) {
-          profileName.textContent = 'Pengunjung';
-          profileEmail.textContent = '';
-          profileBadge.innerHTML = '';
-          profileAvatar.textContent = 'G';
-          sellerApplyLink.classList.add('hidden');
-          sellerDashboardLink.classList.add('hidden');
-          loginFab.classList.remove('hidden');
+          sidebarName.textContent = 'Pengunjung';
+          sidebarUsername.textContent = '@pengunjung';
+          sidebarBio.innerHTML = '<p class="text-blue-200/80">Login untuk melihat profil</p>';
+          sidebarAvatar.src = 'https://placehold.co/96x96/1e4f9c/white?text=G';
+          sidebarBadge.innerHTML = '';
+          sidebarSellerApply.classList.add('hidden');
+          sidebarDashboard.classList.add('hidden');
+          statPosts.textContent = '0';
+          statFollowers.textContent = '0';
+          statFollowing.textContent = '0';
+          userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div>';
           return;
         }
         
         const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
-        userProfile = profile || { email: currentUser.email, role: 'buyer' };
+        userProfile = profile || { role: 'buyer', email: currentUser.email };
         userRole = userProfile.role || 'buyer';
         
-        const firstLetter = (userProfile.full_name || currentUser.email || 'U').charAt(0).toUpperCase();
-        profileAvatar.textContent = firstLetter;
-        profileName.textContent = userProfile.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
-        profileEmail.textContent = currentUser.email || '';
+        sidebarName.textContent = userProfile.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
+        sidebarUsername.textContent = `@${userProfile.username || currentUser.email?.split('@')[0] || 'pengguna'}`;
+        sidebarBio.innerHTML = userProfile.bio ? `<p class="text-blue-200/80">${userProfile.bio}</p>` : '<p class="text-blue-400/60 italic">Belum ada bio</p>';
+        sidebarAvatar.src = userProfile.avatar_url || `https://placehold.co/96x96/1e4f9c/white?text=${(sidebarName.textContent.charAt(0)).toUpperCase()}`;
         
         if (userRole === 'seller') {
-          profileBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
-          sellerApplyLink.classList.add('hidden');
-          sellerDashboardLink.classList.remove('hidden');
+          sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
+          sidebarSellerApply.classList.add('hidden');
+          sidebarDashboard.classList.remove('hidden');
         } else if (userRole === 'admin') {
-          profileBadge.innerHTML = '<span class="verified-badge"><i data-lucide="shield" class="w-3 h-3"></i> Admin</span>';
-          sellerApplyLink.classList.add('hidden');
-          sellerDashboardLink.classList.remove('hidden');
+          sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="shield" class="w-3 h-3"></i> Admin</span>';
+          sidebarSellerApply.classList.add('hidden');
+          sidebarDashboard.classList.remove('hidden');
         } else {
-          profileBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Raja Pembeli</span><p class="text-xs text-blue-300 mt-1">Silakan verifikasi untuk menjadi penjual</p>';
-          sellerApplyLink.classList.remove('hidden');
-          sellerDashboardLink.classList.add('hidden');
+          sidebarBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Raja Pembeli</span><p class="text-xs text-blue-300 mt-1">Jadi penjual untuk mulai berjualan</p>';
+          sidebarSellerApply.classList.remove('hidden');
+          sidebarDashboard.classList.add('hidden');
         }
         lucide.createIcons();
-        loginFab.classList.add('hidden');
       }
 
-      // ==================== NOTIFICATION FUNCTIONS ====================
+      async function loadUserProducts() {
+        if (!currentUser || userRole !== 'seller') {
+          userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">' + (currentUser ? 'Jadi penjual untuk mulai berjualan' : 'Login untuk melihat produk') + '</div>';
+          return;
+        }
+        const { data } = await supabaseClient.from('products').select('*').eq('seller_id', userProfile?.seller_id || 0).limit(9);
+        if (data && data.length > 0) {
+          statPosts.textContent = data.length;
+          userProductsGrid.innerHTML = data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden hover:scale-105 transition"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('');
+        } else {
+          statPosts.textContent = '0';
+          userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Belum ada produk</div>';
+        }
+      }
+
+      async function saveProfileChangesFunc() {
+        const fullName = editFullName.value;
+        const username = editUsername.value;
+        const bio = editBio.value;
+        const avatarFile = editAvatar.files[0];
+        let avatarUrl = userProfile?.avatar_url;
+        
+        if (avatarFile) {
+          const fileName = `${currentUser.id}_${Date.now()}.jpg`;
+          const { error } = await supabaseClient.storage.from('avatars').upload(fileName, avatarFile);
+          if (!error) {
+            const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
+            avatarUrl = urlData.publicUrl;
+          }
+        }
+        
+        const { error } = await supabaseClient.from('profiles').update({ full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
+        if (error) {
+          editProfileMessage.textContent = 'Gagal: ' + error.message;
+        } else {
+          editProfileMessage.textContent = 'Profil berhasil diperbarui!';
+          updateSidebarUI();
+          setTimeout(() => { editProfileModal.classList.add('hidden'); editProfileMessage.textContent = ''; }, 1500);
+        }
+      }
+
+      // ==================== NOTIFICATIONS ====================
       async function loadNotifications() {
         if (!currentUser) return;
         const { data } = await supabaseClient.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
@@ -363,21 +458,19 @@
         const unreadCount = notifications.filter(n => !n.is_read).length;
         if (unreadCount > 0) { notifBadge.classList.remove('hidden'); notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount; } 
         else { notifBadge.classList.add('hidden'); }
-        
         if (notifications.length === 0) { notificationList.innerHTML = '<div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div>'; return; }
-        
-        notificationList.innerHTML = notifications.map(n => `<div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer hover:opacity-80 transition notification-item" data-id="${n.id}"><div class="flex items-start gap-2"><i data-lucide="${n.icon || 'bell'}" class="w-4 h-4 mt-1 flex-shrink-0"></i><div class="flex-1"><p class="text-sm font-medium">${n.title}</p><p class="text-xs text-blue-300 truncate">${n.message}</p><p class="text-xs text-blue-400/70 mt-1">${new Date(n.created_at).toLocaleDateString('id-ID')}</p></div>${!n.is_read ? '<span class="w-2 h-2 bg-blue-400 rounded-full"></span>' : ''}</div></div>`).join('');
+        notificationList.innerHTML = notifications.map(n => `<div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer notification-item" data-id="${n.id}"><div class="flex items-start gap-2"><i data-lucide="${n.icon || 'bell'}" class="w-4 h-4 mt-1"></i><div class="flex-1"><p class="text-sm font-medium">${n.title}</p><p class="text-xs text-blue-300">${n.message}</p><p class="text-xs text-blue-400/70 mt-1">${new Date(n.created_at).toLocaleDateString('id-ID')}</p></div>${!n.is_read ? '<span class="w-2 h-2 bg-blue-400 rounded-full"></span>' : ''}</div></div>`).join('');
         lucide.createIcons();
-        document.querySelectorAll('.notification-item').forEach(item => { item.addEventListener('click', () => markAsRead(item.dataset.id)); });
+        document.querySelectorAll('.notification-item').forEach(item => item.addEventListener('click', () => markAsRead(item.dataset.id)));
       }
 
       async function markAsRead(id) { await supabaseClient.from('notifications').update({ is_read: true }).eq('id', id); const n = notifications.find(n => n.id == id); if(n) n.is_read = true; renderNotifications(); }
       async function markAllAsRead() { await supabaseClient.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false); notifications.forEach(n => n.is_read = true); renderNotifications(); }
 
-      // ==================== LOAD PRODUCTS & CART ====================
+      // ==================== PRODUCTS & CART ====================
       async function loadProductsFromDB() {
         const { data, error } = await supabaseClient.from('products').select('*');
-        if (error) { productGrid.innerHTML = `<div class="col-span-full text-center py-16">❌ Gagal memuat produk</div>`; return; }
+        if (error) { productGrid.innerHTML = '<div class="col-span-full text-center py-16">❌ Gagal memuat produk</div>'; return; }
         products = data || []; renderProducts();
       }
 
@@ -454,7 +547,7 @@
         else { msg.textContent = 'Pengajuan berhasil! Menunggu verifikasi admin.'; if(user) await supabaseClient.from('notifications').insert({ user_id: user.id, title: 'Pengajuan Penjual', message: 'Pengajuan Anda sedang diproses.', icon: 'store', is_read: false }); setTimeout(() => document.getElementById('sellerApplyModal')?.classList.add('hidden'), 2000); }
       }
 
-      // ==================== INIT ====================
+      // ==================== INIT & EVENT LISTENERS ====================
       async function init() {
         lucide.createIcons();
         await checkUser();
@@ -465,33 +558,40 @@
         
         document.querySelectorAll('.category-btn').forEach(btn => { btn.addEventListener('click', () => { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active')); btn.classList.add('category-active'); activeCategory = btn.dataset.cat; renderProducts(); }); });
         searchInput?.addEventListener('input', (e) => { searchTerm = e.target.value; renderProducts(); });
-        cartIcon?.addEventListener('click', (e) => { e.preventDefault(); cartModal?.classList.remove('hidden'); renderCartModal(); profileDropdown?.classList.remove('show'); notificationDropdown?.classList.remove('show'); });
+        cartIcon?.addEventListener('click', (e) => { e.preventDefault(); cartModal?.classList.remove('hidden'); renderCartModal(); });
         document.getElementById('closeCart')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
         document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
         
-        profileBtn?.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown?.classList.toggle('show'); notificationDropdown?.classList.remove('show'); });
-        notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); profileDropdown?.classList.remove('show'); });
-        document.addEventListener('click', () => { profileDropdown?.classList.remove('show'); notificationDropdown?.classList.remove('show'); });
+        // Profile sidebar
+        document.getElementById('profileBtn')?.addEventListener('click', openProfileSidebar);
+        closeProfileSidebar?.addEventListener('click', closeProfileSidebarFunc);
+        profileSidebarOverlay?.addEventListener('click', closeProfileSidebarFunc);
+        editProfileBtn?.addEventListener('click', openEditProfileModal);
+        closeEditProfile?.addEventListener('click', () => { editProfileModal.classList.add('hidden'); });
+        editProfileOverlay?.addEventListener('click', () => { editProfileModal.classList.add('hidden'); });
+        saveProfileChanges?.addEventListener('click', saveProfileChangesFunc);
+        document.getElementById('sidebarSellerApplyBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
+        document.getElementById('sidebarDashboardBtn')?.addEventListener('click', () => { alert('Dashboard penjual akan segera hadir!'); });
+        document.getElementById('sidebarLogoutBtn')?.addEventListener('click', logout);
         
-        logoutBtn?.addEventListener('click', logout);
+        // Notifications
+        notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); });
+        document.addEventListener('click', () => { notificationDropdown?.classList.remove('show'); });
         markAllReadBtn?.addEventListener('click', markAllAsRead);
-        document.getElementById('sellerApplyFromProfile')?.addEventListener('click', () => { profileDropdown?.classList.remove('show'); document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
-        document.getElementById('sellerDashboardFromProfile')?.addEventListener('click', () => { alert('Dashboard penjual akan segera hadir!'); });
         
+        // Login modal
         loginFab?.addEventListener('click', openLoginModal);
         document.querySelector('footer a:first-child')?.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
-        document.getElementById('closeLogin')?.addEventListener('click', () => { loginModal?.classList.add('hidden'); loginModal?.classList.remove('flex'); });
-        document.getElementById('loginOverlay')?.addEventListener('click', () => { loginModal?.classList.add('hidden'); loginModal?.classList.remove('flex'); });
-        
+        document.getElementById('closeLogin')?.addEventListener('click', () => { loginModal?.classList.add('hidden'); });
+        document.getElementById('loginOverlay')?.addEventListener('click', () => { loginModal?.classList.add('hidden'); });
         loginBtn?.addEventListener('click', () => { const email = loginEmail?.value, pass = loginPassword?.value; if(email && pass) login(email, pass); else loginMessage.textContent = 'Email dan password harus diisi'; });
         registerBtn?.addEventListener('click', () => { const email = regEmail?.value, pass = regPassword?.value, confirm = regConfirmPassword?.value; if(!email || !pass || !confirm) registerMessage.textContent = 'Semua field harus diisi!'; else if(pass !== confirm) registerMessage.textContent = 'Password tidak cocok!'; else register(email, pass); });
         
         sellerApplyBtn?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
-        document.getElementById('closeSellerApply')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); document.getElementById('sellerApplyModal')?.classList.remove('flex'); });
+        document.getElementById('closeSellerApply')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
         document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication);
-        
         complaintBtn?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.remove('hidden'); document.getElementById('complaintModal')?.classList.add('flex'); });
-        document.getElementById('closeComplaint')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.add('hidden'); document.getElementById('complaintModal')?.classList.remove('flex'); });
+        document.getElementById('closeComplaint')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.add('hidden'); });
         document.getElementById('submitComplaint')?.addEventListener('click', () => { alert('Pengaduan terkirim ke admin: shofiankurniady@gmail.com'); document.getElementById('complaintModal')?.classList.add('hidden'); });
         document.getElementById('explorePromo')?.addEventListener('click', () => { document.getElementById('productGrid')?.scrollIntoView({ behavior: 'smooth' }); });
         console.log('✅ App initialized successfully');
@@ -501,7 +601,6 @@
       else init();
     })();
   </script>
-  
   <script>setInterval(() => { if(typeof lucide !== 'undefined') lucide.createIcons(); }, 1000);</script>
 </body>
 </html>
