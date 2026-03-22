@@ -69,7 +69,7 @@
       border-bottom-color: #3b82f6 !important;
     }
     
-    .cart-badge, .notif-badge {
+    .cart-badge, .notif-badge, .chat-badge {
       background: #E53E3E;
       color: white;
       font-size: 0.7rem;
@@ -112,6 +112,17 @@
       gap: 0.25rem;
     }
     
+    .admin-badge {
+      background: #EF4444;
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
     .loader {
       border: 3px solid rgba(255,255,255,0.3);
       border-radius: 50%;
@@ -127,7 +138,7 @@
       100% { transform: rotate(360deg); }
     }
     
-    .notification-dropdown {
+    .notification-dropdown, .chat-dropdown {
       position: absolute;
       right: 0;
       top: 100%;
@@ -143,12 +154,13 @@
       border: 1px solid rgba(30, 100, 200, 0.4);
     }
     
-    .notification-dropdown.show { display: block; }
+    .notification-dropdown.show, .chat-dropdown.show { display: block; }
     
     .status-pending { background: #F59E0B; }
     .status-paid { background: #3B82F6; }
     .status-shipped { background: #8B5CF6; }
     .status-completed { background: #10B981; }
+    .status-cancelled { background: #EF4444; }
     
     #profileSidebar {
       transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -159,9 +171,54 @@
     body { background: #071126; }
     .hero-bg { background: radial-gradient(circle at 30% 30%, #12458c, #05122e); }
     
-    .scroll-cart::-webkit-scrollbar { width: 6px; }
-    .scroll-cart::-webkit-scrollbar-track { background: #112244; border-radius: 20px; }
-    .scroll-cart::-webkit-scrollbar-thumb { background: #2F66B5; border-radius: 20px; }
+    .scroll-cart::-webkit-scrollbar,
+    .scroll-chat::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scroll-cart::-webkit-scrollbar-track,
+    .scroll-chat::-webkit-scrollbar-track {
+      background: #112244;
+      border-radius: 20px;
+    }
+    .scroll-cart::-webkit-scrollbar-thumb,
+    .scroll-chat::-webkit-scrollbar-thumb {
+      background: #2F66B5;
+      border-radius: 20px;
+    }
+    
+    .login-header-btn {
+      background: linear-gradient(135deg, #1e4f9c, #3b82f6);
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .login-header-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #3b82f6;
+    }
+    
+    .chat-message {
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    .chat-message.sent {
+      margin-left: auto;
+      background: #1e4f9c;
+      border-radius: 18px 18px 4px 18px;
+    }
+    .chat-message.received {
+      background: #2d3748;
+      border-radius: 18px 18px 18px 4px;
+    }
+    
+    .admin-stats-card {
+      background: rgba(30, 79, 156, 0.3);
+      border: 1px solid rgba(100, 180, 255, 0.3);
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+    }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
@@ -186,6 +243,23 @@
         <button id="sellerApplyBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
           <i data-lucide="store" class="w-6 h-6 text-white"></i>
         </button>
+        
+        <!-- Chat Button -->
+        <div class="relative">
+          <button id="chatBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic relative">
+            <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
+            <span id="chatBadge" class="chat-badge hidden">0</span>
+          </button>
+          <div id="chatDropdown" class="chat-dropdown p-4">
+            <h4 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="message-circle"></i> Pesan</h4>
+            <div id="chatList" class="space-y-3 max-h-60 overflow-y-auto"></div>
+            <div class="border-t border-blue-400/30 mt-3 pt-3">
+              <input type="text" id="chatSearchInput" placeholder="Cari penjual/pembeli..." class="w-full p-2 rounded-lg bg-[#122b50] border border-blue-400/50 text-sm">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notification Button -->
         <div class="relative">
           <button id="notificationBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic relative">
             <i data-lucide="bell" class="w-6 h-6 text-white"></i>
@@ -199,13 +273,23 @@
             </div>
           </div>
         </div>
+        
+        <!-- Cart Button -->
         <div class="relative cursor-pointer" id="cartIcon">
           <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
             <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
           </div>
           <span id="cartBadge" class="cart-badge hidden">0</span>
         </div>
-        <div class="relative">
+        
+        <!-- Login Button (shown when not logged in) -->
+        <button id="headerLoginBtn" class="login-header-btn flex items-center gap-2">
+          <i data-lucide="log-in" class="w-5 h-5"></i>
+          <span class="hidden sm:inline">Masuk</span>
+        </button>
+        
+        <!-- Profile Button (shown when logged in) -->
+        <div class="relative hidden" id="profileBtnContainer">
           <button id="profileBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
             <i data-lucide="user" class="w-6 h-6 text-white"></i>
           </button>
@@ -255,6 +339,7 @@
       <button id="cartTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">🛒 Keranjang</button>
       <button id="ordersTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">📦 Pesanan Saya</button>
       <button id="sellerTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">🏪 Dashboard Seller</button>
+      <button id="adminTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap hidden">👑 Dashboard Admin</button>
     </div>
   </div>
 
@@ -295,12 +380,77 @@
   <div id="sellerSection" class="mx-4 md:mx-8 mt-6 hidden">
     <div class="glass-panel p-6">
       <h2 class="text-2xl font-bold mb-6">🏪 Dashboard Penjual</h2>
+      <h3 class="text-xl font-semibold mb-4">Produk Saya</h3>
+      <div id="sellerProductsContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8"></div>
+      <button id="addProductBtn" class="mb-6 bg-green-600 px-4 py-2 rounded-full hover:bg-green-700 transition">+ Tambah Produk Baru</button>
       <h3 class="text-xl font-semibold mb-4">Pesanan Masuk</h3>
       <div id="sellerOrdersContainer" class="space-y-4 max-h-[600px] overflow-y-auto scroll-cart"></div>
     </div>
   </div>
 
-  <!-- MODALS -->
+  <!-- ADMIN DASHBOARD SECTION -->
+  <div id="adminSection" class="mx-4 md:mx-8 mt-6 hidden">
+    <div class="glass-panel p-6">
+      <h2 class="text-2xl font-bold mb-6">👑 Dashboard Admin</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="admin-stats-card"><div class="text-2xl font-bold" id="adminStatUsers">0</div><div class="text-sm text-blue-300">Total Users</div></div>
+        <div class="admin-stats-card"><div class="text-2xl font-bold" id="adminStatProducts">0</div><div class="text-sm text-blue-300">Total Products</div></div>
+        <div class="admin-stats-card"><div class="text-2xl font-bold" id="adminStatOrders">0</div><div class="text-sm text-blue-300">Total Orders</div></div>
+        <div class="admin-stats-card"><div class="text-2xl font-bold" id="adminStatRevenue">Rp 0</div><div class="text-sm text-blue-300">Revenue</div></div>
+      </div>
+      <div class="flex gap-2 border-b border-blue-400/30 mb-4">
+        <button class="admin-subtab px-4 py-2 text-sm font-semibold text-blue-300 hover:text-white" data-subtab="users">👥 Users</button>
+        <button class="admin-subtab px-4 py-2 text-sm font-semibold text-blue-300 hover:text-white" data-subtab="products">📦 Products</button>
+        <button class="admin-subtab px-4 py-2 text-sm font-semibold text-blue-300 hover:text-white" data-subtab="orders">📋 Orders</button>
+        <button class="admin-subtab px-4 py-2 text-sm font-semibold text-blue-300 hover:text-white" data-subtab="sellers">🏪 Seller Applications</button>
+        <button class="admin-subtab px-4 py-2 text-sm font-semibold text-blue-300 hover:text-white" data-subtab="complaints">⚠️ Complaints</button>
+      </div>
+      <div id="adminUsersContainer" class="admin-content space-y-4 max-h-[500px] overflow-y-auto scroll-cart"></div>
+      <div id="adminProductsContainer" class="admin-content hidden space-y-4 max-h-[500px] overflow-y-auto scroll-cart"></div>
+      <div id="adminOrdersContainer" class="admin-content hidden space-y-4 max-h-[500px] overflow-y-auto scroll-cart"></div>
+      <div id="adminSellersContainer" class="admin-content hidden space-y-4 max-h-[500px] overflow-y-auto scroll-cart"></div>
+      <div id="adminComplaintsContainer" class="admin-content hidden space-y-4 max-h-[500px] overflow-y-auto scroll-cart"></div>
+    </div>
+  </div>
+
+  <!-- CHAT MODAL -->
+  <div id="chatModal" class="fixed inset-0 z-[400] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="chatModalOverlay"></div>
+    <div class="relative glass-panel w-full max-w-lg h-96 flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-blue-400/30">
+        <h3 class="text-xl font-bold flex items-center gap-2"><i data-lucide="message-circle"></i> <span id="chatWithName">Chat</span></h3>
+        <button id="closeChatModal" class="p-2 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="chatMessagesContainer" class="flex-1 overflow-y-auto p-4 space-y-3 scroll-chat"></div>
+      <div class="p-4 border-t border-blue-400/30 flex gap-2">
+        <input type="text" id="chatMessageInput" placeholder="Ketik pesan..." class="flex-1 p-2 rounded-lg bg-[#122b50] border border-blue-400/50 text-white">
+        <button id="sendChatMessage" class="bg-[#1e4f9c] px-4 py-2 rounded-full hover:bg-[#2f6bc9]"><i data-lucide="send" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT MODAL -->
+  <div id="addProductModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="addProductOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="package-plus"></i> Tambah Produk</h3>
+      <div class="space-y-3">
+        <input type="text" id="productName" placeholder="Nama Produk" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <textarea id="productDesc" rows="3" placeholder="Deskripsi" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
+        <input type="number" id="productPrice" placeholder="Harga" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="productCategory" placeholder="Kategori (Makanan/Pakaian/Celana/Elektronik)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="number" id="productStock" placeholder="Stok" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="productImage" placeholder="URL Gambar" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <div class="flex gap-2">
+          <button id="submitProductBtn" class="flex-1 bg-[#1e4f9c] py-2 rounded-full">Simpan</button>
+          <button id="closeAddProductBtn" class="flex-1 border border-blue-400 py-2 rounded-full">Batal</button>
+        </div>
+        <div id="addProductMessage" class="text-sm text-yellow-300 text-center"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELLER APPLICATION MODAL -->
   <div id="sellerApplyModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sellerApplyOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto">
@@ -322,6 +472,7 @@
     </div>
   </div>
 
+  <!-- COMPLAINT MODAL -->
   <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
@@ -331,6 +482,7 @@
           <option value="technical">Kendala Teknis</option>
           <option value="payment">Masalah Pembayaran</option>
           <option value="buyer">Masalah dengan Pembeli</option>
+          <option value="seller">Masalah dengan Penjual</option>
           <option value="other">Lainnya</option>
         </select>
         <textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
@@ -343,45 +495,70 @@
     </div>
   </div>
 
+  <!-- LOGIN MODAL -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
       <div class="flex border-b border-blue-400/30 mb-6">
         <button class="tab-login-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button>
         <button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button>
-        <button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="forgot">Lupa</button>
       </div>
+      
+      <!-- LOGIN TAB -->
       <div id="loginTab" class="login-tab-content">
         <h3 class="text-2xl font-bold mb-4"><i data-lucide="log-in"></i> Masuk ke Akun</h3>
-        <button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full flex items-center justify-center gap-3 mb-4"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google</button>
-        <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau</span></div></div>
+        
+        <button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full flex items-center justify-center gap-3 mb-4 hover:scale-105 transition">
+          <img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google
+        </button>
+        
+        <button id="phoneLoginBtn" class="w-full bg-green-600 text-white py-3 rounded-full flex items-center justify-center gap-3 mb-4 hover:scale-105 transition">
+          <i data-lucide="phone" class="w-5 h-5"></i> Login dengan Nomor Ponsel
+        </button>
+        
+        <div class="relative my-4">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div>
+          <div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau dengan Email</span></div>
+        </div>
+        
         <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-        <button class="w-full bg-[#316bc7] py-2 rounded-full mb-2" id="loginBtn">Masuk</button>
+        <button class="w-full bg-[#316bc7] py-2 rounded-full mb-2" id="loginBtn">Masuk dengan Email</button>
         <div id="loginMessage" class="text-sm text-center text-yellow-300"></div>
       </div>
+      
+      <!-- REGISTER TAB -->
       <div id="registerTab" class="login-tab-content hidden">
         <h3 class="text-2xl font-bold mb-4"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3>
         <input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <button class="w-full bg-[#316bc7] py-2 rounded-full" id="registerBtn">Daftar</button>
-        <div id="registerMessage" class="text-sm text-center text-yellow-300"></div>
+        <div id="registerMessage" class="text-sm text-center text-yellow-300 mt-2"></div>
       </div>
-      <div id="forgotTab" class="login-tab-content hidden">
-        <h3 class="text-2xl font-bold mb-4"><i data-lucide="key"></i> Reset Password</h3>
-        <input type="email" id="resetEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-        <button class="w-full bg-[#316bc7] py-2 rounded-full mb-2" id="resetBtn">Kirim Reset Link</button>
-        <div id="resetMessage" class="text-sm text-center text-yellow-300"></div>
-      </div>
+      
       <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button>
     </div>
   </div>
 
-  <div id="loginFab" style="position: fixed; bottom: 20px; right: 20px; z-index: 60;" class="hidden">
-    <button class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400"><i data-lucide="user" class="w-6 h-6"></i></button>
+  <!-- PHONE LOGIN MODAL -->
+  <div id="phoneLoginModal" class="fixed inset-0 z-[250] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="phoneLoginOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="phone"></i> Login dengan Nomor Ponsel</h3>
+      <p class="text-sm text-blue-300 mb-4">Masukkan nomor ponsel untuk menerima kode OTP via SMS/WhatsApp</p>
+      <input type="tel" id="phoneNumber" placeholder="Contoh: 08123456789" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+      <div id="otpSection" class="hidden">
+        <input type="text" id="otpCode" placeholder="Kode OTP 6 digit" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <button id="verifyOtpBtn" class="w-full bg-green-600 py-2 rounded-full mb-2">Verifikasi OTP</button>
+      </div>
+      <button id="sendOtpBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full">Kirim Kode OTP</button>
+      <button id="closePhoneLogin" class="w-full border border-blue-400 py-2 rounded-full mt-2">Batal</button>
+      <div id="phoneLoginMessage" class="text-sm text-center text-yellow-300 mt-2"></div>
+    </div>
   </div>
 
+  <!-- PROFILE SIDEBAR -->
   <div id="profileSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[500] transition-transform duration-300" style="transform: translateX(100%);">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="profileSidebarOverlay"></div>
     <div class="relative glass-panel w-full h-full ml-auto flex flex-col overflow-y-auto">
@@ -405,6 +582,7 @@
     </div>
   </div>
 
+  <!-- EDIT PROFILE MODAL -->
   <div id="editProfileModal" class="fixed inset-0 z-[600] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="editProfileOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
@@ -431,518 +609,768 @@
 
   <script>
     (function() {
-      // ==================== SUPABASE INIT ====================
+      // Supabase Configuration
       const supabaseUrl = 'https://kybuycilewowjljyemmd.supabase.co';
       const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5YnV5Y2lsZXdvd2psanllbW1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxOTA3OTksImV4cCI6MjA4OTc2Njc5OX0.4A8Yr-YCctQd6dmn29eOuvizxeDZN2b2G8fQvnufzoY';
-      
-      if (typeof window.supabase === 'undefined') {
-        console.error('Supabase client not loaded');
-        document.getElementById('productGrid').innerHTML = '<div class="col-span-full text-center py-16 text-2xl text-blue-200/60 glass-panel">❌ Gagal memuat koneksi database. Refresh halaman.</div>';
-        return;
-      }
       
       const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
       console.log('✅ Supabase initialized');
       
-      // Test koneksi
-      (async function testConnection() {
-        const { error } = await supabase.from('profiles').select('count');
-        if (error) console.log('⚠️ Koneksi Supabase error:', error.message);
-        else console.log('✅ Supabase connected!');
-      })();
-    
-    // ==================== GLOBAL STATE ====================
-    let currentUser = null;
-    let currentUserRole = 'guest';
-    let currentUserProfile = null;
-    let products = [];
-    let cart = [];
-    let orders = [];
-    let notifications = [];
-    let activeCategory = 'all';
-    let searchTerm = '';
-    let selectedPayment = null;
-    
-    // ==================== DOM ELEMENTS ====================
-    const productGrid = document.getElementById('productGrid');
-    const searchInput = document.getElementById('searchInput');
-    const cartBadge = document.getElementById('cartBadge');
-    const cartIcon = document.getElementById('cartIcon');
-    const cartSection = document.getElementById('cartSection');
-    const ordersSection = document.getElementById('ordersSection');
-    const sellerSection = document.getElementById('sellerSection');
-    const cartTab = document.getElementById('cartTab');
-    const ordersTab = document.getElementById('ordersTab');
-    const sellerTab = document.getElementById('sellerTab');
-    const cartItemsContainer = document.getElementById('cartItemsContainer');
-    const cartSubtotalSpan = document.getElementById('cartSubtotal');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const ordersContainer = document.getElementById('ordersContainer');
-    const sellerOrdersContainer = document.getElementById('sellerOrdersContainer');
-    const loginModal = document.getElementById('loginModal');
-    const loginFab = document.getElementById('loginFab');
-    const roleBadge = document.getElementById('roleBadge');
-    const sellerApplyBtn = document.getElementById('sellerApplyBtn');
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    const notificationList = document.getElementById('notificationList');
-    const notifBadge = document.getElementById('notifBadge');
-    const markAllReadBtn = document.getElementById('markAllReadBtn');
-    const profileSidebar = document.getElementById('profileSidebar');
-    const closeProfileSidebar = document.getElementById('closeProfileSidebar');
-    const profileSidebarOverlay = document.getElementById('profileSidebarOverlay');
-    const editProfileModal = document.getElementById('editProfileModal');
-    const editProfileOverlay = document.getElementById('editProfileOverlay');
-    const closeEditProfileBtn = document.getElementById('closeEditProfileBtn');
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    const saveProfileChangesBtn = document.getElementById('saveProfileChangesBtn');
-    const sidebarAvatar = document.getElementById('sidebarAvatar');
-    const sidebarName = document.getElementById('sidebarName');
-    const sidebarUsername = document.getElementById('sidebarUsername');
-    const sidebarBio = document.getElementById('sidebarBio');
-    const sidebarBadge = document.getElementById('sidebarBadge');
-    const sidebarSellerApply = document.getElementById('sidebarSellerApply');
-    const sidebarDashboard = document.getElementById('sidebarDashboard');
-    const userProductsGrid = document.getElementById('userProductsGrid');
-    const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
-    const editFullName = document.getElementById('editFullName');
-    const editUsername = document.getElementById('editUsername');
-    const editBio = document.getElementById('editBio');
-    const editAvatar = document.getElementById('editAvatar');
-    const editProfileMessage = document.getElementById('editProfileMessage');
-    
-    // ==================== AUTH FUNCTIONS ====================
-    async function checkAuth() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        currentUser = user;
+      // Global State
+      let currentUser = null;
+      let currentUserRole = 'guest';
+      let currentUserProfile = null;
+      let products = [];
+      let cart = [];
+      let orders = [];
+      let activeCategory = 'all';
+      let searchTerm = '';
+      let selectedPayment = null;
+      let currentChatUserId = null;
+      let currentChatProductId = null;
+      let pendingPhoneNumber = null;
+      
+      // DOM Elements
+      const productGrid = document.getElementById('productGrid');
+      const searchInput = document.getElementById('searchInput');
+      const cartBadge = document.getElementById('cartBadge');
+      const cartIcon = document.getElementById('cartIcon');
+      const cartSection = document.getElementById('cartSection');
+      const ordersSection = document.getElementById('ordersSection');
+      const sellerSection = document.getElementById('sellerSection');
+      const adminSection = document.getElementById('adminSection');
+      const cartTab = document.getElementById('cartTab');
+      const ordersTab = document.getElementById('ordersTab');
+      const sellerTab = document.getElementById('sellerTab');
+      const adminTab = document.getElementById('adminTab');
+      const cartItemsContainer = document.getElementById('cartItemsContainer');
+      const cartSubtotalSpan = document.getElementById('cartSubtotal');
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      const ordersContainer = document.getElementById('ordersContainer');
+      const sellerOrdersContainer = document.getElementById('sellerOrdersContainer');
+      const sellerProductsContainer = document.getElementById('sellerProductsContainer');
+      const loginModal = document.getElementById('loginModal');
+      const headerLoginBtn = document.getElementById('headerLoginBtn');
+      const profileBtnContainer = document.getElementById('profileBtnContainer');
+      const profileBtn = document.getElementById('profileBtn');
+      const roleBadge = document.getElementById('roleBadge');
+      const sellerApplyBtn = document.getElementById('sellerApplyBtn');
+      const notificationBtn = document.getElementById('notificationBtn');
+      const notificationDropdown = document.getElementById('notificationDropdown');
+      const notificationList = document.getElementById('notificationList');
+      const notifBadge = document.getElementById('notifBadge');
+      const markAllReadBtn = document.getElementById('markAllReadBtn');
+      const chatBtn = document.getElementById('chatBtn');
+      const chatDropdown = document.getElementById('chatDropdown');
+      const chatList = document.getElementById('chatList');
+      const chatModal = document.getElementById('chatModal');
+      const chatModalOverlay = document.getElementById('chatModalOverlay');
+      const closeChatModal = document.getElementById('closeChatModal');
+      const chatMessagesContainer = document.getElementById('chatMessagesContainer');
+      const chatMessageInput = document.getElementById('chatMessageInput');
+      const sendChatMessage = document.getElementById('sendChatMessage');
+      const chatWithName = document.getElementById('chatWithName');
+      const profileSidebar = document.getElementById('profileSidebar');
+      const closeProfileSidebar = document.getElementById('closeProfileSidebar');
+      const profileSidebarOverlay = document.getElementById('profileSidebarOverlay');
+      const editProfileModal = document.getElementById('editProfileModal');
+      const editProfileOverlay = document.getElementById('editProfileOverlay');
+      const closeEditProfileBtn = document.getElementById('closeEditProfileBtn');
+      const editProfileBtn = document.getElementById('editProfileBtn');
+      const saveProfileChangesBtn = document.getElementById('saveProfileChangesBtn');
+      const sidebarAvatar = document.getElementById('sidebarAvatar');
+      const sidebarName = document.getElementById('sidebarName');
+      const sidebarUsername = document.getElementById('sidebarUsername');
+      const sidebarBio = document.getElementById('sidebarBio');
+      const sidebarBadge = document.getElementById('sidebarBadge');
+      const sidebarSellerApply = document.getElementById('sidebarSellerApply');
+      const sidebarDashboard = document.getElementById('sidebarDashboard');
+      const userProductsGrid = document.getElementById('userProductsGrid');
+      const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+      const editFullName = document.getElementById('editFullName');
+      const editUsername = document.getElementById('editUsername');
+      const editBio = document.getElementById('editBio');
+      const editAvatar = document.getElementById('editAvatar');
+      const editProfileMessage = document.getElementById('editProfileMessage');
+      const phoneLoginModal = document.getElementById('phoneLoginModal');
+      const phoneNumberInput = document.getElementById('phoneNumber');
+      const sendOtpBtn = document.getElementById('sendOtpBtn');
+      const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+      const otpSection = document.getElementById('otpSection');
+      const otpCodeInput = document.getElementById('otpCode');
+      const phoneLoginMessage = document.getElementById('phoneLoginMessage');
+      const closePhoneLogin = document.getElementById('closePhoneLogin');
+      const phoneLoginOverlay = document.getElementById('phoneLoginOverlay');
+      const addProductModal = document.getElementById('addProductModal');
+      const addProductOverlay = document.getElementById('addProductOverlay');
+      const closeAddProductBtn = document.getElementById('closeAddProductBtn');
+      const submitProductBtn = document.getElementById('submitProductBtn');
+      const addProductBtn = document.getElementById('addProductBtn');
+      
+      // ==================== AUTH FUNCTIONS ====================
+      async function checkAuth() {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          currentUser = user;
+          
+          if (user) {
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+            currentUserProfile = profile || { role: 'buyer', email: user.email };
+            currentUserRole = currentUserProfile.role || 'buyer';
+            
+            roleBadge.classList.remove('hidden');
+            roleBadge.textContent = currentUserRole.toUpperCase();
+            
+            if (currentUserRole === 'buyer') sellerApplyBtn.classList.remove('hidden');
+            else sellerApplyBtn.classList.add('hidden');
+            
+            if (currentUserRole === 'admin') adminTab.classList.remove('hidden');
+            else adminTab.classList.add('hidden');
+            
+            await loadCart();
+            await loadOrders();
+            await loadProducts();
+            await loadSellerProducts();
+            await loadSellerOrders();
+            await updateSidebarUI();
+            
+            if (currentUserRole === 'admin') loadAdminData();
+          } else {
+            currentUserRole = 'guest';
+            roleBadge.classList.add('hidden');
+            sellerApplyBtn.classList.add('hidden');
+            adminTab.classList.add('hidden');
+            cart = [];
+            orders = [];
+            await loadProducts();
+            await updateSidebarUI();
+          }
+          
+          headerLoginBtn.classList.toggle('hidden', currentUser);
+          profileBtnContainer.classList.toggle('hidden', !currentUser);
+          lucide.createIcons();
+          return user;
+        } catch (error) {
+          console.error('Error checkAuth:', error);
+          return null;
+        }
+      }
+      
+      async function login(email, password) {
+        try {
+          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          await checkAuth();
+          loginModal.classList.add('hidden');
+          alert('✅ Login berhasil!');
+        } catch (error) {
+          document.getElementById('loginMessage').textContent = 'Login gagal: ' + error.message;
+        }
+      }
+      
+      async function register(email, password) {
+        try {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
+          if (data?.user) {
+            await supabase.from('profiles').insert({ id: data.user.id, email: email, role: 'buyer', username: email.split('@')[0] });
+          }
+          document.getElementById('registerMessage').textContent = '✅ Registrasi berhasil! Silakan login.';
+          setTimeout(() => {
+            document.querySelector('[data-tab="login"]').click();
+            document.getElementById('registerMessage').textContent = '';
+          }, 2000);
+        } catch (error) {
+          document.getElementById('registerMessage').textContent = 'Registrasi gagal: ' + error.message;
+        }
+      }
+      
+      async function logout() {
+        await supabase.auth.signOut();
+        window.location.reload();
+      }
+      
+      function openLoginModal() {
+        loginModal.classList.remove('hidden');
+        loginModal.classList.add('flex');
+      }
+      
+      // ==================== PHONE LOGIN ====================
+      function openPhoneLoginModal() {
+        phoneLoginModal.classList.remove('hidden');
+        phoneLoginModal.classList.add('flex');
+        phoneNumberInput.value = '';
+        otpCodeInput.value = '';
+        otpSection.classList.add('hidden');
+        sendOtpBtn.classList.remove('hidden');
+        phoneLoginMessage.textContent = '';
+      }
+      
+      async function sendOtp() {
+        let phone = phoneNumberInput.value.trim();
+        if (!phone) { phoneLoginMessage.textContent = 'Masukkan nomor ponsel'; return; }
         
-        if (user) {
-          const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-          currentUserProfile = profile || { role: 'buyer', email: user.email };
-          currentUserRole = currentUserProfile.role || 'buyer';
+        if (phone.startsWith('0')) phone = '+62' + phone.substring(1);
+        if (!phone.startsWith('+')) phone = '+62' + phone;
+        pendingPhoneNumber = phone;
+        
+        try {
+          const { error } = await supabase.auth.signInWithOtp({ phone: phone });
+          if (error) throw error;
+          phoneLoginMessage.textContent = '✅ Kode OTP telah dikirim!';
+          otpSection.classList.remove('hidden');
+          sendOtpBtn.classList.add('hidden');
+        } catch (error) {
+          phoneLoginMessage.textContent = '❌ Gagal: ' + error.message;
+        }
+      }
+      
+      async function verifyOtp() {
+        const enteredOtp = otpCodeInput.value.trim();
+        if (!enteredOtp) { phoneLoginMessage.textContent = 'Masukkan kode OTP'; return; }
+        
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            phone: pendingPhoneNumber,
+            token: enteredOtp,
+            type: 'sms',
+          });
+          if (error) throw error;
           
-          roleBadge.classList.remove('hidden');
-          roleBadge.textContent = currentUserRole.toUpperCase();
-          
-          if (currentUserRole === 'buyer') sellerApplyBtn.classList.remove('hidden');
-          else sellerApplyBtn.classList.add('hidden');
-          
-          await loadCart();
-          await loadOrders();
-          await loadNotifications();
-          await updateSidebarUI();
+          if (data?.user) {
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+            if (!profile) {
+              await supabase.from('profiles').insert({
+                id: data.user.id,
+                email: data.user.email || `user_${pendingPhoneNumber.slice(-6)}@temp.com`,
+                username: `user_${pendingPhoneNumber.slice(-6)}`,
+                role: 'buyer',
+                phone: pendingPhoneNumber
+              });
+            }
+            await checkAuth();
+            phoneLoginModal.classList.add('hidden');
+            alert('✅ Login berhasil!');
+          }
+        } catch (error) {
+          phoneLoginMessage.textContent = '❌ Kode OTP salah: ' + error.message;
+        }
+      }
+      
+      // ==================== CART FUNCTIONS ====================
+      async function loadCart() {
+        if (!currentUser) { cart = []; renderCart(); updateCartBadge(); return; }
+        const { data, error } = await supabase.from('carts').select(`*, products(*)`).eq('user_id', currentUser.id);
+        if (!error && data) {
+          cart = data.map(item => ({
+            cart_id: item.id, id: item.product_id, nama: item.products?.nama || 'Produk',
+            harga: item.products?.harga || 0, gambar: item.products?.gambar,
+            quantity: item.quantity, seller_id: item.products?.seller_id
+          }));
+          renderCart();
+          updateCartBadge();
+        }
+      }
+      
+      async function addToCart(productId, quantity = 1) {
+        if (!currentUser) { alert('Silakan login'); openLoginModal(); return false; }
+        const existing = cart.find(item => item.id === productId);
+        if (existing) {
+          await supabase.from('carts').update({ quantity: existing.quantity + quantity }).eq('id', existing.cart_id);
         } else {
-          currentUserRole = 'guest';
-          roleBadge.classList.add('hidden');
-          sellerApplyBtn.classList.add('hidden');
-          cart = [];
-          orders = [];
-          await updateSidebarUI();
+          await supabase.from('carts').insert({ user_id: currentUser.id, product_id: productId, quantity });
         }
-        lucide.createIcons();
-        return user;
-      } catch (error) {
-        console.error('Error checkAuth:', error);
-        return null;
+        await loadCart();
+        return true;
       }
-    }
-    
-    async function login(email, password) {
-      try {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await checkAuth();
-        loginModal.classList.add('hidden');
-        alert('✅ Login berhasil!');
-      } catch (error) {
-        document.getElementById('loginMessage').textContent = 'Login gagal: ' + error.message;
+      
+      async function updateCartQuantity(cartId, productId, newQty) {
+        if (newQty <= 0) { await supabase.from('carts').delete().eq('id', cartId); }
+        else { await supabase.from('carts').update({ quantity: newQty }).eq('id', cartId); }
+        await loadCart();
       }
-    }
-    
-    async function register(email, password) {
-      try {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        if (data?.user) {
-          await supabase.from('profiles').insert({ id: data.user.id, email: email, role: 'buyer', username: email.split('@')[0] });
+      
+      async function removeFromCart(cartId) {
+        await supabase.from('carts').delete().eq('id', cartId);
+        await loadCart();
+      }
+      
+      function updateCartBadge() {
+        const total = cart.reduce((s, i) => s + (i.quantity || 0), 0);
+        if (total > 0) { cartBadge.classList.remove('hidden'); cartBadge.textContent = total > 99 ? '99+' : total; }
+        else cartBadge.classList.add('hidden');
+      }
+      
+      function renderCart() {
+        if (!cartItemsContainer) return;
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML = `<div class="text-center py-10"><i data-lucide="shopping-cart" class="w-16 h-16 mx-auto opacity-50"></i><p>Keranjang kosong</p></div>`;
+          cartSubtotalSpan.textContent = 'Rp 0';
+          lucide.createIcons();
+          return;
         }
-        document.getElementById('registerMessage').textContent = '✅ Registrasi berhasil! Silakan login.';
-        setTimeout(() => document.querySelector('[data-tab="login"]').click(), 2000);
-      } catch (error) {
-        document.getElementById('registerMessage').textContent = 'Registrasi gagal: ' + error.message;
-      }
-    }
-    
-    async function logout() {
-      await supabase.auth.signOut();
-      window.location.reload();
-    }
-    
-    function openLoginModal() {
-      loginModal.classList.remove('hidden');
-      loginModal.classList.add('flex');
-    }
-    
-    // ==================== CART FUNCTIONS ====================
-    async function loadCart() {
-      if (!currentUser) { cart = []; renderCart(); updateCartBadge(); return; }
-      
-      const { data, error } = await supabase.from('carts').select(`*, products(*)`).eq('user_id', currentUser.id);
-      if (!error && data) {
-        cart = data.map(item => ({
-          cart_id: item.id, id: item.product_id, nama: item.products?.nama || 'Produk',
-          harga: item.products?.harga || 0, gambar: item.products?.gambar,
-          quantity: item.quantity, seller_id: item.products?.seller_id
-        }));
-        renderCart();
-        updateCartBadge();
-      }
-    }
-    
-    async function addToCart(productId, quantity = 1) {
-      if (!currentUser) { alert('Silakan login terlebih dahulu'); openLoginModal(); return false; }
-      
-      const existingItem = cart.find(item => item.id === productId);
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + quantity;
-        const { error } = await supabase.from('carts').update({ quantity: newQuantity }).eq('id', existingItem.cart_id);
-        if (!error) await loadCart();
-      } else {
-        const { error } = await supabase.from('carts').insert({ user_id: currentUser.id, product_id: productId, quantity: quantity });
-        if (!error) await loadCart();
-      }
-      return true;
-    }
-    
-    async function updateCartQuantity(cartId, productId, newQuantity) {
-      if (newQuantity <= 0) { await removeFromCart(cartId); return; }
-      const { error } = await supabase.from('carts').update({ quantity: newQuantity }).eq('id', cartId);
-      if (!error) await loadCart();
-    }
-    
-    async function removeFromCart(cartId) {
-      const { error } = await supabase.from('carts').delete().eq('id', cartId);
-      if (!error) await loadCart();
-    }
-    
-    function updateCartBadge() {
-      const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-      if (totalQty > 0) { cartBadge.classList.remove('hidden'); cartBadge.textContent = totalQty > 99 ? '99+' : totalQty; }
-      else cartBadge.classList.add('hidden');
-    }
-    
-    function renderCart() {
-      if (!cartItemsContainer) return;
-      if (cart.length === 0) {
-        cartItemsContainer.innerHTML = `<div class="text-center text-blue-200/70 py-10"><i data-lucide="shopping-cart" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Keranjang belanja kosong</p></div>`;
-        if (cartSubtotalSpan) cartSubtotalSpan.textContent = 'Rp 0';
+        
+        let subtotal = 0;
+        let html = '';
+        cart.forEach(item => {
+          const itemTotal = item.harga * item.quantity;
+          subtotal += itemTotal;
+          html += `<div class="flex gap-4 py-4 border-b border-blue-400/20">
+            <img src="${item.gambar || 'https://placehold.co/80x80/1e4f9c/white?text=Product'}" class="w-20 h-20 rounded-lg object-cover">
+            <div class="flex-1"><h4 class="font-semibold">${item.nama}</h4><p class="text-blue-300">Rp ${item.harga.toLocaleString()}</p>
+            <div class="flex gap-2 mt-2">
+              <button class="cart-qty-minus bg-blue-600/30 px-3 py-1 rounded-full" data-cart-id="${item.cart_id}" data-product-id="${item.id}">-</button>
+              <span>${item.quantity}</span>
+              <button class="cart-qty-plus bg-blue-600/30 px-3 py-1 rounded-full" data-cart-id="${item.cart_id}" data-product-id="${item.id}">+</button>
+              <button class="cart-remove text-red-400" data-cart-id="${item.cart_id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div></div>
+            <div class="text-right"><p class="font-bold">Rp ${itemTotal.toLocaleString()}</p></div>
+          </div>`;
+        });
+        cartItemsContainer.innerHTML = html;
+        cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString()}`;
+        
+        document.querySelectorAll('.cart-qty-plus, .cart-qty-minus, .cart-remove').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const cartId = parseInt(btn.dataset.cartId);
+            const productId = parseInt(btn.dataset.productId);
+            const item = cart.find(i => i.id === productId);
+            if (btn.classList.contains('cart-qty-plus')) await updateCartQuantity(cartId, productId, item.quantity + 1);
+            else if (btn.classList.contains('cart-qty-minus')) await updateCartQuantity(cartId, productId, item.quantity - 1);
+            else await removeFromCart(cartId);
+          });
+        });
         lucide.createIcons();
-        return;
       }
       
-      let subtotal = 0;
-      let html = '';
-      cart.forEach(item => {
-        const itemTotal = item.harga * item.quantity;
-        subtotal += itemTotal;
-        html += `<div class="flex gap-4 py-4 border-b border-blue-400/20">
-          <img src="${item.gambar || 'https://placehold.co/80x80/1e4f9c/white?text=Product'}" class="w-20 h-20 rounded-lg object-cover">
-          <div class="flex-1"><h4 class="font-semibold">${item.nama}</h4><p class="text-blue-300 text-sm">Rp ${item.harga.toLocaleString('id-ID')}</p>
-          <div class="flex items-center gap-2 mt-2">
-            <button class="cart-qty-minus bg-blue-600/30 hover:bg-blue-600 px-3 py-1 rounded-full text-sm" data-cart-id="${item.cart_id}" data-product-id="${item.id}">-</button>
-            <span class="w-8 text-center">${item.quantity}</span>
-            <button class="cart-qty-plus bg-blue-600/30 hover:bg-blue-600 px-3 py-1 rounded-full text-sm" data-cart-id="${item.cart_id}" data-product-id="${item.id}">+</button>
-            <button class="cart-remove text-red-400 hover:text-red-300 text-sm ml-2" data-cart-id="${item.cart_id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-          </div></div>
-          <div class="text-right"><p class="font-bold">Rp ${itemTotal.toLocaleString('id-ID')}</p></div>
-        </div>`;
-      });
-      cartItemsContainer.innerHTML = html;
-      cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
-      
-      document.querySelectorAll('.cart-qty-plus').forEach(btn => btn.addEventListener('click', async () => {
-        const cartId = parseInt(btn.dataset.cartId), productId = parseInt(btn.dataset.productId);
-        const item = cart.find(i => i.id === productId);
-        if (item) await updateCartQuantity(cartId, productId, item.quantity + 1);
-      }));
-      document.querySelectorAll('.cart-qty-minus').forEach(btn => btn.addEventListener('click', async () => {
-        const cartId = parseInt(btn.dataset.cartId), productId = parseInt(btn.dataset.productId);
-        const item = cart.find(i => i.id === productId);
-        if (item) await updateCartQuantity(cartId, productId, item.quantity - 1);
-      }));
-      document.querySelectorAll('.cart-remove').forEach(btn => btn.addEventListener('click', async () => {
-        await removeFromCart(parseInt(btn.dataset.cartId));
-      }));
-      lucide.createIcons();
-    }
-    
-    // ==================== ORDER FUNCTIONS ====================
-    async function checkout(paymentMethod) {
-      if (!currentUser) { alert('Silakan login terlebih dahulu'); openLoginModal(); return false; }
-      if (cart.length === 0) { alert('Keranjang belanja kosong'); return false; }
-      
-      const orderNumber = `INV/${new Date().getFullYear()}/${Math.floor(Math.random() * 10000)}`;
-      const totalPrice = cart.reduce((sum, item) => sum + (item.harga * item.quantity), 0);
-      const status = paymentMethod === 'transfer' ? 'paid' : 'pending';
-      
-      try {
-        const { data: order, error: orderError } = await supabase.from('orders').insert({ 
-          order_number: orderNumber, user_id: currentUser.id, total_price: totalPrice, 
-          payment_method: paymentMethod, status: status 
+      // ==================== ORDER FUNCTIONS ====================
+      async function checkout(paymentMethod) {
+        if (!currentUser) { alert('Login dulu'); openLoginModal(); return; }
+        if (cart.length === 0) { alert('Keranjang kosong'); return; }
+        
+        const orderNumber = `INV/${Date.now()}`;
+        const totalPrice = cart.reduce((s, i) => s + (i.harga * i.quantity), 0);
+        const status = paymentMethod === 'transfer' ? 'paid' : 'pending';
+        
+        const { data: order, error: orderError } = await supabase.from('orders').insert({
+          order_number: orderNumber, user_id: currentUser.id, total_price: totalPrice,
+          payment_method: paymentMethod, status
         }).select().single();
-        if (orderError) throw orderError;
+        if (orderError) { alert('Gagal checkout'); return; }
         
-        const orderItems = cart.map(item => ({ 
-          order_id: order.id, product_id: item.id, seller_id: item.seller_id, 
-          quantity: item.quantity, price: item.harga, subtotal: item.harga * item.quantity 
+        const orderItems = cart.map(i => ({
+          order_id: order.id, product_id: i.id, seller_id: i.seller_id,
+          quantity: i.quantity, price: i.harga, subtotal: i.harga * i.quantity
         }));
-        const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-        if (itemsError) throw itemsError;
-        
+        await supabase.from('order_items').insert(orderItems);
         await supabase.from('carts').delete().eq('user_id', currentUser.id);
         
         for (const item of orderItems) {
           if (item.seller_id) {
-            await supabase.from('notifications').insert({ 
-              user_id: item.seller_id, title: 'Pesanan Baru', 
-              message: `Anda mendapat pesanan baru: ${orderNumber}`, icon: 'shopping-bag', is_read: false 
+            await supabase.from('notifications').insert({
+              user_id: item.seller_id, title: 'Pesanan Baru',
+              message: `Pesanan baru: ${orderNumber}`, icon: 'shopping-bag'
             });
           }
         }
         
         await loadCart();
         await loadOrders();
-        alert(`✅ Pesanan berhasil dibuat!\n📦 No. Pesanan: ${orderNumber}\n💳 Status: ${status === 'paid' ? 'Sudah Dibayar' : 'Menunggu Pembayaran'}`);
-        return true;
-      } catch (error) {
-        console.error('Checkout error:', error);
-        alert('❌ Gagal checkout: ' + error.message);
-        return false;
-      }
-    }
-    
-    async function loadOrders() {
-      if (!currentUser) return;
-      const { data, error } = await supabase.from('orders').select(`*, order_items(*, products(*))`).eq('user_id', currentUser.id).order('created_at', { ascending: false });
-      if (!error && data) { orders = data; renderOrders(); }
-    }
-    
-    function renderOrders() {
-      if (!ordersContainer) return;
-      if (orders.length === 0) {
-        ordersContainer.innerHTML = `<div class="text-center text-blue-200/70 py-10"><i data-lucide="package" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Belum ada pesanan</p></div>`;
-        lucide.createIcons(); return;
+        alert(`✅ Pesanan berhasil! No: ${orderNumber}\nStatus: ${status}`);
       }
       
-      let html = '';
-      orders.forEach(order => {
-        const statusClass = { pending: 'status-pending', paid: 'status-paid', shipped: 'status-shipped', completed: 'status-completed' }[order.status] || 'status-pending';
-        html += `<div class="glass-panel p-6 mb-4">
-          <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
-            <div><p class="text-sm text-blue-300">No. Pesanan</p><p class="font-mono font-bold">${order.order_number}</p><p class="text-xs text-blue-400">${new Date(order.created_at).toLocaleDateString('id-ID')}</p></div>
-            <div><span class="px-3 py-1 rounded-full text-sm font-semibold ${statusClass}">${order.status.toUpperCase()}</span></div>
-          </div>
-          <div class="border-t border-blue-400/20 pt-4">
-            ${order.order_items.map(item => `<div class="flex gap-3 mb-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><p class="font-semibold">${item.products?.nama || 'Product'}</p><p class="text-sm text-blue-300">${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="text-right"><p class="font-bold">Rp ${item.subtotal.toLocaleString('id-ID')}</p></div></div>`).join('')}
-          </div>
-          <div class="border-t border-blue-400/20 pt-4 flex justify-between items-center"><p class="text-sm">Total Pesanan</p><p class="text-xl font-bold">Rp ${order.total_price.toLocaleString('id-ID')}</p></div>
-          ${order.status !== 'completed' ? `<div class="mt-4"><button class="complete-order w-full bg-green-600/30 hover:bg-green-600 border border-green-500 py-2 rounded-full transition" data-order-id="${order.id}">✅ Selesaikan Pesanan</button></div>` : ''}
-        </div>`;
-      });
-      ordersContainer.innerHTML = html;
-      document.querySelectorAll('.complete-order').forEach(btn => btn.addEventListener('click', async () => {
-        await supabase.from('orders').update({ status: 'completed' }).eq('id', parseInt(btn.dataset.orderId));
-        await loadOrders();
-        alert('✅ Pesanan telah diselesaikan!');
-      }));
-      lucide.createIcons();
-    }
-    
-    // ==================== SELLER FUNCTIONS ====================
-    async function loadSellerOrders() {
-      if (!currentUser || currentUserRole !== 'seller') return;
-      const { data, error } = await supabase.from('order_items').select(`*, orders(*), products(*)`).eq('seller_id', currentUser.id).order('created_at', { ascending: false });
-      if (!error && data) renderSellerOrders(data);
-    }
-    
-    function renderSellerOrders(orderItems) {
-      if (!sellerOrdersContainer) return;
-      const groupedOrders = {};
-      orderItems.forEach(item => { if (!groupedOrders[item.order_id]) groupedOrders[item.order_id] = { order: item.orders, items: [] }; groupedOrders[item.order_id].items.push(item); });
-      if (Object.keys(groupedOrders).length === 0) {
-        sellerOrdersContainer.innerHTML = `<div class="text-center text-blue-300 py-10"><i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Belum ada pesanan masuk</p></div>`;
-        lucide.createIcons(); return;
+      async function loadOrders() {
+        if (!currentUser) return;
+        const { data } = await supabase.from('orders').select(`*, order_items(*, products(*))`).eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        if (data) { orders = data; renderOrders(); }
       }
       
-      let html = '';
-      for (const orderId in groupedOrders) {
-        const { order, items } = groupedOrders[orderId];
-        const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
-        html += `<div class="glass-panel p-6 mb-4">
-          <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
-            <div><p class="text-sm text-blue-300">No. Pesanan</p><p class="font-mono font-bold">${order.order_number}</p><p class="text-xs text-blue-400">${new Date(order.created_at).toLocaleDateString('id-ID')}</p></div>
-            <div><select class="update-status px-3 py-1 rounded-full text-sm bg-blue-600/50 border border-blue-400" data-order-id="${order.id}"><option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option><option value="paid" ${order.status === 'paid' ? 'selected' : ''}>💰 Paid</option><option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🚚 Shipped</option><option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Completed</option></select></div>
+      function renderOrders() {
+        if (!ordersContainer) return;
+        if (orders.length === 0) {
+          ordersContainer.innerHTML = `<div class="text-center py-10"><i data-lucide="package" class="w-16 h-16 mx-auto opacity-50"></i><p>Belum ada pesanan</p></div>`;
+          lucide.createIcons();
+          return;
+        }
+        
+        ordersContainer.innerHTML = orders.map(order => `
+          <div class="glass-panel p-6 mb-4">
+            <div class="flex justify-between"><p class="font-mono">${order.order_number}</p><span class="px-3 py-1 rounded-full text-sm ${order.status === 'completed' ? 'bg-green-600' : order.status === 'paid' ? 'bg-blue-600' : 'bg-yellow-600'}">${order.status}</span></div>
+            ${order.order_items.map(item => `<div class="flex gap-3 mt-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded object-cover"><div><p class="font-semibold">${item.products?.nama}</p><p>${item.quantity} x Rp ${item.price.toLocaleString()}</p></div><div class="ml-auto font-bold">Rp ${item.subtotal.toLocaleString()}</div></div>`).join('')}
+            <div class="border-t mt-3 pt-3 flex justify-between"><span>Total</span><span class="font-bold">Rp ${order.total_price.toLocaleString()}</span></div>
+            ${order.status !== 'completed' ? `<button class="complete-order mt-4 w-full bg-green-600 py-2 rounded-full" data-id="${order.id}">Selesaikan Pesanan</button>` : ''}
           </div>
-          ${items.map(item => `<div class="flex gap-3 mb-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><p class="font-semibold">${item.products?.nama || 'Product'}</p><p class="text-sm text-blue-300">${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="text-right"><p class="font-bold">Rp ${item.subtotal.toLocaleString('id-ID')}</p></div></div>`).join('')}
-          <div class="border-t border-blue-400/20 pt-4 text-right"><p class="text-sm">Total dari toko Anda</p><p class="text-xl font-bold">Rp ${totalAmount.toLocaleString('id-ID')}</p></div>
-        </div>`;
+        `).join('');
+        
+        document.querySelectorAll('.complete-order').forEach(btn => btn.addEventListener('click', async () => {
+          await supabase.from('orders').update({ status: 'completed' }).eq('id', parseInt(btn.dataset.id));
+          await loadOrders();
+        }));
+        lucide.createIcons();
       }
-      sellerOrdersContainer.innerHTML = html;
-      document.querySelectorAll('.update-status').forEach(select => select.addEventListener('change', async () => {
-        await supabase.from('orders').update({ status: select.value }).eq('id', parseInt(select.dataset.orderId));
-        await loadSellerOrders();
-        alert(`✅ Status pesanan diubah menjadi ${select.value}`);
-      }));
-      lucide.createIcons();
-    }
-    
-    // ==================== PRODUCT FUNCTIONS ====================
-    async function loadProducts() {
-      const { data, error } = await supabase.from('products').select('*');
-      if (!error && data) { products = data; renderProducts(); }
-      else productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-red-400">❌ Gagal memuat produk</div>';
-    }
-    
-    function renderProducts() {
-      if (!products.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🛒 Belum ada produk</div>'; return; }
-      const filtered = products.filter(p => (activeCategory === 'all' || p.kategori === activeCategory) && p.nama?.toLowerCase().includes(searchTerm.toLowerCase()));
-      if (!filtered.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🔍 Produk tidak ditemukan</div>'; return; }
-      productGrid.innerHTML = filtered.map(p => `<div class="glass-panel p-4 flex flex-col hover-metallic"><img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover" onerror="this.src='https://placehold.co/400x300/1e4f9c/white?text=Produk'"><div class="mt-3 flex justify-between items-start"><div><h3 class="font-bold text-lg">${p.nama}</h3><p class="text-xs text-blue-200/80">${p.kategori || 'Umum'} • ⭐ ${p.rating || 0}</p></div><span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm">Rp ${(p.harga || 0).toLocaleString('id-ID')}</span></div><button class="add-to-cart mt-4 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full flex items-center justify-center gap-2" data-id="${p.id}"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah ke Keranjang</button></div>`).join('');
-      lucide.createIcons();
-      document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', async () => { await addToCart(parseInt(btn.dataset.id), 1); alert('✅ Produk ditambahkan ke keranjang!'); }));
-    }
-    
-    // ==================== NOTIFICATION FUNCTIONS ====================
-    async function loadNotifications() {
-      if (!currentUser) return;
-      const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
-      if (data) { notifications = data; renderNotifications(); }
-    }
-    
-    function renderNotifications() {
-      if (!notificationList) return;
-      const unreadCount = notifications.filter(n => !n.is_read).length;
-      if (unreadCount > 0) { notifBadge.classList.remove('hidden'); notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount; }
-      else notifBadge.classList.add('hidden');
-      if (notifications.length === 0) { notificationList.innerHTML = '<div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div>'; return; }
-      notificationList.innerHTML = notifications.map(n => `<div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer notification-item" data-id="${n.id}"><div class="flex items-start gap-2"><i data-lucide="${n.icon || 'bell'}" class="w-4 h-4 mt-1"></i><div class="flex-1"><p class="text-sm font-medium">${n.title}</p><p class="text-xs text-blue-300">${n.message}</p><p class="text-xs text-blue-400/70 mt-1">${new Date(n.created_at).toLocaleDateString('id-ID')}</p></div>${!n.is_read ? '<span class="w-2 h-2 bg-blue-400 rounded-full"></span>' : ''}</div></div>`).join('');
-      lucide.createIcons();
-      document.querySelectorAll('.notification-item').forEach(item => item.addEventListener('click', async () => { await supabase.from('notifications').update({ is_read: true }).eq('id', item.dataset.id); await loadNotifications(); }));
-    }
-    
-    async function markAllNotificationsAsRead() {
-      if (!currentUser) return;
-      await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false);
-      await loadNotifications();
-    }
-    
-    // ==================== PROFILE FUNCTIONS ====================
-    async function updateSidebarUI() {
-      if (!currentUser) {
-        sidebarName.textContent = 'Pengunjung'; sidebarUsername.textContent = '@pengunjung';
-        sidebarBio.innerHTML = '<p class="text-blue-200/80">Login untuk melihat profil</p>';
-        sidebarAvatar.src = 'https://placehold.co/96x96/1e4f9c/white?text=G';
-        sidebarBadge.innerHTML = ''; sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.add('hidden');
-        userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div>';
-        return;
+      
+      // ==================== SELLER FUNCTIONS ====================
+      async function loadSellerProducts() {
+        if (!currentUser || currentUserRole !== 'seller') return;
+        const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id);
+        if (data) renderSellerProducts(data);
       }
-      sidebarName.textContent = currentUserProfile?.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
-      sidebarUsername.textContent = `@${currentUserProfile?.username || currentUser.email?.split('@')[0] || 'pengguna'}`;
-      sidebarBio.innerHTML = currentUserProfile?.bio ? `<p class="text-blue-200/80">${currentUserProfile.bio}</p>` : '<p class="text-blue-400/60 italic">Belum ada bio</p>';
-      sidebarAvatar.src = currentUserProfile?.avatar_url || `https://placehold.co/96x96/1e4f9c/white?text=${(sidebarName.textContent.charAt(0)).toUpperCase()}`;
-      if (currentUserRole === 'seller') {
-        sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
-        sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.remove('hidden'); await loadUserProducts();
-      } else {
-        sidebarBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Pembeli</span>';
-        sidebarSellerApply.classList.remove('hidden'); sidebarDashboard.classList.add('hidden');
+      
+      function renderSellerProducts(productsData) {
+        if (!sellerProductsContainer) return;
+        if (!productsData?.length) { sellerProductsContainer.innerHTML = '<div class="col-span-full text-center py-8">Belum ada produk</div>'; return; }
+        sellerProductsContainer.innerHTML = productsData.map(p => `
+          <div class="glass-panel p-3"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-32 object-cover rounded mb-2"><h4 class="font-semibold">${p.nama}</h4><p class="text-blue-300">Rp ${p.harga.toLocaleString()}</p><button class="delete-product mt-2 w-full bg-red-600/50 py-1 rounded-full" data-id="${p.id}">Hapus</button></div>
+        `).join('');
+        document.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', async () => {
+          if (confirm('Hapus produk?')) await supabase.from('products').delete().eq('id', parseInt(btn.dataset.id));
+          await loadSellerProducts();
+          await loadProducts();
+        }));
       }
-      lucide.createIcons();
-    }
-    
-    async function loadUserProducts() {
-      if (!currentUser || currentUserRole !== 'seller') {
-        userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">' + (currentUser ? 'Jadi penjual untuk mulai berjualan' : 'Login untuk melihat produk') + '</div>';
-        return;
+      
+      async function addProduct() {
+        const name = document.getElementById('productName').value;
+        const price = parseFloat(document.getElementById('productPrice').value);
+        if (!name || !price) { document.getElementById('addProductMessage').textContent = 'Nama dan Harga harus diisi'; return; }
+        
+        const { error } = await supabase.from('products').insert({
+          nama: name, deskripsi: document.getElementById('productDesc').value, harga: price,
+          kategori: document.getElementById('productCategory').value, gambar: document.getElementById('productImage').value || 'https://placehold.co/400x300/1e4f9c/white?text=Produk',
+          stock: parseInt(document.getElementById('productStock').value) || 0, seller_id: currentUser.id,
+          seller_name: currentUserProfile?.full_name || currentUser.email
+        });
+        if (error) document.getElementById('addProductMessage').textContent = 'Gagal: ' + error.message;
+        else { document.getElementById('addProductMessage').textContent = '✅ Berhasil!'; addProductModal.classList.add('hidden'); await loadSellerProducts(); await loadProducts(); }
       }
-      const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id).limit(9);
-      if (data && data.length > 0) userProductsGrid.innerHTML = data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('');
-      else userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Belum ada produk</div>';
-    }
-    
-    async function saveProfileChanges() {
-      const fullName = editFullName.value, username = editUsername.value, bio = editBio.value, avatarFile = editAvatar.files[0];
-      let avatarUrl = currentUserProfile?.avatar_url;
-      if (avatarFile) {
-        const fileName = `${currentUser.id}_${Date.now()}.jpg`;
-        const { error } = await supabase.storage.from('avatars').upload(fileName, avatarFile);
-        if (!error) { const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName); avatarUrl = urlData.publicUrl; }
+      
+      async function loadSellerOrders() {
+        if (!currentUser || currentUserRole !== 'seller') return;
+        const { data } = await supabase.from('order_items').select(`*, orders(*), products(*)`).eq('seller_id', currentUser.id).order('created_at', { ascending: false });
+        if (data) renderSellerOrders(data);
       }
-      const { error } = await supabase.from('profiles').update({ full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
-      if (error) editProfileMessage.textContent = 'Gagal: ' + error.message;
-      else { editProfileMessage.textContent = 'Profil berhasil diperbarui!'; currentUserProfile = { ...currentUserProfile, full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }; updateSidebarUI(); setTimeout(() => { editProfileModal.classList.add('hidden'); editProfileMessage.textContent = ''; }, 1500); }
-    }
-    
-    async function submitSellerApplication() {
-      const fullName = document.getElementById('sellerFullName')?.value, nik = document.getElementById('sellerNIK')?.value, bank = document.getElementById('sellerBank')?.value, account = document.getElementById('sellerAccount')?.value, accountName = document.getElementById('sellerAccountName')?.value, phone = document.getElementById('sellerPhone')?.value, email = document.getElementById('sellerEmail')?.value;
-      if (!fullName || !nik || !bank || !account || !accountName || !phone || !email) { document.getElementById('sellerApplyMessage').textContent = 'Semua field harus diisi!'; return; }
-      const { error } = await supabase.from('seller_applications').insert({ user_id: currentUser.id, full_name: fullName, nik, bank_name: bank, bank_account: account, bank_account_name: accountName, phone, email, status: 'pending' });
-      const msg = document.getElementById('sellerApplyMessage');
-      if (error) msg.textContent = 'Gagal: ' + error.message;
-      else { msg.textContent = '✅ Pengajuan berhasil! Menunggu verifikasi admin.'; await supabase.from('notifications').insert({ user_id: currentUser.id, title: 'Pengajuan Penjual', message: 'Pengajuan Anda sedang diproses.', icon: 'store', is_read: false }); setTimeout(() => document.getElementById('sellerApplyModal')?.classList.add('hidden'), 2000); }
-    }
-    
-    // ==================== UI FUNCTIONS ====================
-    function openProfileSidebar() { profileSidebar.style.transform = 'translateX(0)'; document.body.style.overflow = 'hidden'; loadUserProducts(); }
-    function closeProfileSidebarFunc() { profileSidebar.style.transform = 'translateX(100%)'; document.body.style.overflow = ''; }
-    function openEditProfileModal() { editFullName.value = currentUserProfile?.full_name || ''; editUsername.value = currentUserProfile?.username || currentUser?.email?.split('@')[0] || ''; editBio.value = currentUserProfile?.bio || ''; editProfileModal.classList.remove('hidden'); editProfileModal.classList.add('flex'); }
-    
-    // ==================== EVENT LISTENERS ====================
-    function initEventListeners() {
-      cartTab?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); });
-      ordersTab?.addEventListener('click', () => { cartSection.classList.add('hidden'); ordersSection.classList.remove('hidden'); sellerSection.classList.add('hidden'); ordersTab.classList.add('active'); cartTab.classList.remove('active'); sellerTab.classList.remove('active'); loadOrders(); });
-      sellerTab?.addEventListener('click', () => { if (currentUserRole === 'seller') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.remove('hidden'); sellerTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); loadSellerOrders(); } else alert('Anda harus menjadi seller terlebih dahulu'); });
-      document.querySelectorAll('.category-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active')); btn.classList.add('category-active'); activeCategory = btn.dataset.cat; renderProducts(); }));
-      document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
-      searchInput?.addEventListener('input', (e) => { searchTerm = e.target.value; renderProducts(); });
-      cartIcon?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); window.scrollTo({ top: cartSection.offsetTop - 100, behavior: 'smooth' }); });
-      document.querySelectorAll('.payment-method').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedPayment = btn.dataset.method; const span = document.getElementById('selectedPayment'); if (span) span.textContent = `Metode dipilih: ${selectedPayment === 'cod' ? 'COD (Bayar di Tempat)' : 'Transfer Bank (Simulasi Pembayaran)'}`; }));
-      checkoutBtn?.addEventListener('click', async () => { if (!selectedPayment) { alert('Pilih metode pembayaran terlebih dahulu'); return; } await checkout(selectedPayment); });
-      document.getElementById('loginBtn')?.addEventListener('click', () => { const email = document.getElementById('loginEmail')?.value, pass = document.getElementById('loginPassword')?.value; if (email && pass) login(email, pass); else document.getElementById('loginMessage').textContent = 'Email dan password harus diisi'; });
-      document.getElementById('registerBtn')?.addEventListener('click', () => { const email = document.getElementById('regEmail')?.value, pass = document.getElementById('regPassword')?.value, confirm = document.getElementById('regConfirmPassword')?.value; if (!email || !pass || !confirm) document.getElementById('registerMessage').textContent = 'Semua field harus diisi!'; else if (pass !== confirm) document.getElementById('registerMessage').textContent = 'Password tidak cocok!'; else register(email, pass); });
-      document.getElementById('resetBtn')?.addEventListener('click', async () => { const email = document.getElementById('resetEmail')?.value; if (!email) { document.getElementById('resetMessage').textContent = 'Email harus diisi!'; return; } const { error } = await supabase.auth.resetPasswordForEmail(email); document.getElementById('resetMessage').textContent = error ? 'Gagal: ' + error.message : 'Link reset password telah dikirim ke email Anda.'; });
-      document.getElementById('googleLoginBtn')?.addEventListener('click', async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); });
-      document.querySelectorAll('.tab-login-btn').forEach(btn => btn.addEventListener('click', () => { const tabId = btn.dataset.tab; document.querySelectorAll('.login-tab-content').forEach(tab => tab.classList.add('hidden')); document.getElementById(tabId + 'Tab').classList.remove('hidden'); document.querySelectorAll('.tab-login-btn').forEach(b => { b.classList.remove('font-bold', 'text-white'); b.classList.add('text-blue-300'); }); btn.classList.add('font-bold', 'text-white'); }));
-      document.getElementById('closeLogin')?.addEventListener('click', () => loginModal.classList.add('hidden')); document.getElementById('loginOverlay')?.addEventListener('click', () => loginModal.classList.add('hidden'));
-      loginFab?.addEventListener('click', openLoginModal); document.getElementById('bantuanLink')?.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
-      sellerApplyBtn?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
-      document.getElementById('closeSellerApply')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
-      document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication); document.getElementById('sellerApplyOverlay')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
-      document.getElementById('complaintBtn')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.remove('hidden'); document.getElementById('complaintModal')?.classList.add('flex'); });
-      document.getElementById('closeComplaint')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.add('hidden'); });
-      document.getElementById('submitComplaint')?.addEventListener('click', () => { const type = document.getElementById('complaintType')?.value, desc = document.getElementById('complaintDesc')?.value; if (!desc) { alert('Harap isi deskripsi keluhan'); return; } alert(`✅ Pengaduan terkirim ke admin: shofiankurniady@gmail.com\n\nJenis: ${type}\nKeluhan: ${desc}`); document.getElementById('complaintModal')?.classList.add('hidden'); document.getElementById('complaintDesc').value = ''; });
-      document.getElementById('profileBtn')?.addEventListener('click', openProfileSidebar); closeProfileSidebar?.addEventListener('click', closeProfileSidebarFunc); profileSidebarOverlay?.addEventListener('click', closeProfileSidebarFunc);
-      editProfileBtn?.addEventListener('click', openEditProfileModal); closeEditProfileBtn?.addEventListener('click', () => editProfileModal.classList.add('hidden')); editProfileOverlay?.addEventListener('click', () => editProfileModal.classList.add('hidden')); saveProfileChangesBtn?.addEventListener('click', saveProfileChanges);
-      document.getElementById('sidebarSellerApplyBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
-      document.getElementById('sidebarDashboardBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); sellerTab?.click(); }); sidebarLogoutBtn?.addEventListener('click', logout);
-      notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); }); document.addEventListener('click', () => notificationDropdown?.classList.remove('show')); markAllReadBtn?.addEventListener('click', markAllNotificationsAsRead);
-      document.getElementById('explorePromo')?.addEventListener('click', () => { productGrid?.scrollIntoView({ behavior: 'smooth' }); });
-      document.getElementById('logoLink')?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    }
-    
-    // ==================== INITIALIZATION ====================
-    async function init() {
-      await checkAuth();
-      await loadProducts();
-      initEventListeners();
-      cartTab.classList.add('active');
-      cartSection.classList.remove('hidden');
-      lucide.createIcons();
-      console.log('✅ Marketplace initialized successfully');
-    }
-    
-    init();
+      
+      function renderSellerOrders(orderItems) {
+        if (!sellerOrdersContainer) return;
+        const grouped = {};
+        orderItems.forEach(i => { if (!grouped[i.order_id]) grouped[i.order_id] = { order: i.orders, items: [] }; grouped[i.order_id].items.push(i); });
+        if (Object.keys(grouped).length === 0) { sellerOrdersContainer.innerHTML = '<div class="text-center py-10">Belum ada pesanan masuk</div>'; return; }
+        
+        sellerOrdersContainer.innerHTML = Object.values(grouped).map(({ order, items }) => `
+          <div class="glass-panel p-6 mb-4">
+            <div class="flex justify-between"><p class="font-mono">${order.order_number}</p><select class="update-status bg-blue-600/50 px-3 py-1 rounded-full" data-id="${order.id}"><option ${order.status === 'pending' ? 'selected' : ''}>pending</option><option ${order.status === 'paid' ? 'selected' : ''}>paid</option><option ${order.status === 'shipped' ? 'selected' : ''}>shipped</option><option ${order.status === 'completed' ? 'selected' : ''}>completed</option></select></div>
+            ${items.map(i => `<div class="flex gap-3 mt-3"><img src="${i.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded object-cover"><div><p>${i.products?.nama}</p><p>${i.quantity} x Rp ${i.price.toLocaleString()}</p></div><div class="ml-auto font-bold">Rp ${i.subtotal.toLocaleString()}</div></div>`).join('')}
+            <div class="border-t mt-3 pt-3 text-right font-bold">Total: Rp ${items.reduce((s, i) => s + i.subtotal, 0).toLocaleString()}</div>
+          </div>
+        `).join('');
+        
+        document.querySelectorAll('.update-status').forEach(select => select.addEventListener('change', async () => {
+          await supabase.from('orders').update({ status: select.value }).eq('id', parseInt(select.dataset.id));
+          await loadSellerOrders();
+        }));
+      }
+      
+      // ==================== ADMIN FUNCTIONS ====================
+      async function loadAdminData() {
+        if (!currentUser || currentUserRole !== 'admin') return;
+        
+        const { count: users } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+        document.getElementById('adminStatUsers').textContent = users || 0;
+        const { count: prods } = await supabase.from('products').select('*', { count: 'exact', head: true });
+        document.getElementById('adminStatProducts').textContent = prods || 0;
+        const { data: ords } = await supabase.from('orders').select('total_price');
+        document.getElementById('adminStatOrders').textContent = ords?.length || 0;
+        document.getElementById('adminStatRevenue').textContent = `Rp ${(ords?.reduce((s, o) => s + o.total_price, 0) || 0).toLocaleString()}`;
+        
+        const { data: usersList } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+        renderAdminUsers(usersList);
+        
+        const { data: productsList } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+        renderAdminProducts(productsList);
+        
+        const { data: ordersList } = await supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
+        renderAdminOrders(ordersList);
+        
+        const { data: apps } = await supabase.from('seller_applications').select('*').order('created_at', { ascending: false });
+        renderAdminSellerApps(apps);
+        
+        const { data: complaintsList } = await supabase.from('complaints').select('*').order('created_at', { ascending: false });
+        renderAdminComplaints(complaintsList);
+      }
+      
+      function renderAdminUsers(users) {
+        const container = document.getElementById('adminUsersContainer');
+        if (!container) return;
+        if (!users?.length) { container.innerHTML = '<div class="text-center py-8">Belum ada user</div>'; return; }
+        container.innerHTML = users.map(u => `<div class="glass-panel p-4 flex justify-between"><div><p class="font-semibold">${u.email}</p><p class="text-sm">Role: ${u.role}</p></div><div><button class="admin-change-role bg-yellow-600 px-3 py-1 rounded-full text-xs mr-2" data-id="${u.id}" data-role="${u.role}">Ubah Role</button><button class="admin-delete-user bg-red-600 px-3 py-1 rounded-full text-xs" data-id="${u.id}">Hapus</button></div></div>`).join('');
+        document.querySelectorAll('.admin-change-role').forEach(btn => btn.addEventListener('click', async () => {
+          const newRole = prompt('Role baru (buyer/seller/admin):', btn.dataset.role);
+          if (newRole) await supabase.from('profiles').update({ role: newRole }).eq('id', btn.dataset.id);
+          await loadAdminData();
+        }));
+        document.querySelectorAll('.admin-delete-user').forEach(btn => btn.addEventListener('click', async () => {
+          if (confirm('Hapus user?')) await supabase.from('profiles').delete().eq('id', btn.dataset.id);
+          await loadAdminData();
+        }));
+      }
+      
+      function renderAdminProducts(productsList) {
+        const container = document.getElementById('adminProductsContainer');
+        if (!container) return;
+        if (!productsList?.length) { container.innerHTML = '<div class="text-center py-8">Belum ada produk</div>'; return; }
+        container.innerHTML = productsList.map(p => `<div class="glass-panel p-4 flex justify-between"><div><p class="font-semibold">${p.nama}</p><p class="text-sm">Rp ${p.harga.toLocaleString()} | Stok: ${p.stock}</p></div><button class="admin-delete-product bg-red-600 px-3 py-1 rounded-full text-xs" data-id="${p.id}">Hapus</button></div>`).join('');
+        document.querySelectorAll('.admin-delete-product').forEach(btn => btn.addEventListener('click', async () => {
+          if (confirm('Hapus produk?')) await supabase.from('products').delete().eq('id', parseInt(btn.dataset.id));
+          await loadAdminData();
+          await loadProducts();
+        }));
+      }
+      
+      function renderAdminOrders(ordersList) {
+        const container = document.getElementById('adminOrdersContainer');
+        if (!container) return;
+        if (!ordersList?.length) { container.innerHTML = '<div class="text-center py-8">Belum ada order</div>'; return; }
+        container.innerHTML = ordersList.map(o => `<div class="glass-panel p-4"><p class="font-mono">${o.order_number}</p><p>Total: Rp ${o.total_price.toLocaleString()}</p><p class="text-sm text-blue-300">${new Date(o.created_at).toLocaleString()}</p></div>`).join('');
+      }
+      
+      function renderAdminSellerApps(apps) {
+        const container = document.getElementById('adminSellersContainer');
+        if (!container) return;
+        if (!apps?.length) { container.innerHTML = '<div class="text-center py-8">Belum ada aplikasi</div>'; return; }
+        container.innerHTML = apps.map(a => `<div class="glass-panel p-4 flex justify-between"><div><p class="font-semibold">${a.full_name}</p><p class="text-sm">${a.email}</p></div><div><button class="admin-approve-seller bg-green-600 px-3 py-1 rounded-full text-xs mr-2" data-id="${a.user_id}" data-app="${a.id}">Approve</button><button class="admin-reject-seller bg-red-600 px-3 py-1 rounded-full text-xs" data-id="${a.user_id}" data-app="${a.id}">Reject</button></div></div>`).join('');
+        document.querySelectorAll('.admin-approve-seller').forEach(btn => btn.addEventListener('click', async () => {
+          await supabase.from('profiles').update({ role: 'seller' }).eq('id', btn.dataset.id);
+          await supabase.from('seller_applications').update({ status: 'approved' }).eq('id', parseInt(btn.dataset.app));
+          await loadAdminData();
+        }));
+        document.querySelectorAll('.admin-reject-seller').forEach(btn => btn.addEventListener('click', async () => {
+          await supabase.from('seller_applications').update({ status: 'rejected' }).eq('id', parseInt(btn.dataset.app));
+          await loadAdminData();
+        }));
+      }
+      
+      function renderAdminComplaints(complaintsList) {
+        const container = document.getElementById('adminComplaintsContainer');
+        if (!container) return;
+        if (!complaintsList?.length) { container.innerHTML = '<div class="text-center py-8">Belum ada pengaduan</div>'; return; }
+        container.innerHTML = complaintsList.map(c => `<div class="glass-panel p-4"><p class="font-semibold">${c.type}</p><p>${c.description}</p><p class="text-sm text-blue-300">${new Date(c.created_at).toLocaleString()}</p><textarea id="resp-${c.id}" placeholder="Respon admin..." class="w-full mt-2 p-2 rounded bg-[#122b50]"></textarea><button class="admin-resolve mt-2 bg-green-600 px-3 py-1 rounded-full text-xs" data-id="${c.id}">Resolve</button></div>`).join('');
+        document.querySelectorAll('.admin-resolve').forEach(btn => btn.addEventListener('click', async () => {
+          const response = document.getElementById(`resp-${btn.dataset.id}`).value;
+          await supabase.from('complaints').update({ status: 'resolved', admin_response: response }).eq('id', parseInt(btn.dataset.id));
+          await loadAdminData();
+        }));
+      }
+      
+      // ==================== PRODUCT FUNCTIONS ====================
+      async function loadProducts() {
+        const { data, error } = await supabase.from('products').select('*').eq('is_active', true);
+        if (error) { productGrid.innerHTML = '<div class="text-center py-16 text-red-400">Gagal memuat produk</div>'; return; }
+        products = data || [];
+        renderProducts();
+      }
+      
+      function renderProducts() {
+        if (!products.length) { productGrid.innerHTML = '<div class="text-center py-16 text-blue-200/70">Belum ada produk</div>'; return; }
+        const filtered = products.filter(p => (activeCategory === 'all' || p.kategori === activeCategory) && p.nama?.toLowerCase().includes(searchTerm.toLowerCase()));
+        if (!filtered.length) { productGrid.innerHTML = '<div class="text-center py-16">Produk tidak ditemukan</div>'; return; }
+        productGrid.innerHTML = filtered.map(p => `
+          <div class="glass-panel p-4 hover-metallic">
+            <img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" class="rounded-xl h-40 w-full object-cover">
+            <div class="mt-3"><h3 class="font-bold">${p.nama}</h3><p class="text-blue-300">${p.kategori || 'Umum'}</p><span class="bg-[#0f3460] px-2 py-1 rounded-full">Rp ${p.harga.toLocaleString()}</span></div>
+            <div class="flex gap-2 mt-4">
+              <button class="add-to-cart flex-1 bg-[#1e4f9c] py-2 rounded-full" data-id="${p.id}">🛒 Keranjang</button>
+              <button class="chat-seller flex-1 bg-green-600 py-2 rounded-full" data-id="${p.seller_id}" data-name="${p.seller_name || 'Penjual'}" data-prod="${p.id}">💬 Chat</button>
+            </div>
+          </div>
+        `).join('');
+        lucide.createIcons();
+        document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', async () => { await addToCart(parseInt(btn.dataset.id), 1); alert('✅ Ditambahkan ke keranjang!'); }));
+        document.querySelectorAll('.chat-seller').forEach(btn => btn.addEventListener('click', () => openChat(btn.dataset.id, btn.dataset.name, btn.dataset.prod)));
+      }
+      
+      // ==================== CHAT FUNCTIONS ====================
+      async function openChat(userId, userName, productId) {
+        if (!currentUser) { alert('Login dulu'); openLoginModal(); return; }
+        currentChatUserId = userId;
+        currentChatProductId = productId;
+        chatWithName.textContent = userName || 'Chat';
+        chatModal.classList.remove('hidden');
+        chatModal.classList.add('flex');
+        await loadChatMessages(userId);
+      }
+      
+      async function loadChatMessages(userId) {
+        const { data } = await supabase.from('messages').select('*').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).order('created_at');
+        if (data) {
+          chatMessagesContainer.innerHTML = data.map(m => `<div class="chat-message ${m.sender_id === currentUser.id ? 'sent ml-auto bg-[#1e4f9c]' : 'received bg-[#2d3748]'} p-3 rounded-lg max-w-[80%]"><p>${m.message}</p><p class="text-xs text-blue-300 mt-1">${new Date(m.created_at).toLocaleTimeString()}</p></div>`).join('');
+          chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
+      }
+      
+      async function sendMessage() {
+        const msg = chatMessageInput.value.trim();
+        if (!msg || !currentChatUserId) return;
+        await supabase.from('messages').insert({ sender_id: currentUser.id, receiver_id: currentChatUserId, product_id: currentChatProductId, message: msg });
+        chatMessageInput.value = '';
+        await loadChatMessages(currentChatUserId);
+      }
+      
+      // ==================== NOTIFICATION FUNCTIONS ====================
+      async function loadNotifications() {
+        if (!currentUser) return;
+        const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        if (data) renderNotifications(data);
+      }
+      
+      function renderNotifications(notifs) {
+        const unread = notifs.filter(n => !n.is_read).length;
+        notifBadge.classList.toggle('hidden', unread === 0);
+        if (unread > 0) notifBadge.textContent = unread > 9 ? '9+' : unread;
+        notificationList.innerHTML = notifs.length ? notifs.map(n => `<div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer" data-id="${n.id}"><p class="font-medium">${n.title}</p><p class="text-xs">${n.message}</p></div>`).join('') : '<div class="text-center py-4">Tidak ada notifikasi</div>';
+        document.querySelectorAll('.notification-item, .notification-list div[data-id]').forEach(el => el.addEventListener('click', async () => {
+          await supabase.from('notifications').update({ is_read: true }).eq('id', parseInt(el.dataset.id));
+          await loadNotifications();
+        }));
+      }
+      
+      // ==================== PROFILE FUNCTIONS ====================
+      async function updateSidebarUI() {
+        if (!currentUser) {
+          sidebarName.textContent = 'Pengunjung'; sidebarUsername.textContent = '@pengunjung';
+          sidebarBio.innerHTML = '<p>Login untuk melihat profil</p>';
+          sidebarAvatar.src = 'https://placehold.co/96x96/1e4f9c/white?text=G';
+          sidebarBadge.innerHTML = ''; sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.add('hidden');
+          userProductsGrid.innerHTML = '<div class="text-center py-8">Login untuk melihat produk</div>';
+          return;
+        }
+        sidebarName.textContent = currentUserProfile?.full_name || currentUser.email.split('@')[0];
+        sidebarUsername.textContent = `@${currentUserProfile?.username || currentUser.email.split('@')[0]}`;
+        sidebarBio.innerHTML = currentUserProfile?.bio ? `<p>${currentUserProfile.bio}</p>` : '<p class="italic">Belum ada bio</p>';
+        sidebarAvatar.src = currentUserProfile?.avatar_url || `https://placehold.co/96x96/1e4f9c/white?text=${sidebarName.textContent.charAt(0).toUpperCase()}`;
+        if (currentUserRole === 'seller') {
+          sidebarBadge.innerHTML = '<span class="verified-badge">✅ Penjual Terverifikasi</span>';
+          sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.remove('hidden');
+          const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id).limit(9);
+          userProductsGrid.innerHTML = data?.length ? data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('') : '<div class="col-span-3 text-center py-8">Belum ada produk</div>';
+        } else if (currentUserRole === 'admin') {
+          sidebarBadge.innerHTML = '<span class="admin-badge">👑 Admin</span>';
+          sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.add('hidden');
+        } else {
+          sidebarBadge.innerHTML = '<span class="buyer-badge">👤 Pembeli</span>';
+          sidebarSellerApply.classList.remove('hidden'); sidebarDashboard.classList.add('hidden');
+        }
+      }
+      
+      async function saveProfileChanges() {
+        if (!currentUser) return;
+        const fullName = editFullName.value, username = editUsername.value, bio = editBio.value, file = editAvatar.files[0];
+        let avatarUrl = currentUserProfile?.avatar_url;
+        if (file) {
+          const fileName = `${currentUser.id}_${Date.now()}.jpg`;
+          await supabase.storage.from('avatars').upload(fileName, file);
+          const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+          avatarUrl = data.publicUrl;
+        }
+        const { error } = await supabase.from('profiles').update({ full_name: fullName, username, bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
+        if (error) editProfileMessage.textContent = 'Gagal: ' + error.message;
+        else { editProfileMessage.textContent = '✅ Berhasil!'; currentUserProfile = { ...currentUserProfile, full_name: fullName, username, bio, avatar_url: avatarUrl }; updateSidebarUI(); setTimeout(() => editProfileModal.classList.add('hidden'), 1500); }
+      }
+      
+      async function submitSellerApplication() {
+        const fullName = document.getElementById('sellerFullName')?.value, nik = document.getElementById('sellerNIK')?.value, bank = document.getElementById('sellerBank')?.value, account = document.getElementById('sellerAccount')?.value, accName = document.getElementById('sellerAccountName')?.value, phone = document.getElementById('sellerPhone')?.value, email = document.getElementById('sellerEmail')?.value;
+        if (!fullName || !nik || !bank || !account || !accName || !phone || !email) { document.getElementById('sellerApplyMessage').textContent = 'Semua field harus diisi!'; return; }
+        const { error } = await supabase.from('seller_applications').insert({ user_id: currentUser.id, full_name: fullName, nik, bank_name: bank, bank_account: account, bank_account_name: accName, phone, email, status: 'pending' });
+        const msg = document.getElementById('sellerApplyMessage');
+        if (error) msg.textContent = 'Gagal: ' + error.message;
+        else { msg.textContent = '✅ Pengajuan berhasil!'; setTimeout(() => document.getElementById('sellerApplyModal')?.classList.add('hidden'), 2000); }
+      }
+      
+      // ==================== EVENT LISTENERS ====================
+      function initEventListeners() {
+        headerLoginBtn?.addEventListener('click', openLoginModal);
+        document.getElementById('phoneLoginBtn')?.addEventListener('click', () => { loginModal.classList.add('hidden'); openPhoneLoginModal(); });
+        sendOtpBtn?.addEventListener('click', sendOtp);
+        verifyOtpBtn?.addEventListener('click', verifyOtp);
+        closePhoneLogin?.addEventListener('click', () => phoneLoginModal.classList.add('hidden'));
+        phoneLoginOverlay?.addEventListener('click', () => phoneLoginModal.classList.add('hidden'));
+        
+        cartTab?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); adminTab.classList.remove('active'); });
+        ordersTab?.addEventListener('click', () => { cartSection.classList.add('hidden'); ordersSection.classList.remove('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.add('hidden'); ordersTab.classList.add('active'); cartTab.classList.remove('active'); sellerTab.classList.remove('active'); adminTab.classList.remove('active'); loadOrders(); });
+        sellerTab?.addEventListener('click', () => { if (currentUserRole === 'seller') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.remove('hidden'); adminSection.classList.add('hidden'); sellerTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); adminTab.classList.remove('active'); loadSellerProducts(); loadSellerOrders(); } else alert('Anda harus menjadi seller'); });
+        adminTab?.addEventListener('click', () => { if (currentUserRole === 'admin') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.remove('hidden'); adminTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); loadAdminData(); } else alert('Anda bukan admin'); });
+        
+        document.querySelectorAll('.admin-subtab').forEach(btn => btn.addEventListener('click', () => {
+          document.querySelectorAll('.admin-content').forEach(c => c.classList.add('hidden'));
+          document.getElementById(`admin${btn.dataset.subtab.charAt(0).toUpperCase() + btn.dataset.subtab.slice(1)}Container`).classList.remove('hidden');
+        }));
+        
+        document.querySelectorAll('.category-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active')); btn.classList.add('category-active'); activeCategory = btn.dataset.cat; renderProducts(); }));
+        document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
+        searchInput?.addEventListener('input', (e) => { searchTerm = e.target.value; renderProducts(); });
+        cartIcon?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); adminTab.classList.remove('active'); window.scrollTo({ top: cartSection.offsetTop - 100, behavior: 'smooth' }); });
+        document.querySelectorAll('.payment-method').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedPayment = btn.dataset.method; document.getElementById('selectedPayment').textContent = `Metode: ${selectedPayment === 'cod' ? 'COD' : 'Transfer'}`; }));
+        checkoutBtn?.addEventListener('click', async () => { if (!selectedPayment) { alert('Pilih metode pembayaran'); return; } await checkout(selectedPayment); });
+        
+        document.getElementById('loginBtn')?.addEventListener('click', () => { const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPassword').value; if (e && p) login(e, p); else document.getElementById('loginMessage').textContent = 'Email dan password harus diisi'; });
+        document.getElementById('registerBtn')?.addEventListener('click', () => { const e = document.getElementById('regEmail').value, p = document.getElementById('regPassword').value, c = document.getElementById('regConfirmPassword').value; if (!e || !p || !c) document.getElementById('registerMessage').textContent = 'Semua field harus diisi'; else if (p !== c) document.getElementById('registerMessage').textContent = 'Password tidak cocok'; else register(e, p); });
+        document.getElementById('googleLoginBtn')?.addEventListener('click', async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); });
+        document.querySelectorAll('.tab-login-btn').forEach(btn => btn.addEventListener('click', () => { const tab = btn.dataset.tab; document.querySelectorAll('.login-tab-content').forEach(t => t.classList.add('hidden')); document.getElementById(tab + 'Tab').classList.remove('hidden'); }));
+        document.getElementById('closeLogin')?.addEventListener('click', () => loginModal.classList.add('hidden'));
+        document.getElementById('loginOverlay')?.addEventListener('click', () => loginModal.classList.add('hidden'));
+        document.getElementById('bantuanLink')?.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
+        
+        sellerApplyBtn?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
+        document.getElementById('closeSellerApply')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
+        document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication);
+        document.getElementById('sellerApplyOverlay')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
+        
+        addProductBtn?.addEventListener('click', () => { addProductModal.classList.remove('hidden'); addProductModal.classList.add('flex'); });
+        closeAddProductBtn?.addEventListener('click', () => addProductModal.classList.add('hidden'));
+        addProductOverlay?.addEventListener('click', () => addProductModal.classList.add('hidden'));
+        submitProductBtn?.addEventListener('click', addProduct);
+        
+        document.getElementById('complaintBtn')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.remove('hidden'); document.getElementById('complaintModal')?.classList.add('flex'); });
+        document.getElementById('closeComplaint')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.add('hidden'); });
+        document.getElementById('submitComplaint')?.addEventListener('click', () => { const desc = document.getElementById('complaintDesc')?.value; if (!desc) { alert('Isi keluhan'); return; } alert('✅ Pengaduan terkirim'); document.getElementById('complaintModal')?.classList.add('hidden'); document.getElementById('complaintDesc').value = ''; });
+        
+        profileBtn?.addEventListener('click', () => { profileSidebar.style.transform = 'translateX(0)'; document.body.style.overflow = 'hidden'; });
+        closeProfileSidebar?.addEventListener('click', () => { profileSidebar.style.transform = 'translateX(100%)'; document.body.style.overflow = ''; });
+        profileSidebarOverlay?.addEventListener('click', () => { profileSidebar.style.transform = 'translateX(100%)'; document.body.style.overflow = ''; });
+        editProfileBtn?.addEventListener('click', () => { editFullName.value = currentUserProfile?.full_name || ''; editUsername.value = currentUserProfile?.username || ''; editBio.value = currentUserProfile?.bio || ''; editProfileModal.classList.remove('hidden'); editProfileModal.classList.add('flex'); });
+        closeEditProfileBtn?.addEventListener('click', () => editProfileModal.classList.add('hidden'));
+        editProfileOverlay?.addEventListener('click', () => editProfileModal.classList.add('hidden'));
+        saveProfileChangesBtn?.addEventListener('click', saveProfileChanges);
+        document.getElementById('sidebarSellerApplyBtn')?.addEventListener('click', () => { closeProfileSidebar?.click(); document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
+        document.getElementById('sidebarDashboardBtn')?.addEventListener('click', () => { closeProfileSidebar?.click(); sellerTab?.click(); });
+        sidebarLogoutBtn?.addEventListener('click', logout);
+        
+        notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); });
+        document.addEventListener('click', () => notificationDropdown?.classList.remove('show'));
+        markAllReadBtn?.addEventListener('click', async () => { await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false); await loadNotifications(); });
+        
+        chatBtn?.addEventListener('click', (e) => { e.stopPropagation(); chatDropdown?.classList.toggle('show'); });
+        document.addEventListener('click', () => chatDropdown?.classList.remove('show'));
+        closeChatModal?.addEventListener('click', () => chatModal.classList.add('hidden'));
+        chatModalOverlay?.addEventListener('click', () => chatModal.classList.add('hidden'));
+        sendChatMessage?.addEventListener('click', sendMessage);
+        chatMessageInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        
+        document.getElementById('explorePromo')?.addEventListener('click', () => productGrid?.scrollIntoView({ behavior: 'smooth' }));
+        document.getElementById('logoLink')?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      }
+      
+      // ==================== INIT ====================
+      async function init() {
+        await checkAuth();
+        initEventListeners();
+        cartTab.classList.add('active');
+        cartSection.classList.remove('hidden');
+        lucide.createIcons();
+        console.log('✅ Marketplace ready');
+      }
+      
+      init();
+    })();
   </script>
 </body>
 </html>
