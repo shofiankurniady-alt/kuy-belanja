@@ -616,6 +616,25 @@
       const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
       console.log('✅ Supabase initialized');
       
+      // ==================== HANDLE GOOGLE LOGIN REDIRECT ====================
+      (async function handleAuthRedirect() {
+        // Cek apakah ada hash token di URL (hasil redirect dari Google)
+        const hash = window.location.hash;
+        if (hash && hash.includes('access_token')) {
+          console.log('🔄 Detected redirect with token, cleaning URL...');
+          // Bersihkan URL dari token
+          window.history.replaceState(null, '', window.location.pathname);
+          
+          // Ambil session dari Supabase
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            console.log('✅ Login berhasil via Google!');
+            // Refresh halaman untuk update UI
+            window.location.reload();
+          }
+        }
+      })();
+      
       // Global State
       let currentUser = null;
       let currentUserRole = 'guest';
