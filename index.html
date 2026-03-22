@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-  <title>Kuy Belanja · Marketplace Indonesia Modern</title>
+  <title>Kuy Belanja · Marketplace Indonesia</title>
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Lucide Icons -->
@@ -34,10 +34,10 @@
     
     .glass-panel {
       background: rgba(10, 30, 60, 0.35);
-      backdrop-filter: blur(12px) saturate(180%);
+      backdrop-filter: blur(12px);
       border: 1px solid rgba(100, 180, 255, 0.3);
       border-radius: 1.5rem;
-      box-shadow: 0 20px 35px -8px rgba(0,0,0,0.6), 0 0 0 1px rgba(70, 160, 255, 0.2) inset;
+      box-shadow: 0 20px 35px -8px rgba(0,0,0,0.6);
     }
     
     .glass-panel-navy {
@@ -48,16 +48,13 @@
     
     .hover-metallic { transition: all 0.2s ease; }
     .hover-metallic:hover {
-      box-shadow: 0 0 0 2px rgba(255,255,255,0.2), 0 8px 20px -5px #1E4F9C, 0 0 15px #5F9FFF;
-      border-color: #AAD0FF;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.2), 0 8px 20px -5px #1E4F9C;
       transform: scale(1.02) translateY(-3px);
-      background: rgba(20, 50, 100, 0.5);
     }
     
     .category-active {
       background: #1E4F9C !important;
       color: white !important;
-      border-color: #7FB4FF !important;
       box-shadow: 0 0 12px #3E7AD0;
     }
     
@@ -71,24 +68,6 @@
       color: white !important;
       border-bottom-color: #3b82f6 !important;
     }
-    
-    .scroll-cart::-webkit-scrollbar,
-    .scroll-orders::-webkit-scrollbar {
-      width: 6px;
-    }
-    .scroll-cart::-webkit-scrollbar-track,
-    .scroll-orders::-webkit-scrollbar-track {
-      background: #112244;
-      border-radius: 20px;
-    }
-    .scroll-cart::-webkit-scrollbar-thumb,
-    .scroll-orders::-webkit-scrollbar-thumb {
-      background: #2F66B5;
-      border-radius: 20px;
-    }
-    
-    body { background: #071126; }
-    .hero-bg { background: radial-gradient(circle at 30% 30%, #12458c, #05122e); }
     
     .cart-badge, .notif-badge {
       background: #E53E3E;
@@ -158,14 +137,13 @@
       overflow-y: auto;
       z-index: 100;
       display: none;
+      background: rgba(8, 20, 48, 0.95);
+      backdrop-filter: blur(16px);
+      border-radius: 1rem;
+      border: 1px solid rgba(30, 100, 200, 0.4);
     }
-    .notification-dropdown.show { display: block; }
     
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    .cart-item-enter { animation: slideIn 0.3s ease; }
+    .notification-dropdown.show { display: block; }
     
     .status-pending { background: #F59E0B; }
     .status-paid { background: #3B82F6; }
@@ -177,36 +155,61 @@
       transform: translateX(100%);
     }
     #profileSidebar.active { transform: translateX(0); }
+    
+    body { background: #071126; }
+    .hero-bg { background: radial-gradient(circle at 30% 30%, #12458c, #05122e); }
+    
+    .scroll-cart::-webkit-scrollbar { width: 6px; }
+    .scroll-cart::-webkit-scrollbar-track { background: #112244; border-radius: 20px; }
+    .scroll-cart::-webkit-scrollbar-thumb { background: #2F66B5; border-radius: 20px; }
   </style>
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
 
-  <!-- HEADER (sama seperti sebelumnya, tidak saya ubah agar tidak terlalu panjang) -->
-  <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <a href="#" class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent drop-shadow-md hover:opacity-80 transition" id="logoLink">KUY BELANJA</a>
+        <a href="#" class="text-3xl font-black tracking-tight bg-gradient-to-r from-blue-200 to-white bg-clip-text text-transparent" id="logoLink">KUY BELANJA</a>
         <span id="roleBadge" class="role-badge hidden"></span>
       </div>
+      
       <div class="order-3 md:order-none w-full md:w-1/3 lg:w-1/2 flex justify-center">
         <div class="relative w-full max-w-md">
           <input type="text" id="searchInput" placeholder="Cari makanan, pakaian, elektronik..." 
-                 class="w-full py-2.5 pl-5 pr-10 rounded-full bg-[#0b2042] border border-[#2f6ab0] text-white placeholder-blue-200/60 focus:outline-none focus:ring-2 focus:ring-[#4791ff] glass-panel-navy">
+                 class="w-full py-2.5 pl-5 pr-10 rounded-full bg-[#0b2042] border border-[#2f6ab0] text-white placeholder-blue-200/60 focus:outline-none focus:ring-2 focus:ring-[#4791ff]">
           <i data-lucide="search" class="absolute right-4 top-3 text-blue-300 w-4 h-4"></i>
         </div>
       </div>
+      
       <div class="flex items-center gap-3">
-        <button id="sellerApplyBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic"><i data-lucide="store" class="w-6 h-6 text-white"></i></button>
+        <button id="sellerApplyBtn" class="hidden bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+          <i data-lucide="store" class="w-6 h-6 text-white"></i>
+        </button>
         <div class="relative">
-          <button id="notificationBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic relative"><i data-lucide="bell" class="w-6 h-6 text-white"></i><span id="notifBadge" class="notif-badge hidden">0</span></button>
-          <div id="notificationDropdown" class="notification-dropdown glass-panel p-4">
+          <button id="notificationBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic relative">
+            <i data-lucide="bell" class="w-6 h-6 text-white"></i>
+            <span id="notifBadge" class="notif-badge hidden">0</span>
+          </button>
+          <div id="notificationDropdown" class="notification-dropdown p-4">
             <h4 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="bell-ring"></i> Notifikasi</h4>
-            <div id="notificationList" class="space-y-3 max-h-60 overflow-y-auto"><div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div></div>
-            <div class="border-t border-blue-400/30 mt-3 pt-3 text-center"><button id="markAllReadBtn" class="text-xs text-blue-300 hover:text-white">Tandai semua dibaca</button></div>
+            <div id="notificationList" class="space-y-3 max-h-60 overflow-y-auto"></div>
+            <div class="border-t border-blue-400/30 mt-3 pt-3 text-center">
+              <button id="markAllReadBtn" class="text-xs text-blue-300 hover:text-white">Tandai semua dibaca</button>
+            </div>
           </div>
         </div>
-        <div class="relative cursor-pointer group" id="cartIcon"><div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic"><i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i></div><span id="cartBadge" class="cart-badge hidden">0</span></div>
-        <div class="relative"><button id="profileBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic"><i data-lucide="user" class="w-6 h-6 text-white"></i></button></div>
+        <div class="relative cursor-pointer" id="cartIcon">
+          <div class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+            <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
+          </div>
+          <span id="cartBadge" class="cart-badge hidden">0</span>
+        </div>
+        <div class="relative">
+          <button id="profileBtn" class="bg-[#163457] p-2.5 rounded-full border border-blue-400/40 hover-metallic">
+            <i data-lucide="user" class="w-6 h-6 text-white"></i>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -214,50 +217,222 @@
   <!-- HERO SECTION -->
   <section class="mx-4 md:mx-8 mt-6 rounded-3xl overflow-hidden hero-bg relative">
     <div class="absolute inset-0 bg-metalic-gradient opacity-80 mix-blend-overlay"></div>
-    <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between backdrop-blur-sm">
-      <div><h1 class="text-4xl md:text-6xl font-black leading-tight drop-xl">Belanja <span class="text-[#B8E2FF]">Semua Kebutuhan</span><br>Indonesia</h1><p class="text-lg md:text-xl text-blue-100 mt-3 max-w-lg">Makanan, Pakaian, Elektronik — semua ada di Kuy Belanja.</p><button class="mt-6 bg-[#0B2F60] border-2 border-[#6DA5FF] px-10 py-4 rounded-full text-xl font-semibold hover-metallic flex items-center gap-3 mx-auto md:mx-0" id="explorePromo"><span>Jelajahi Produk</span> <i data-lucide="sparkles" class="w-5 h-5"></i></button></div>
-      <div class="mt-6 md:mt-0 w-44 h-44 rounded-full overflow-hidden border-4 border-blue-400/30 shadow-2xl hover:scale-105 transition-transform duration-300"><img src="https://i.imgur.com/zduxmnN.png" alt="Belanja Online" class="w-full h-full object-cover"></div>
+    <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between">
+      <div>
+        <h1 class="text-4xl md:text-6xl font-black">Belanja <span class="text-[#B8E2FF]">Semua Kebutuhan</span><br>Indonesia</h1>
+        <p class="text-lg md:text-xl text-blue-100 mt-3">Makanan, Pakaian, Elektronik — semua ada di Kuy Belanja.</p>
+        <button class="mt-6 bg-[#0B2F60] border-2 border-[#6DA5FF] px-10 py-4 rounded-full text-xl font-semibold hover-metallic flex items-center gap-3 mx-auto md:mx-0" id="explorePromo">
+          <span>Jelajahi Produk</span> <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div class="mt-6 md:mt-0 w-44 h-44 rounded-full overflow-hidden border-4 border-blue-400/30">
+        <img src="https://i.imgur.com/zduxmnN.png" alt="Belanja Online" class="w-full h-full object-cover">
+      </div>
     </div>
   </section>
 
   <!-- KATEGORI -->
-  <div class="mx-4 md:mx-8 mt-8"><div class="flex flex-wrap gap-3 justify-center md:justify-start" id="categoryContainer"><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="all">Semua</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Makanan">Makanan</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Pakaian">Pakaian</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Celana">Celana</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Elektronik">Elektronik</button></div></div>
+  <div class="mx-4 md:mx-8 mt-8">
+    <div class="flex flex-wrap gap-3 justify-center md:justify-start" id="categoryContainer">
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white hover-metallic" data-cat="all">Semua</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white hover-metallic" data-cat="Makanan">Makanan</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white hover-metallic" data-cat="Pakaian">Pakaian</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white hover-metallic" data-cat="Celana">Celana</button>
+      <button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white hover-metallic" data-cat="Elektronik">Elektronik</button>
+    </div>
+  </div>
 
   <!-- PRODUK GRID -->
-  <div class="mx-4 md:mx-8 mt-8"><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid"><div class="col-span-full text-center py-16"><div class="loader"></div><p class="text-blue-200/70">Memuat produk...</p></div></div></div>
+  <div class="mx-4 md:mx-8 mt-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid">
+      <div class="col-span-full text-center py-16"><div class="loader"></div><p class="text-blue-200/70">Memuat produk...</p></div>
+    </div>
+  </div>
 
   <!-- TABS NAVIGATION -->
-  <div class="mx-4 md:mx-8 mt-12"><div class="flex gap-4 border-b border-blue-400/30 overflow-x-auto"><button id="cartTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">🛒 Keranjang</button><button id="ordersTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">📦 Pesanan Saya</button><button id="sellerTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">🏪 Dashboard Seller</button></div></div>
+  <div class="mx-4 md:mx-8 mt-12">
+    <div class="flex gap-4 border-b border-blue-400/30 overflow-x-auto">
+      <button id="cartTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">🛒 Keranjang</button>
+      <button id="ordersTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">📦 Pesanan Saya</button>
+      <button id="sellerTab" class="tab-nav px-6 py-3 text-lg font-semibold text-blue-300 hover:text-white border-b-2 border-transparent hover:border-blue-400 transition whitespace-nowrap">🏪 Dashboard Seller</button>
+    </div>
+  </div>
 
   <!-- CART SECTION -->
-  <div id="cartSection" class="mx-4 md:mx-8 mt-6 hidden"><div class="glass-panel p-6"><h2 class="text-2xl font-bold mb-6">🛒 Keranjang Belanja</h2><div id="cartItemsContainer" class="space-y-4 max-h-96 overflow-y-auto scroll-cart"></div><div class="border-t border-blue-400/30 pt-4 mt-4"><div class="flex justify-between text-xl font-bold mb-4"><span>Total</span><span id="cartSubtotal">Rp 0</span></div><div class="mb-4"><p class="text-sm mb-2">Metode Pembayaran:</p><div class="grid grid-cols-2 gap-2"><button class="payment-method p-3 rounded-lg bg-[#0f284a] border border-blue-400/30 text-sm hover:bg-[#1e4f9c] transition" data-method="cod">🚚 COD (Bayar di Tempat)</button><button class="payment-method p-3 rounded-lg bg-[#0f284a] border border-blue-400/30 text-sm hover:bg-[#1e4f9c] transition" data-method="transfer">💳 Transfer Bank (Simulasi)</button></div><div id="selectedPayment" class="text-xs text-yellow-300 mt-2"></div></div><button id="checkoutBtn" class="w-full bg-gradient-to-r from-[#1e4f9c] to-[#3b82f6] py-3 rounded-full border border-blue-300 font-semibold hover:scale-105 transition-all flex items-center justify-center gap-2"><i data-lucide="credit-card"></i> Checkout Sekarang</button></div></div></div>
+  <div id="cartSection" class="mx-4 md:mx-8 mt-6 hidden">
+    <div class="glass-panel p-6">
+      <h2 class="text-2xl font-bold mb-6">🛒 Keranjang Belanja</h2>
+      <div id="cartItemsContainer" class="space-y-4 max-h-96 overflow-y-auto scroll-cart"></div>
+      <div class="border-t border-blue-400/30 pt-4 mt-4">
+        <div class="flex justify-between text-xl font-bold mb-4">
+          <span>Total</span>
+          <span id="cartSubtotal">Rp 0</span>
+        </div>
+        <div class="mb-4">
+          <p class="text-sm mb-2">Metode Pembayaran:</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="payment-method p-3 rounded-lg bg-[#0f284a] border border-blue-400/30 text-sm hover:bg-[#1e4f9c] transition" data-method="cod">🚚 COD (Bayar di Tempat)</button>
+            <button class="payment-method p-3 rounded-lg bg-[#0f284a] border border-blue-400/30 text-sm hover:bg-[#1e4f9c] transition" data-method="transfer">💳 Transfer Bank (Simulasi)</button>
+          </div>
+          <div id="selectedPayment" class="text-xs text-yellow-300 mt-2"></div>
+        </div>
+        <button id="checkoutBtn" class="w-full bg-gradient-to-r from-[#1e4f9c] to-[#3b82f6] py-3 rounded-full font-semibold hover:scale-105 transition-all flex items-center justify-center gap-2">
+          <i data-lucide="credit-card"></i> Checkout Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ORDERS SECTION -->
-  <div id="ordersSection" class="mx-4 md:mx-8 mt-6 hidden"><div class="glass-panel p-6"><h2 class="text-2xl font-bold mb-6">📦 Pesanan Saya</h2><div id="ordersContainer" class="space-y-4 max-h-[600px] overflow-y-auto scroll-orders"></div></div></div>
+  <div id="ordersSection" class="mx-4 md:mx-8 mt-6 hidden">
+    <div class="glass-panel p-6">
+      <h2 class="text-2xl font-bold mb-6">📦 Pesanan Saya</h2>
+      <div id="ordersContainer" class="space-y-4 max-h-[600px] overflow-y-auto scroll-cart"></div>
+    </div>
+  </div>
 
   <!-- SELLER DASHBOARD SECTION -->
-  <div id="sellerSection" class="mx-4 md:mx-8 mt-6 hidden"><div class="glass-panel p-6"><h2 class="text-2xl font-bold mb-6">🏪 Dashboard Penjual</h2><h3 class="text-xl font-semibold mb-4">Pesanan Masuk</h3><div id="sellerOrdersContainer" class="space-y-4 max-h-[600px] overflow-y-auto scroll-orders"></div></div></div>
+  <div id="sellerSection" class="mx-4 md:mx-8 mt-6 hidden">
+    <div class="glass-panel p-6">
+      <h2 class="text-2xl font-bold mb-6">🏪 Dashboard Penjual</h2>
+      <h3 class="text-xl font-semibold mb-4">Pesanan Masuk</h3>
+      <div id="sellerOrdersContainer" class="space-y-4 max-h-[600px] overflow-y-auto scroll-cart"></div>
+    </div>
+  </div>
 
-  <!-- MODALS (diperpendek untuk menghemat space, struktur sama) -->
-  <div id="sellerApplyModal" class="fixed inset-0 z-[300] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sellerApplyOverlay"></div><div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="store"></i> Daftar Jadi Penjual</h3><div class="space-y-3"><input type="text" id="sellerFullName" placeholder="Nama Lengkap" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerNIK" placeholder="NIK" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerBank" placeholder="Bank" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerAccount" placeholder="No Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerAccountName" placeholder="Nama Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerPhone" placeholder="WhatsApp" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="email" id="sellerEmail" placeholder="Email" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><div class="text-sm text-yellow-300 mt-2" id="sellerApplyMessage"></div><div class="flex gap-2"><button id="submitSellerApply" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Ajukan</button><button id="closeSellerApply" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button></div></div></div></div>
+  <!-- MODALS -->
+  <div id="sellerApplyModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sellerApplyOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="store"></i> Daftar Jadi Penjual</h3>
+      <div class="space-y-3">
+        <input type="text" id="sellerFullName" placeholder="Nama Lengkap" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerNIK" placeholder="NIK" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerBank" placeholder="Bank" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerAccount" placeholder="No Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerAccountName" placeholder="Nama Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="sellerPhone" placeholder="WhatsApp" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="email" id="sellerEmail" placeholder="Email" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <div class="text-sm text-yellow-300" id="sellerApplyMessage"></div>
+        <div class="flex gap-2">
+          <button id="submitSellerApply" class="flex-1 bg-[#1e4f9c] py-2 rounded-full">Ajukan</button>
+          <button id="closeSellerApply" class="flex-1 border border-blue-400 py-2 rounded-full">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div><div class="relative glass-panel w-96 p-6 text-white"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="alert-circle"></i> Pengaduan ke Admin</h3><div class="space-y-3"><select id="complaintType" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><option value="technical">Kendala Teknis</option><option value="payment">Masalah Pembayaran</option><option value="buyer">Masalah dengan Pembeli</option><option value="other">Lainnya</option></select><textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea><div class="text-sm text-yellow-300">Email admin: shofiankurniady@gmail.com</div><div class="flex gap-2"><button id="submitComplaint" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Kirim</button><button id="closeComplaint" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button></div></div></div></div>
+  <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="alert-circle"></i> Pengaduan ke Admin</h3>
+      <div class="space-y-3">
+        <select id="complaintType" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+          <option value="technical">Kendala Teknis</option>
+          <option value="payment">Masalah Pembayaran</option>
+          <option value="buyer">Masalah dengan Pembeli</option>
+          <option value="other">Lainnya</option>
+        </select>
+        <textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
+        <div class="text-sm text-yellow-300">Email admin: shofiankurniady@gmail.com</div>
+        <div class="flex gap-2">
+          <button id="submitComplaint" class="flex-1 bg-[#1e4f9c] py-2 rounded-full">Kirim</button>
+          <button id="closeComplaint" class="flex-1 border border-blue-400 py-2 rounded-full">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div><div class="relative glass-panel w-96 p-6 text-white"><div class="flex border-b border-blue-400/30 mb-6"><button class="tab-login-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button><button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button><button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="forgot">Lupa</button></div><div id="loginTab" class="login-tab-content"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Masuk ke Akun</h3><button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full hover-metallic flex items-center justify-center gap-3 mb-4"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google</button><div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau</span></div></div><input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="loginBtn">Masuk</button><div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div><div id="registerTab" class="login-tab-content hidden"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3><input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic" id="registerBtn">Daftar</button><div id="registerMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div><div id="forgotTab" class="login-tab-content hidden"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="key"></i> Reset Password</h3><input type="email" id="resetEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="resetBtn">Kirim Reset Link</button><div id="resetMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div><button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button></div></div>
+  <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <div class="flex border-b border-blue-400/30 mb-6">
+        <button class="tab-login-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button>
+        <button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button>
+        <button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="forgot">Lupa</button>
+      </div>
+      <div id="loginTab" class="login-tab-content">
+        <h3 class="text-2xl font-bold mb-4"><i data-lucide="log-in"></i> Masuk ke Akun</h3>
+        <button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full flex items-center justify-center gap-3 mb-4"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google</button>
+        <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau</span></div></div>
+        <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <button class="w-full bg-[#316bc7] py-2 rounded-full mb-2" id="loginBtn">Masuk</button>
+        <div id="loginMessage" class="text-sm text-center text-yellow-300"></div>
+      </div>
+      <div id="registerTab" class="login-tab-content hidden">
+        <h3 class="text-2xl font-bold mb-4"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3>
+        <input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <button class="w-full bg-[#316bc7] py-2 rounded-full" id="registerBtn">Daftar</button>
+        <div id="registerMessage" class="text-sm text-center text-yellow-300"></div>
+      </div>
+      <div id="forgotTab" class="login-tab-content hidden">
+        <h3 class="text-2xl font-bold mb-4"><i data-lucide="key"></i> Reset Password</h3>
+        <input type="email" id="resetEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <button class="w-full bg-[#316bc7] py-2 rounded-full mb-2" id="resetBtn">Kirim Reset Link</button>
+        <div id="resetMessage" class="text-sm text-center text-yellow-300"></div>
+      </div>
+      <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button>
+    </div>
+  </div>
 
-  <div id="loginFab" style="position: fixed; bottom: 20px; right: 20px; z-index: 60;" class="hidden"><button class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic"><i data-lucide="user" class="w-6 h-6"></i></button></div>
+  <div id="loginFab" style="position: fixed; bottom: 20px; right: 20px; z-index: 60;" class="hidden">
+    <button class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400"><i data-lucide="user" class="w-6 h-6"></i></button>
+  </div>
 
-  <div id="profileSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[500] transition-transform duration-300 ease-out" style="transform: translateX(100%);"><div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="profileSidebarOverlay"></div><div class="relative glass-panel w-full h-full ml-auto flex flex-col overflow-y-auto"><div class="flex justify-between items-center p-4 border-b border-blue-400/30"><h2 class="text-xl font-bold">Profil</h2><button id="closeProfileSidebar" class="p-2 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600"><div class="absolute -bottom-12 left-4"><div class="w-24 h-24 rounded-full border-4 border-white bg-[#0f284a] overflow-hidden"><img id="sidebarAvatar" src="https://placehold.co/96x96/1e4f9c/white?text=U" class="w-full h-full object-cover"></div></div></div><div class="h-14"></div><div class="px-4"><div class="flex justify-between items-start"><div><h3 id="sidebarName" class="text-xl font-bold">Pengguna</h3><p id="sidebarUsername" class="text-sm text-blue-300">@pengguna</p></div><button id="editProfileBtn" class="px-4 py-1.5 text-sm border border-blue-400 rounded-full hover:bg-[#1e4f9c] transition">Edit Profil</button></div><div id="sidebarBio" class="mt-3 text-sm"><p class="text-blue-200/80">Belum ada bio</p></div><div id="sidebarBadge" class="mt-3"></div><div id="sidebarSellerApply" class="mt-3 hidden"><button id="sidebarSellerApplyBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 py-2 rounded-full text-sm font-semibold hover:opacity-90">Jadi Penjual</button></div><div id="sidebarDashboard" class="mt-3 hidden"><button id="sidebarDashboardBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full text-sm font-semibold hover:bg-[#2f6bc9]">Dashboard Penjual</button></div></div><div class="mt-6 px-4"><h4 class="text-sm font-semibold mb-3 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> Produk Saya</h4><div id="userProductsGrid" class="grid grid-cols-3 gap-1"><div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div></div></div><div class="mt-auto p-4 border-t border-blue-400/30"><button id="sidebarLogoutBtn" class="w-full bg-red-600/30 text-red-300 py-2 rounded-full hover:bg-red-600/50 transition flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar</button></div></div></div>
+  <div id="profileSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[500] transition-transform duration-300" style="transform: translateX(100%);">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="profileSidebarOverlay"></div>
+    <div class="relative glass-panel w-full h-full ml-auto flex flex-col overflow-y-auto">
+      <div class="flex justify-between items-center p-4 border-b border-blue-400/30">
+        <h2 class="text-xl font-bold">Profil</h2>
+        <button id="closeProfileSidebar" class="p-2 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
+        <div class="absolute -bottom-12 left-4"><div class="w-24 h-24 rounded-full border-4 border-white bg-[#0f284a] overflow-hidden"><img id="sidebarAvatar" src="https://placehold.co/96x96/1e4f9c/white?text=U" class="w-full h-full object-cover"></div></div>
+      </div>
+      <div class="h-14"></div>
+      <div class="px-4">
+        <div class="flex justify-between items-start"><div><h3 id="sidebarName" class="text-xl font-bold">Pengguna</h3><p id="sidebarUsername" class="text-sm text-blue-300">@pengguna</p></div><button id="editProfileBtn" class="px-4 py-1.5 text-sm border border-blue-400 rounded-full">Edit Profil</button></div>
+        <div id="sidebarBio" class="mt-3 text-sm"></div>
+        <div id="sidebarBadge" class="mt-3"></div>
+        <div id="sidebarSellerApply" class="mt-3 hidden"><button id="sidebarSellerApplyBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 py-2 rounded-full text-sm font-semibold">Jadi Penjual</button></div>
+        <div id="sidebarDashboard" class="mt-3 hidden"><button id="sidebarDashboardBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full text-sm font-semibold">Dashboard Penjual</button></div>
+      </div>
+      <div class="mt-6 px-4"><h4 class="text-sm font-semibold mb-3"><i data-lucide="grid" class="w-4 h-4 inline mr-2"></i> Produk Saya</h4><div id="userProductsGrid" class="grid grid-cols-3 gap-1"></div></div>
+      <div class="mt-auto p-4 border-t border-blue-400/30"><button id="sidebarLogoutBtn" class="w-full bg-red-600/30 text-red-300 py-2 rounded-full flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar</button></div>
+    </div>
+  </div>
 
-  <div id="editProfileModal" class="fixed inset-0 z-[600] hidden items-center justify-center"><div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="editProfileOverlay"></div><div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user"></i> Edit Profil</h3><div class="space-y-4"><div><label class="text-sm text-blue-300">Nama</label><input type="text" id="editFullName" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Username</label><input type="text" id="editUsername" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Bio</label><textarea id="editBio" rows="3" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></textarea></div><div><label class="text-sm text-blue-300">Foto Profil</label><input type="file" id="editAvatar" accept="image/*" class="w-full text-sm text-blue-300"></div><div class="flex gap-2 pt-2"><button id="saveProfileChangesBtn" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Simpan</button><button id="closeEditProfileBtn" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Batal</button></div><div id="editProfileMessage" class="text-sm text-yellow-300 text-center"></div></div></div></div>
+  <div id="editProfileModal" class="fixed inset-0 z-[600] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="editProfileOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="user"></i> Edit Profil</h3>
+      <div class="space-y-4">
+        <input type="text" id="editFullName" placeholder="Nama Lengkap" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <input type="text" id="editUsername" placeholder="Username" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <textarea id="editBio" rows="3" placeholder="Bio" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea>
+        <input type="file" id="editAvatar" accept="image/*" class="w-full text-sm text-blue-300">
+        <div class="flex gap-2">
+          <button id="saveProfileChangesBtn" class="flex-1 bg-[#1e4f9c] py-2 rounded-full">Simpan</button>
+          <button id="closeEditProfileBtn" class="flex-1 border border-blue-400 py-2 rounded-full">Batal</button>
+        </div>
+        <div id="editProfileMessage" class="text-sm text-yellow-300 text-center"></div>
+      </div>
+    </div>
+  </div>
 
-  <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80"><div class="flex gap-6 flex-wrap justify-center"><a href="#" class="hover:text-white" id="bantuanLink">Bantuan</a><a href="#" class="hover:text-white">Pengiriman</a><a href="#" class="hover:text-white">Syarat Penjual</a></div><div class="flex gap-4 my-3 md:my-0"><i data-lucide="credit-card" class="w-5 h-5"></i><i data-lucide="landmark" class="w-5 h-5"></i><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-xs">COD / Transfer Bank</span></div><div>© 2026 Kuy Belanja · Marketplace Indonesia</div></footer>
+  <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80">
+    <div class="flex gap-6"><a href="#" class="hover:text-white" id="bantuanLink">Bantuan</a><a href="#" class="hover:text-white">Pengiriman</a><a href="#" class="hover:text-white">Syarat Penjual</a></div>
+    <div class="flex gap-4 my-3 md:my-0"><i data-lucide="credit-card"></i><i data-lucide="landmark"></i><i data-lucide="wallet"></i><span class="text-xs">COD / Transfer Bank</span></div>
+    <div>© 2026 Kuy Belanja · Marketplace Indonesia</div>
+  </footer>
 
   <script>
     // ==================== SUPABASE INIT ====================
-    // HANYA SATU DEKLARASI - TIDAK ADA DUPLIKAT
-    const supabaseUrl = 'https://mpgkhjzvvzcczsdczlca.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZ2toanp2dnpjY3pzZGN6bGNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NjY2NDQsImV4cCI6MjA4OTI0MjY0NH0.HrRAnpdTAv86RO4nkPMV6NXYrM8MkrpajR7mKkZwfS8';
+    const supabaseUrl = 'https://kybuycilewowjljyemmd.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5YnV5Y2lsZXdvd2psanllbW1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxOTA3OTksImV4cCI6MjA4OTc2Njc5OX0.4A8Yr-YCctQd6dmn29eOuvizxeDZN2b2G8fQvnufzoY';
     
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
     
@@ -463,7 +638,7 @@
       cart.forEach(item => {
         const itemTotal = item.harga * item.quantity;
         subtotal += itemTotal;
-        html += `<div class="flex gap-4 py-4 border-b border-blue-400/20 cart-item-enter">
+        html += `<div class="flex gap-4 py-4 border-b border-blue-400/20">
           <img src="${item.gambar || 'https://placehold.co/80x80/1e4f9c/white?text=Product'}" class="w-20 h-20 rounded-lg object-cover">
           <div class="flex-1"><h4 class="font-semibold">${item.nama}</h4><p class="text-blue-300 text-sm">Rp ${item.harga.toLocaleString('id-ID')}</p>
           <div class="flex items-center gap-2 mt-2">
@@ -504,10 +679,16 @@
       const status = paymentMethod === 'transfer' ? 'paid' : 'pending';
       
       try {
-        const { data: order, error: orderError } = await supabase.from('orders').insert({ order_number: orderNumber, user_id: currentUser.id, total_price: totalPrice, payment_method: paymentMethod, status: status }).select().single();
+        const { data: order, error: orderError } = await supabase.from('orders').insert({ 
+          order_number: orderNumber, user_id: currentUser.id, total_price: totalPrice, 
+          payment_method: paymentMethod, status: status 
+        }).select().single();
         if (orderError) throw orderError;
         
-        const orderItems = cart.map(item => ({ order_id: order.id, product_id: item.id, seller_id: item.seller_id, quantity: item.quantity, price: item.harga, subtotal: item.harga * item.quantity }));
+        const orderItems = cart.map(item => ({ 
+          order_id: order.id, product_id: item.id, seller_id: item.seller_id, 
+          quantity: item.quantity, price: item.harga, subtotal: item.harga * item.quantity 
+        }));
         const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
         if (itemsError) throw itemsError;
         
@@ -515,7 +696,10 @@
         
         for (const item of orderItems) {
           if (item.seller_id) {
-            await supabase.from('notifications').insert({ user_id: item.seller_id, title: 'Pesanan Baru', message: `Anda mendapat pesanan baru: ${orderNumber}`, icon: 'shopping-bag', is_read: false });
+            await supabase.from('notifications').insert({ 
+              user_id: item.seller_id, title: 'Pesanan Baru', 
+              message: `Anda mendapat pesanan baru: ${orderNumber}`, icon: 'shopping-bag', is_read: false 
+            });
           }
         }
         
@@ -616,7 +800,7 @@
       if (!products.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🛒 Belum ada produk</div>'; return; }
       const filtered = products.filter(p => (activeCategory === 'all' || p.kategori === activeCategory) && p.nama?.toLowerCase().includes(searchTerm.toLowerCase()));
       if (!filtered.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🔍 Produk tidak ditemukan</div>'; return; }
-      productGrid.innerHTML = filtered.map(p => `<div class="glass-panel p-4 flex flex-col hover-metallic transition-all"><img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover border border-blue-300/40" onerror="this.src='https://placehold.co/400x300/1e4f9c/white?text=Produk'"><div class="mt-3 flex justify-between items-start"><div><h3 class="font-bold text-lg">${p.nama}</h3><p class="text-xs text-blue-200/80">${p.kategori || 'Umum'} • ⭐ ${p.rating || 0}</p></div><span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm font-mono">Rp ${(p.harga || 0).toLocaleString('id-ID')}</span></div><button class="add-to-cart mt-4 flex-1 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full hover-metallic flex items-center justify-center gap-2" data-id="${p.id}"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah ke Keranjang</button></div>`).join('');
+      productGrid.innerHTML = filtered.map(p => `<div class="glass-panel p-4 flex flex-col hover-metallic"><img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover" onerror="this.src='https://placehold.co/400x300/1e4f9c/white?text=Produk'"><div class="mt-3 flex justify-between items-start"><div><h3 class="font-bold text-lg">${p.nama}</h3><p class="text-xs text-blue-200/80">${p.kategori || 'Umum'} • ⭐ ${p.rating || 0}</p></div><span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm">Rp ${(p.harga || 0).toLocaleString('id-ID')}</span></div><button class="add-to-cart mt-4 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full flex items-center justify-center gap-2" data-id="${p.id}"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah ke Keranjang</button></div>`).join('');
       lucide.createIcons();
       document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', async () => { await addToCart(parseInt(btn.dataset.id), 1); alert('✅ Produk ditambahkan ke keranjang!'); }));
     }
@@ -662,9 +846,6 @@
       if (currentUserRole === 'seller') {
         sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
         sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.remove('hidden'); await loadUserProducts();
-      } else if (currentUserRole === 'admin') {
-        sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="shield" class="w-3 h-3"></i> Admin</span>';
-        sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.remove('hidden');
       } else {
         sidebarBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Pembeli</span>';
         sidebarSellerApply.classList.remove('hidden'); sidebarDashboard.classList.add('hidden');
@@ -678,7 +859,7 @@
         return;
       }
       const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id).limit(9);
-      if (data && data.length > 0) userProductsGrid.innerHTML = data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden hover:scale-105 transition"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('');
+      if (data && data.length > 0) userProductsGrid.innerHTML = data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('');
       else userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Belum ada produk</div>';
     }
     
