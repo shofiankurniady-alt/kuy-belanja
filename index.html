@@ -13,7 +13,6 @@
   <!-- Supabase Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* ... (semua style-nya sama seperti kode Anda, tidak berubah) ... */
     * { font-family: 'Inter', system-ui, sans-serif; }
     .bg-metalic-gradient {
       background: linear-gradient(145deg, #0B1E4A 0%, #0A2F6C 30%, #1E4F9C 70%, #1479EA 100%);
@@ -75,7 +74,7 @@
 </head>
 <body class="bg-metalic-gradient text-white antialiased">
 
-  <!-- ==================== HEADER (TIDAK BERUBAH) ==================== -->
+  <!-- HEADER -->
   <header class="sticky top-0 z-50 glass-panel-navy py-2 px-4 md:px-8 mx-2 md:mx-6 mt-2 rounded-3xl backdrop-blur-lg">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-2">
@@ -109,7 +108,7 @@
     </div>
   </header>
 
-  <!-- ==================== HERO, KATEGORI, PRODUK (TIDAK BERUBAH) ==================== -->
+  <!-- HERO SECTION -->
   <section class="mx-4 md:mx-8 mt-6 rounded-3xl overflow-hidden hero-bg relative">
     <div class="absolute inset-0 bg-metalic-gradient opacity-80 mix-blend-overlay"></div>
     <div class="relative z-10 p-8 md:p-14 text-center md:text-left flex flex-col md:flex-row items-center justify-between backdrop-blur-sm">
@@ -118,35 +117,74 @@
     </div>
   </section>
 
+  <!-- KATEGORI -->
   <div class="mx-4 md:mx-8 mt-8"><div class="flex flex-wrap gap-3 justify-center md:justify-start" id="categoryContainer"><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="all">Semua</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Makanan">Makanan</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Pakaian">Pakaian</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Celana">Celana</button><button class="category-btn px-6 py-2 rounded-full border border-blue-400/50 bg-[#0f284a] text-white font-medium backdrop-blur-sm hover-metallic" data-cat="Elektronik">Elektronik</button></div></div>
 
+  <!-- PRODUK GRID -->
   <div class="mx-4 md:mx-8 mt-8"><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="productGrid"><div class="col-span-full text-center py-16"><div class="loader"></div><p class="text-blue-200/70">Memuat produk...</p></div></div></div>
 
-  <!-- ==================== SEMUA MODAL (SUDAH BENAR) ==================== -->
+  <!-- SELLER APPLICATION MODAL -->
   <div id="sellerApplyModal" class="fixed inset-0 z-[300] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="sellerApplyOverlay"></div><div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="store"></i> Daftar Jadi Penjual</h3><div class="space-y-3"><input type="text" id="sellerFullName" placeholder="Nama Lengkap (sesuai KTP)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerNIK" placeholder="NIK (sesuai KTP)" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerBank" placeholder="Bank Penerima" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerAccount" placeholder="Nomor Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerAccountName" placeholder="Nama Pemilik Rekening" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="text" id="sellerPhone" placeholder="Nomor WhatsApp" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="email" id="sellerEmail" placeholder="Email" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><div class="text-sm text-yellow-300 mt-2" id="sellerApplyMessage"></div><div class="flex gap-2"><button id="submitSellerApply" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Ajukan</button><button id="closeSellerApply" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button></div></div></div></div>
+
+  <!-- COMPLAINT MODAL -->
   <div id="complaintModal" class="fixed inset-0 z-[300] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="complaintOverlay"></div><div class="relative glass-panel w-96 p-6 text-white"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="alert-circle"></i> Pengaduan ke Admin</h3><div class="space-y-3"><select id="complaintType" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><option value="technical">Kendala Teknis</option><option value="payment">Masalah Pembayaran</option><option value="buyer">Masalah dengan Pembeli</option><option value="other">Lainnya</option></select><textarea id="complaintDesc" rows="4" placeholder="Jelaskan keluhan Anda..." class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50"></textarea><div class="text-sm text-yellow-300" id="complaintMessage">Email admin: shofiankurniady@gmail.com</div><div class="flex gap-2"><button id="submitComplaint" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Kirim</button><button id="closeComplaint" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Tutup</button></div></div></div></div>
+
+  <!-- WHATSAPP POPUP -->
   <div id="whatsappPopup" class="fixed bottom-24 right-6 z-50 hidden"><div class="glass-panel p-4 w-64"><p class="text-sm mb-2">Hubungi penjual via WhatsApp</p><a id="whatsappLink" href="#" target="_blank" class="block bg-green-600 text-center py-2 rounded-full hover-metallic"><i data-lucide="message-circle" class="w-4 h-4 inline mr-1"></i> Chat Now</a></div></div>
+
+  <!-- CART MODAL -->
   <div id="cartModal" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[100] hidden transition-all duration-300 ease-out"><div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="cartOverlay"></div><div class="relative glass-panel w-full h-full ml-auto p-5 flex flex-col text-white border-l-2 border-blue-400/30 shadow-2xl"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold flex gap-2"><i data-lucide="shopping-bag"></i> Keranjangmu</h2><button id="closeCart" class="p-2 rounded-full bg-[#1c3f6e] hover:bg-[#28579b]"><i data-lucide="x" class="w-5 h-5"></i></button></div><div class="flex-1 overflow-y-auto scroll-cart pr-2" id="cartItemsContainer"><div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div></div><div class="border-t border-blue-400/30 pt-4 mt-2"><div class="flex justify-between text-xl font-bold mb-3"><span>Subtotal</span> <span id="cartSubtotal">Rp 0</span></div><div class="mb-3"><p class="text-sm mb-2">Metode Pembayaran:</p><div class="grid grid-cols-3 gap-2"><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="BCA">🏦 BCA</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="MANDIRI">🏦 Mandiri</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="BNI">🏦 BNI</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="GOPAY">📱 GoPay</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="OVO">📱 OVO</button><button class="payment-method p-2 rounded-lg bg-[#0f284a] border border-blue-400/30 text-xs hover:bg-[#1e4f9c]" data-method="DANA">📱 DANA</button></div><div id="selectedPayment" class="text-xs text-yellow-300 mt-2"></div></div><button class="w-full bg-[#1e4f9c] py-3 rounded-full border border-blue-300 font-semibold hover-metallic flex items-center justify-center gap-2" id="checkoutBtn"><i data-lucide="credit-card"></i> Checkout</button></div></div></div>
+
+  <!-- LOGIN MODAL -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center"><div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div><div class="relative glass-panel w-96 p-6 text-white"><div class="flex border-b border-blue-400/30 mb-6"><button class="tab-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button><button class="tab-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button><button class="tab-btn flex-1 py-2 text-center text-blue-300" data-tab="forgot">Lupa</button></div>
     <div id="loginTab" class="tab-content"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="log-in"></i> Masuk ke Akun</h3><button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full hover-metallic flex items-center justify-center gap-3 mb-4"><img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google</button><div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau</span></div></div><input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="loginBtn">Masuk</button><div id="loginMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div>
     <div id="registerTab" class="tab-content hidden"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3><input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white"><input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic" id="registerBtn">Daftar</button><div id="registerMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div>
     <div id="forgotTab" class="tab-content hidden"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="key"></i> Reset Password</h3><input type="email" id="resetEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50"><button class="w-full bg-[#316bc7] py-2 rounded-full hover-metallic mb-2" id="resetBtn">Kirim Reset Link</button><div id="resetMessage" class="text-sm text-center mt-2 text-yellow-300"></div></div>
     <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button></div></div>
+
+  <!-- FAB LOGIN -->
   <div id="loginFab" style="position: fixed; bottom: 20px; right: 20px; z-index: 60;" class="hidden"><button class="glass-panel w-14 h-14 rounded-full flex items-center justify-center border border-blue-400 hover-metallic"><i data-lucide="user" class="w-6 h-6"></i></button></div>
 
-  <!-- ==================== PROFILE SIDEBAR (INSTAGRAM STYLE) ==================== -->
+  <!-- INSTAGRAM-STYLE PROFILE SIDEBAR (SLIDE FROM RIGHT) -->
   <div id="profileSidebar" class="fixed top-0 right-0 h-full w-full sm:w-96 z-[500] transition-transform duration-300 ease-out">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" id="profileSidebarOverlay"></div>
     <div class="relative glass-panel w-full h-full ml-auto flex flex-col overflow-y-auto">
-      <div class="flex justify-between items-center p-4 border-b border-blue-400/30"><h2 class="text-xl font-bold">Profil</h2><button id="closeProfileSidebar" class="p-2 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-5 h-5"></i></button></div>
-      <div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600 bg-cover bg-center"><div class="absolute -bottom-12 left-4"><div class="w-24 h-24 rounded-full border-4 border-white bg-[#0f284a] flex items-center justify-center text-3xl font-bold overflow-hidden"><img id="sidebarAvatar" src="https://placehold.co/96x96/1e4f9c/white?text=U" class="w-full h-full object-cover"></div></div><button id="changeCoverBtn" class="absolute top-2 right-2 bg-black/50 p-1 rounded-full hover:bg-black/70"><i data-lucide="camera" class="w-4 h-4"></i></button></div>
+      <div class="flex justify-between items-center p-4 border-b border-blue-400/30">
+        <h2 class="text-xl font-bold">Profil</h2>
+        <button id="closeProfileSidebar" class="p-2 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <!-- Cover Photo -->
+      <div class="relative h-32 bg-gradient-to-r from-blue-500 to-purple-600">
+        <div class="absolute -bottom-12 left-4">
+          <div class="w-24 h-24 rounded-full border-4 border-white bg-[#0f284a] flex items-center justify-center text-3xl font-bold overflow-hidden">
+            <img id="sidebarAvatar" src="https://placehold.co/96x96/1e4f9c/white?text=U" class="w-full h-full object-cover">
+          </div>
+        </div>
+        <button id="changeCoverBtn" class="absolute top-2 right-2 bg-black/50 p-1 rounded-full hover:bg-black/70"><i data-lucide="camera" class="w-4 h-4"></i></button>
+      </div>
       <div class="h-14"></div>
-      <div class="px-4"><div class="flex justify-between items-start"><div><h3 id="sidebarName" class="text-xl font-bold">Pengguna</h3><p id="sidebarUsername" class="text-sm text-blue-300">@pengguna</p></div><button id="editProfileBtn" class="px-4 py-1.5 text-sm border border-blue-400 rounded-full hover:bg-[#1e4f9c] transition">Edit Profil</button></div><div id="sidebarBio" class="mt-3 text-sm"><p class="text-blue-200/80">Belum ada bio</p></div><div class="flex gap-6 mt-4 py-3 border-y border-blue-400/30"><div class="text-center"><div id="statPosts" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Postingan</div></div><div class="text-center"><div id="statFollowers" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Pengikut</div></div><div class="text-center"><div id="statFollowing" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Mengikuti</div></div></div><div id="sidebarBadge" class="mt-3"></div><div id="sidebarSellerApply" class="mt-3 hidden"><button id="sidebarSellerApplyBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 py-2 rounded-full text-sm font-semibold hover:opacity-90">Jadi Penjual</button></div><div id="sidebarDashboard" class="mt-3 hidden"><button id="sidebarDashboardBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full text-sm font-semibold hover:bg-[#2f6bc9]">Dashboard Penjual</button></div></div>
+      <div class="px-4">
+        <div class="flex justify-between items-start">
+          <div><h3 id="sidebarName" class="text-xl font-bold">Pengguna</h3><p id="sidebarUsername" class="text-sm text-blue-300">@pengguna</p></div>
+          <button id="editProfileBtn" class="px-4 py-1.5 text-sm border border-blue-400 rounded-full hover:bg-[#1e4f9c] transition">Edit Profil</button>
+        </div>
+        <div id="sidebarBio" class="mt-3 text-sm"><p class="text-blue-200/80">Belum ada bio</p></div>
+        <div class="flex gap-6 mt-4 py-3 border-y border-blue-400/30">
+          <div class="text-center"><div id="statPosts" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Postingan</div></div>
+          <div class="text-center"><div id="statFollowers" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Pengikut</div></div>
+          <div class="text-center"><div id="statFollowing" class="text-lg font-bold">0</div><div class="text-xs text-blue-300">Mengikuti</div></div>
+        </div>
+        <div id="sidebarBadge" class="mt-3"></div>
+        <div id="sidebarSellerApply" class="mt-3 hidden"><button id="sidebarSellerApplyBtn" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 py-2 rounded-full text-sm font-semibold hover:opacity-90">Jadi Penjual</button></div>
+        <div id="sidebarDashboard" class="mt-3 hidden"><button id="sidebarDashboardBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full text-sm font-semibold hover:bg-[#2f6bc9]">Dashboard Penjual</button></div>
+      </div>
       <div class="mt-6 px-4"><h4 class="text-sm font-semibold mb-3 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> Produk Saya</h4><div id="userProductsGrid" class="grid grid-cols-3 gap-1"><div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div></div></div>
       <div class="mt-auto p-4 border-t border-blue-400/30"><button id="sidebarLogoutBtn" class="w-full bg-red-600/30 text-red-300 py-2 rounded-full hover:bg-red-600/50 transition flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar</button></div>
     </div>
   </div>
-  <div id="editProfileModal" class="fixed inset-0 z-[600] hidden items-center justify-center"><div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="editProfileOverlay"></div><div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user"></i> Edit Profil</h3><div class="space-y-4"><div><label class="text-sm text-blue-300">Nama</label><input type="text" id="editFullName" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Username</label><input type="text" id="editUsername" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Bio</label><textarea id="editBio" rows="3" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></textarea></div><div><label class="text-sm text-blue-300">Foto Profil</label><input type="file" id="editAvatar" accept="image/*" class="w-full text-sm text-blue-300"></div><div><label class="text-sm text-blue-300">Foto Sampul</label><input type="file" id="editCover" accept="image/*" class="w-full text-sm text-blue-300"></div><div class="flex gap-2 pt-2"><button id="saveProfileChanges" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Simpan</button><button id="closeEditProfile" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Batal</button></div><div id="editProfileMessage" class="text-sm text-yellow-300 text-center"></div></div></div></div>
+
+  <!-- EDIT PROFILE MODAL -->
+  <div id="editProfileModal" class="fixed inset-0 z-[600] hidden items-center justify-center"><div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="editProfileOverlay"></div><div class="relative glass-panel w-96 p-6 text-white max-h-[90vh] overflow-y-auto"><h3 class="text-2xl font-bold mb-4 flex gap-2"><i data-lucide="user"></i> Edit Profil</h3><div class="space-y-4"><div><label class="text-sm text-blue-300">Nama</label><input type="text" id="editFullName" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Username</label><input type="text" id="editUsername" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></div><div><label class="text-sm text-blue-300">Bio</label><textarea id="editBio" rows="3" class="w-full p-3 rounded-lg bg-[#122b50] border border-blue-400/50 text-white mt-1"></textarea></div><div><label class="text-sm text-blue-300">Foto Profil</label><input type="file" id="editAvatar" accept="image/*" class="w-full text-sm text-blue-300"></div><div class="flex gap-2 pt-2"><button id="saveProfileChanges" class="flex-1 bg-[#1e4f9c] py-2 rounded-full hover-metallic">Simpan</button><button id="closeEditProfile" class="flex-1 border border-blue-400 py-2 rounded-full hover-metallic">Batal</button></div><div id="editProfileMessage" class="text-sm text-yellow-300 text-center"></div></div></div></div>
 
   <!-- FOOTER -->
   <footer class="mt-16 glass-panel-navy mx-4 md:mx-8 py-6 px-8 rounded-3xl flex flex-col md:flex-row justify-between items-center text-sm text-blue-200/80"><div class="flex gap-6 flex-wrap justify-center"><a href="#" class="hover:text-white" id="bantuanLink">Bantuan</a><a href="#" class="hover:text-white">Pengiriman</a><a href="#" class="hover:text-white">Syarat Penjual</a></div><div class="flex gap-4 my-3 md:my-0"><i data-lucide="credit-card" class="w-5 h-5"></i><i data-lucide="landmark" class="w-5 h-5"></i><i data-lucide="wallet" class="w-5 h-5"></i><span class="text-xs">BCA / Mandiri / BNI / GoPay / OVO / DANA</span></div><div>© 2026 Kuy Belanja · Marketplace Indonesia</div></footer>
@@ -217,7 +255,6 @@
       const editUsername = document.getElementById('editUsername');
       const editBio = document.getElementById('editBio');
       const editAvatar = document.getElementById('editAvatar');
-      const editCover = document.getElementById('editCover');
       const editProfileMessage = document.getElementById('editProfileMessage');
       
       // Notification elements
@@ -340,25 +377,12 @@
           statFollowers.textContent = '0';
           statFollowing.textContent = '0';
           userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div>';
-          const coverDiv = document.querySelector('#profileSidebar .relative.h-32');
-          if (coverDiv) coverDiv.style.background = 'linear-gradient(to right, #3B82F6, #8B5CF6)';
           return;
         }
         
         const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
         userProfile = profile || { role: 'buyer', email: currentUser.email };
         userRole = userProfile.role || 'buyer';
-        
-        const coverDiv = document.querySelector('#profileSidebar .relative.h-32');
-        if (coverDiv) {
-          if (userProfile.cover_url) {
-            coverDiv.style.background = `url(${userProfile.cover_url})`;
-            coverDiv.style.backgroundSize = 'cover';
-            coverDiv.style.backgroundPosition = 'center';
-          } else {
-            coverDiv.style.background = 'linear-gradient(to right, #3B82F6, #8B5CF6)';
-          }
-        }
         
         sidebarName.textContent = userProfile.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
         sidebarUsername.textContent = `@${userProfile.username || currentUser.email?.split('@')[0] || 'pengguna'}`;
@@ -396,69 +420,31 @@
         }
       }
 
-      // ==================== SAVE PROFILE CHANGES ====================
       async function saveProfileChangesFunc() {
         const fullName = editFullName.value;
         const username = editUsername.value;
         const bio = editBio.value;
         const avatarFile = editAvatar.files[0];
-        const coverFile = editCover.files[0];
-        
         let avatarUrl = userProfile?.avatar_url;
-        let coverUrl = userProfile?.cover_url;
         
         if (avatarFile) {
-          const fileName = `${currentUser.id}_avatar_${Date.now()}.jpg`;
-          const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(fileName, avatarFile);
-          if (uploadError) {
-            editProfileMessage.textContent = 'Gagal upload foto: ' + uploadError.message;
-            return;
+          const fileName = `${currentUser.id}_${Date.now()}.jpg`;
+          const { error } = await supabaseClient.storage.from('avatars').upload(fileName, avatarFile);
+          if (!error) {
+            const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
+            avatarUrl = urlData.publicUrl;
           }
-          const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(fileName);
-          avatarUrl = urlData.publicUrl;
         }
         
-        if (coverFile) {
-          const fileName = `${currentUser.id}_cover_${Date.now()}.jpg`;
-          const { error: uploadError } = await supabaseClient.storage.from('covers').upload(fileName, coverFile);
-          if (uploadError) {
-            editProfileMessage.textContent = 'Gagal upload sampul: ' + uploadError.message;
-            return;
-          }
-          const { data: urlData } = supabaseClient.storage.from('covers').getPublicUrl(fileName);
-          coverUrl = urlData.publicUrl;
-        }
-        
-        const updateData = { full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl, cover_url: coverUrl, updated_at: new Date() };
-        const { error } = await supabaseClient.from('profiles').update(updateData).eq('id', currentUser.id);
+        const { error } = await supabaseClient.from('profiles').update({ full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
         if (error) {
           editProfileMessage.textContent = 'Gagal: ' + error.message;
         } else {
           editProfileMessage.textContent = 'Profil berhasil diperbarui!';
-          await updateSidebarUI();
+          updateSidebarUI();
           setTimeout(() => { editProfileModal.classList.add('hidden'); editProfileMessage.textContent = ''; }, 1500);
         }
       }
-      
-      // ==================== COVER UPLOAD FROM SIDEBAR ====================
-      document.getElementById('changeCoverBtn')?.addEventListener('click', async () => {
-        if (!currentUser) { alert('Silakan login dulu'); return; }
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.onchange = async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          const fileName = `${currentUser.id}_cover_${Date.now()}.jpg`;
-          const { error: uploadError } = await supabaseClient.storage.from('covers').upload(fileName, file);
-          if (uploadError) { alert('Gagal upload cover: ' + uploadError.message); return; }
-          const { data: urlData } = supabaseClient.storage.from('covers').getPublicUrl(fileName);
-          const { error: updateError } = await supabaseClient.from('profiles').update({ cover_url: urlData.publicUrl }).eq('id', currentUser.id);
-          if (updateError) { alert('Gagal update cover: ' + updateError.message); } 
-          else { alert('Cover berhasil diperbarui!'); await updateSidebarUI(); }
-        };
-        fileInput.click();
-      });
 
       // ==================== NOTIFICATIONS ====================
       async function loadNotifications() {
@@ -522,7 +508,7 @@
         if (!cartItemsContainer || !cartSubtotalSpan) return;
         if (cart.length === 0) { cartItemsContainer.innerHTML = '<div class="text-center text-blue-200/70 mt-10">Keranjang masih kosong</div>'; cartSubtotalSpan.textContent = 'Rp 0'; return; }
         let subtotal = 0; let html = '';
-        cart.forEach(item => { subtotal += (item.harga||0)*(item.qty||0); html += `<div class="flex gap-3 items-center border-b border-blue-500/30 py-3"><div class="w-12 h-12 rounded bg-[#12315e] flex items-center justify-center text-xs">🛍️</div><div class="flex-1"><p class="font-semibold">${item.nama}</p><div class="flex items-center gap-2 text-sm"><span>${item.qty} x Rp ${(item.harga||0).toLocaleString()}</span></div></div><button class="remove-item text-red-300 p-1" data-id="${item.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`); });
+        cart.forEach(item => { subtotal += (item.harga||0)*(item.qty||0); html += `<div class="flex gap-3 items-center border-b border-blue-500/30 py-3"><div class="w-12 h-12 rounded bg-[#12315e] flex items-center justify-center text-xs">🛍️</div><div class="flex-1"><p class="font-semibold">${item.nama}</p><div class="flex items-center gap-2 text-sm"><span>${item.qty} x Rp ${(item.harga||0).toLocaleString()}</span></div></div><button class="remove-item text-red-300 p-1" data-id="${item.id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`; });
         cartItemsContainer.innerHTML = html; cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`; lucide.createIcons();
         document.querySelectorAll('.remove-item').forEach(btn => { btn.addEventListener('click', async (e) => { e.preventDefault(); const id = Number(btn.dataset.id); const { data: { user } } = await supabaseClient.auth.getUser(); if(user) await supabaseClient.from('carts').delete().eq('user_id', user.id).eq('product_id', id); loadCartFromDB(); }); });
         document.querySelectorAll('.payment-method').forEach(btn => { btn.addEventListener('click', () => { selectedPayment = btn.dataset.method; const el = document.getElementById('selectedPayment'); if(el) el.textContent = `Metode dipilih: ${selectedPayment}`; }); });
@@ -576,6 +562,7 @@
         document.getElementById('closeCart')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
         document.getElementById('cartOverlay')?.addEventListener('click', () => cartModal?.classList.add('hidden'));
         
+        // Profile sidebar
         document.getElementById('profileBtn')?.addEventListener('click', openProfileSidebar);
         closeProfileSidebar?.addEventListener('click', closeProfileSidebarFunc);
         profileSidebarOverlay?.addEventListener('click', closeProfileSidebarFunc);
@@ -587,10 +574,12 @@
         document.getElementById('sidebarDashboardBtn')?.addEventListener('click', () => { alert('Dashboard penjual akan segera hadir!'); });
         document.getElementById('sidebarLogoutBtn')?.addEventListener('click', logout);
         
+        // Notifications
         notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); });
         document.addEventListener('click', () => { notificationDropdown?.classList.remove('show'); });
         markAllReadBtn?.addEventListener('click', markAllAsRead);
         
+        // Login modal
         loginFab?.addEventListener('click', openLoginModal);
         document.querySelector('footer a:first-child')?.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
         document.getElementById('closeLogin')?.addEventListener('click', () => { loginModal?.classList.add('hidden'); });
