@@ -864,76 +864,17 @@
         else userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Belum ada produk</div>';
       }
       
-      // ==================== SAVE PROFILE CHANGES (FIXED) ====================
       async function saveProfileChanges() {
-        // Cek apakah user login
-        if (!currentUser) {
-          editProfileMessage.textContent = '❌ Anda harus login terlebih dahulu!';
-          setTimeout(() => editProfileMessage.textContent = '', 2000);
-          return;
-        }
-        
-        const fullName = editFullName.value;
-        const username = editUsername.value;
-        const bio = editBio.value;
-        const avatarFile = editAvatar.files[0];
+        const fullName = editFullName.value, username = editUsername.value, bio = editBio.value, avatarFile = editAvatar.files[0];
         let avatarUrl = currentUserProfile?.avatar_url;
-        
-        // Upload avatar jika ada file
         if (avatarFile) {
-          try {
-            const fileName = `${currentUser.id}_${Date.now()}.jpg`;
-            const { error: uploadError } = await supabase.storage
-              .from('avatars')
-              .upload(fileName, avatarFile);
-            
-            if (uploadError) {
-              console.error('Upload error:', uploadError);
-              editProfileMessage.textContent = '❌ Gagal upload foto: ' + uploadError.message;
-              return;
-            }
-            
-            const { data: urlData } = supabase.storage
-              .from('avatars')
-              .getPublicUrl(fileName);
-            avatarUrl = urlData.publicUrl;
-          } catch (err) {
-            console.error('Avatar upload error:', err);
-            editProfileMessage.textContent = '❌ Gagal upload foto';
-            return;
-          }
+          const fileName = `${currentUser.id}_${Date.now()}.jpg`;
+          const { error } = await supabase.storage.from('avatars').upload(fileName, avatarFile);
+          if (!error) { const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName); avatarUrl = urlData.publicUrl; }
         }
-        
-        // Update profile
-        const { error } = await supabase
-          .from('profiles')
-          .update({ 
-            full_name: fullName, 
-            username: username, 
-            bio: bio, 
-            avatar_url: avatarUrl 
-          })
-          .eq('id', currentUser.id);
-        
-        if (error) {
-          console.error('Update error:', error);
-          editProfileMessage.textContent = '❌ Gagal: ' + error.message;
-        } else {
-          editProfileMessage.textContent = '✅ Profil berhasil diperbarui!';
-          // Update local data
-          currentUserProfile = { 
-            ...currentUserProfile, 
-            full_name: fullName, 
-            username: username, 
-            bio: bio, 
-            avatar_url: avatarUrl 
-          };
-          await updateSidebarUI();
-          setTimeout(() => { 
-            editProfileModal.classList.add('hidden'); 
-            editProfileMessage.textContent = ''; 
-          }, 1500);
-        }
+        const { error } = await supabase.from('profiles').update({ full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
+        if (error) editProfileMessage.textContent = 'Gagal: ' + error.message;
+        else { editProfileMessage.textContent = 'Profil berhasil diperbarui!'; currentUserProfile = { ...currentUserProfile, full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }; updateSidebarUI(); setTimeout(() => { editProfileModal.classList.add('hidden'); editProfileMessage.textContent = ''; }, 1500); }
       }
       
       async function submitSellerApplication() {
@@ -948,17 +889,7 @@
       // ==================== UI FUNCTIONS ====================
       function openProfileSidebar() { profileSidebar.style.transform = 'translateX(0)'; document.body.style.overflow = 'hidden'; loadUserProducts(); }
       function closeProfileSidebarFunc() { profileSidebar.style.transform = 'translateX(100%)'; document.body.style.overflow = ''; }
-      function openEditProfileModal() { 
-        if (!currentUser) {
-          alert('Silakan login terlebih dahulu');
-          return;
-        }
-        editFullName.value = currentUserProfile?.full_name || ''; 
-        editUsername.value = currentUserProfile?.username || currentUser?.email?.split('@')[0] || ''; 
-        editBio.value = currentUserProfile?.bio || ''; 
-        editProfileModal.classList.remove('hidden'); 
-        editProfileModal.classList.add('flex'); 
-      }
+      function openEditProfileModal() { editFullName.value = currentUserProfile?.full_name || ''; editUsername.value = currentUserProfile?.username || currentUser?.email?.split('@')[0] || ''; editBio.value = currentUserProfile?.bio || ''; editProfileModal.classList.remove('hidden'); editProfileModal.classList.add('flex'); }
       
       // ==================== EVENT LISTENERS ====================
       function initEventListeners() {
