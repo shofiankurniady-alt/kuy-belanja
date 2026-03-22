@@ -191,6 +191,18 @@
       box-shadow: 0 0 15px #3b82f6;
     }
     
+    .logout-header-btn {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .logout-header-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ef4444;
+    }
+    
     .chat-message {
       max-width: 80%;
       word-wrap: break-word;
@@ -269,7 +281,8 @@
           <span id="cartBadge" class="cart-badge hidden">0</span>
         </div>
         
-        <button id="headerLoginBtn" class="login-header-btn flex items-center gap-2">
+        <!-- Tombol yang berubah: Login / Logout -->
+        <button id="authHeaderBtn" class="login-header-btn flex items-center gap-2">
           <i data-lucide="log-in" class="w-5 h-5"></i>
           <span class="hidden sm:inline">Masuk</span>
         </button>
@@ -395,7 +408,7 @@
     </div>
   </div>
 
-  <!-- MODALS -->
+  <!-- LOGIN MODAL (dengan 2 pilihan: Google & Phone) -->
   <div id="loginModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="loginOverlay"></div>
     <div class="relative glass-panel w-96 p-6 text-white">
@@ -403,26 +416,89 @@
         <button class="tab-login-btn flex-1 py-2 text-center font-bold text-white" data-tab="login">Login</button>
         <button class="tab-login-btn flex-1 py-2 text-center text-blue-300" data-tab="register">Daftar</button>
       </div>
+      
+      <!-- LOGIN TAB -->
       <div id="loginTab" class="login-tab-content">
         <h3 class="text-2xl font-bold mb-4"><i data-lucide="log-in"></i> Masuk ke Akun</h3>
+        
         <button id="googleLoginBtn" class="w-full bg-white text-gray-800 py-3 rounded-full flex items-center justify-center gap-3 mb-4 hover:scale-105 transition">
           <img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Login dengan Google
         </button>
-        <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau dengan Email</span></div></div>
+        
+        <button id="phoneLoginBtn" class="w-full bg-green-600 text-white py-3 rounded-full flex items-center justify-center gap-3 mb-4 hover:scale-105 transition">
+          <i data-lucide="phone" class="w-5 h-5"></i> Login dengan Nomor Ponsel
+        </button>
+        
+        <div class="relative my-4">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div>
+          <div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau dengan Email</span></div>
+        </div>
+        
         <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <button class="w-full bg-[#316bc7] py-2 rounded-full mb-2" id="loginBtn">Masuk dengan Email</button>
         <div id="loginMessage" class="text-sm text-center text-yellow-300"></div>
       </div>
+      
+      <!-- REGISTER TAB (dengan 2 pilihan: Google & Phone) -->
       <div id="registerTab" class="login-tab-content hidden">
         <h3 class="text-2xl font-bold mb-4"><i data-lucide="user-plus"></i> Daftar Akun Baru</h3>
+        
+        <button id="googleRegisterBtn" class="w-full bg-white text-gray-800 py-3 rounded-full flex items-center justify-center gap-3 mb-4 hover:scale-105 transition">
+          <img src="https://www.google.com/favicon.ico" class="w-5 h-5"> Daftar dengan Google
+        </button>
+        
+        <button id="phoneRegisterBtn" class="w-full bg-green-600 text-white py-3 rounded-full flex items-center justify-center gap-3 mb-4 hover:scale-105 transition">
+          <i data-lucide="phone" class="w-5 h-5"></i> Daftar dengan Nomor Ponsel
+        </button>
+        
+        <div class="relative my-4">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-blue-400/30"></div></div>
+          <div class="relative flex justify-center text-sm"><span class="px-2 bg-[#122b50] text-blue-300">Atau dengan Email</span></div>
+        </div>
+        
         <input type="email" id="regEmail" placeholder="Email" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="password" id="regPassword" placeholder="Password" class="w-full mb-3 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
         <input type="password" id="regConfirmPassword" placeholder="Konfirmasi Password" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
-        <button class="w-full bg-[#316bc7] py-2 rounded-full" id="registerBtn">Daftar</button>
+        <button class="w-full bg-[#316bc7] py-2 rounded-full" id="registerBtn">Daftar dengan Email</button>
         <div id="registerMessage" class="text-sm text-center text-yellow-300 mt-2"></div>
       </div>
+      
       <button id="closeLogin" class="absolute top-3 right-3 text-blue-300"><i data-lucide="x-circle"></i></button>
+    </div>
+  </div>
+
+  <!-- PHONE LOGIN MODAL -->
+  <div id="phoneLoginModal" class="fixed inset-0 z-[250] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="phoneLoginOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="phone"></i> Login dengan Nomor Ponsel</h3>
+      <p class="text-sm text-blue-300 mb-4">Masukkan nomor ponsel untuk menerima kode OTP via SMS/WhatsApp</p>
+      <input type="tel" id="phoneNumber" placeholder="Contoh: 08123456789" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+      <div id="otpSection" class="hidden">
+        <input type="text" id="otpCode" placeholder="Kode OTP 6 digit" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <button id="verifyOtpBtn" class="w-full bg-green-600 py-2 rounded-full mb-2">Verifikasi OTP</button>
+      </div>
+      <button id="sendOtpBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full">Kirim Kode OTP</button>
+      <button id="closePhoneLogin" class="w-full border border-blue-400 py-2 rounded-full mt-2">Batal</button>
+      <div id="phoneLoginMessage" class="text-sm text-center text-yellow-300 mt-2"></div>
+    </div>
+  </div>
+
+  <!-- PHONE REGISTER MODAL (sama dengan login) -->
+  <div id="phoneRegisterModal" class="fixed inset-0 z-[250] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="phoneRegisterOverlay"></div>
+    <div class="relative glass-panel w-96 p-6 text-white">
+      <h3 class="text-2xl font-bold mb-4"><i data-lucide="phone"></i> Daftar dengan Nomor Ponsel</h3>
+      <p class="text-sm text-blue-300 mb-4">Masukkan nomor ponsel untuk menerima kode OTP via SMS/WhatsApp</p>
+      <input type="tel" id="regPhoneNumber" placeholder="Contoh: 08123456789" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+      <div id="regOtpSection" class="hidden">
+        <input type="text" id="regOtpCode" placeholder="Kode OTP 6 digit" class="w-full mb-4 p-3 rounded-lg bg-[#122b50] border border-blue-400/50">
+        <button id="verifyRegOtpBtn" class="w-full bg-green-600 py-2 rounded-full mb-2">Verifikasi OTP</button>
+      </div>
+      <button id="sendRegOtpBtn" class="w-full bg-[#1e4f9c] py-2 rounded-full">Kirim Kode OTP</button>
+      <button id="closePhoneRegister" class="w-full border border-blue-400 py-2 rounded-full mt-2">Batal</button>
+      <div id="phoneRegisterMessage" class="text-sm text-center text-yellow-300 mt-2"></div>
     </div>
   </div>
 
@@ -550,11 +626,7 @@
         const hash = window.location.hash;
         if (hash && hash.includes('access_token')) {
           console.log('🔄 Detected redirect, processing...');
-          
-          // Hapus hash dari URL
           window.history.replaceState(null, '', window.location.pathname);
-          
-          // Tunggu sebentar lalu refresh
           setTimeout(() => {
             window.location.reload();
           }, 500);
@@ -574,6 +646,7 @@
       let currentChatUserId = null;
       let currentChatProductId = null;
       let pendingPhoneNumber = null;
+      let pendingRegPhoneNumber = null;
       
       // DOM Elements
       const productGrid = document.getElementById('productGrid');
@@ -595,7 +668,7 @@
       const sellerOrdersContainer = document.getElementById('sellerOrdersContainer');
       const sellerProductsContainer = document.getElementById('sellerProductsContainer');
       const loginModal = document.getElementById('loginModal');
-      const headerLoginBtn = document.getElementById('headerLoginBtn');
+      const authHeaderBtn = document.getElementById('authHeaderBtn');
       const profileBtnContainer = document.getElementById('profileBtnContainer');
       const profileBtn = document.getElementById('profileBtn');
       const roleBadge = document.getElementById('roleBadge');
@@ -646,6 +719,15 @@
       const phoneLoginMessage = document.getElementById('phoneLoginMessage');
       const closePhoneLogin = document.getElementById('closePhoneLogin');
       const phoneLoginOverlay = document.getElementById('phoneLoginOverlay');
+      const phoneRegisterModal = document.getElementById('phoneRegisterModal');
+      const regPhoneNumberInput = document.getElementById('regPhoneNumber');
+      const sendRegOtpBtn = document.getElementById('sendRegOtpBtn');
+      const verifyRegOtpBtn = document.getElementById('verifyRegOtpBtn');
+      const regOtpSection = document.getElementById('regOtpSection');
+      const regOtpCodeInput = document.getElementById('regOtpCode');
+      const phoneRegisterMessage = document.getElementById('phoneRegisterMessage');
+      const closePhoneRegister = document.getElementById('closePhoneRegister');
+      const phoneRegisterOverlay = document.getElementById('phoneRegisterOverlay');
       const addProductModal = document.getElementById('addProductModal');
       const addProductOverlay = document.getElementById('addProductOverlay');
       const closeAddProductBtn = document.getElementById('closeAddProductBtn');
@@ -691,8 +773,19 @@
             await updateSidebarUI();
           }
           
-          headerLoginBtn.classList.toggle('hidden', currentUser);
-          profileBtnContainer.classList.toggle('hidden', !currentUser);
+          // Update header button (Login / Logout)
+          if (currentUser) {
+            authHeaderBtn.innerHTML = '<i data-lucide="log-out" class="w-5 h-5"></i><span class="hidden sm:inline">Keluar</span>';
+            authHeaderBtn.classList.remove('login-header-btn');
+            authHeaderBtn.classList.add('logout-header-btn');
+            profileBtnContainer.classList.remove('hidden');
+          } else {
+            authHeaderBtn.innerHTML = '<i data-lucide="log-in" class="w-5 h-5"></i><span class="hidden sm:inline">Masuk</span>';
+            authHeaderBtn.classList.remove('logout-header-btn');
+            authHeaderBtn.classList.add('login-header-btn');
+            profileBtnContainer.classList.add('hidden');
+          }
+          
           lucide.createIcons();
           return user;
         } catch (error) {
@@ -738,6 +831,130 @@
       function openLoginModal() {
         loginModal.classList.remove('hidden');
         loginModal.classList.add('flex');
+      }
+      
+      // ==================== PHONE LOGIN ====================
+      function openPhoneLoginModal() {
+        phoneLoginModal.classList.remove('hidden');
+        phoneLoginModal.classList.add('flex');
+        phoneNumberInput.value = '';
+        otpCodeInput.value = '';
+        otpSection.classList.add('hidden');
+        sendOtpBtn.classList.remove('hidden');
+        phoneLoginMessage.textContent = '';
+      }
+      
+      async function sendOtp() {
+        let phone = phoneNumberInput.value.trim();
+        if (!phone) { phoneLoginMessage.textContent = 'Masukkan nomor ponsel'; return; }
+        
+        if (phone.startsWith('0')) phone = '+62' + phone.substring(1);
+        if (!phone.startsWith('+')) phone = '+62' + phone;
+        pendingPhoneNumber = phone;
+        
+        try {
+          const { error } = await supabase.auth.signInWithOtp({ phone: phone });
+          if (error) throw error;
+          phoneLoginMessage.textContent = '✅ Kode OTP telah dikirim!';
+          otpSection.classList.remove('hidden');
+          sendOtpBtn.classList.add('hidden');
+        } catch (error) {
+          phoneLoginMessage.textContent = '❌ Gagal: ' + error.message;
+        }
+      }
+      
+      async function verifyOtp() {
+        const enteredOtp = otpCodeInput.value.trim();
+        if (!enteredOtp) { phoneLoginMessage.textContent = 'Masukkan kode OTP'; return; }
+        
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            phone: pendingPhoneNumber,
+            token: enteredOtp,
+            type: 'sms',
+          });
+          if (error) throw error;
+          
+          if (data?.user) {
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+            if (!profile) {
+              await supabase.from('profiles').insert({
+                id: data.user.id,
+                email: data.user.email || `user_${pendingPhoneNumber.slice(-6)}@temp.com`,
+                username: `user_${pendingPhoneNumber.slice(-6)}`,
+                role: 'buyer',
+                phone: pendingPhoneNumber
+              });
+            }
+            await checkAuth();
+            phoneLoginModal.classList.add('hidden');
+            alert('✅ Login berhasil!');
+          }
+        } catch (error) {
+          phoneLoginMessage.textContent = '❌ Kode OTP salah: ' + error.message;
+        }
+      }
+      
+      // ==================== PHONE REGISTER ====================
+      function openPhoneRegisterModal() {
+        phoneRegisterModal.classList.remove('hidden');
+        phoneRegisterModal.classList.add('flex');
+        regPhoneNumberInput.value = '';
+        regOtpCodeInput.value = '';
+        regOtpSection.classList.add('hidden');
+        sendRegOtpBtn.classList.remove('hidden');
+        phoneRegisterMessage.textContent = '';
+      }
+      
+      async function sendRegOtp() {
+        let phone = regPhoneNumberInput.value.trim();
+        if (!phone) { phoneRegisterMessage.textContent = 'Masukkan nomor ponsel'; return; }
+        
+        if (phone.startsWith('0')) phone = '+62' + phone.substring(1);
+        if (!phone.startsWith('+')) phone = '+62' + phone;
+        pendingRegPhoneNumber = phone;
+        
+        try {
+          const { error } = await supabase.auth.signInWithOtp({ phone: phone });
+          if (error) throw error;
+          phoneRegisterMessage.textContent = '✅ Kode OTP telah dikirim!';
+          regOtpSection.classList.remove('hidden');
+          sendRegOtpBtn.classList.add('hidden');
+        } catch (error) {
+          phoneRegisterMessage.textContent = '❌ Gagal: ' + error.message;
+        }
+      }
+      
+      async function verifyRegOtp() {
+        const enteredOtp = regOtpCodeInput.value.trim();
+        if (!enteredOtp) { phoneRegisterMessage.textContent = 'Masukkan kode OTP'; return; }
+        
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            phone: pendingRegPhoneNumber,
+            token: enteredOtp,
+            type: 'sms',
+          });
+          if (error) throw error;
+          
+          if (data?.user) {
+            const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+            if (!profile) {
+              await supabase.from('profiles').insert({
+                id: data.user.id,
+                email: data.user.email || `user_${pendingRegPhoneNumber.slice(-6)}@temp.com`,
+                username: `user_${pendingRegPhoneNumber.slice(-6)}`,
+                role: 'buyer',
+                phone: pendingRegPhoneNumber
+              });
+            }
+            await checkAuth();
+            phoneRegisterModal.classList.add('hidden');
+            alert('✅ Registrasi berhasil!');
+          }
+        } catch (error) {
+          phoneRegisterMessage.textContent = '❌ Kode OTP salah: ' + error.message;
+        }
       }
       
       // ==================== CART FUNCTIONS ====================
@@ -1170,13 +1387,50 @@
       
       // ==================== EVENT LISTENERS ====================
       function initEventListeners() {
-        headerLoginBtn?.addEventListener('click', openLoginModal);
-        document.getElementById('googleLoginBtn')?.addEventListener('click', async () => { 
+        // Header Auth Button (Login/Logout)
+        authHeaderBtn?.addEventListener('click', () => {
+          if (currentUser) {
+            logout();
+          } else {
+            openLoginModal();
+          }
+        });
+        
+        // Google Login & Register
+        document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
           await supabase.auth.signInWithOAuth({ 
             provider: 'google', 
             options: { redirectTo: window.location.origin } 
-          }); 
+          });
         });
+        document.getElementById('googleRegisterBtn')?.addEventListener('click', async () => {
+          await supabase.auth.signInWithOAuth({ 
+            provider: 'google', 
+            options: { redirectTo: window.location.origin } 
+          });
+        });
+        
+        // Phone Login
+        document.getElementById('phoneLoginBtn')?.addEventListener('click', () => { 
+          loginModal.classList.add('hidden'); 
+          openPhoneLoginModal(); 
+        });
+        document.getElementById('phoneRegisterBtn')?.addEventListener('click', () => { 
+          loginModal.classList.add('hidden'); 
+          openPhoneRegisterModal(); 
+        });
+        sendOtpBtn?.addEventListener('click', sendOtp);
+        verifyOtpBtn?.addEventListener('click', verifyOtp);
+        closePhoneLogin?.addEventListener('click', () => phoneLoginModal.classList.add('hidden'));
+        phoneLoginOverlay?.addEventListener('click', () => phoneLoginModal.classList.add('hidden'));
+        
+        // Phone Register
+        sendRegOtpBtn?.addEventListener('click', sendRegOtp);
+        verifyRegOtpBtn?.addEventListener('click', verifyRegOtp);
+        closePhoneRegister?.addEventListener('click', () => phoneRegisterModal.classList.add('hidden'));
+        phoneRegisterOverlay?.addEventListener('click', () => phoneRegisterModal.classList.add('hidden'));
+        
+        // Email Login/Register
         document.getElementById('loginBtn')?.addEventListener('click', () => { 
           const e = document.getElementById('loginEmail').value, p = document.getElementById('loginPassword').value; 
           if (e && p) login(e, p); 
@@ -1188,13 +1442,26 @@
           else if (p !== c) document.getElementById('registerMessage').textContent = 'Password tidak cocok'; 
           else register(e, p); 
         });
+        
+        // Modal close
         document.getElementById('closeLogin')?.addEventListener('click', () => loginModal.classList.add('hidden'));
         document.getElementById('loginOverlay')?.addEventListener('click', () => loginModal.classList.add('hidden'));
+        document.querySelectorAll('.tab-login-btn').forEach(btn => btn.addEventListener('click', () => { 
+          const tab = btn.dataset.tab; 
+          document.querySelectorAll('.login-tab-content').forEach(t => t.classList.add('hidden')); 
+          document.getElementById(tab + 'Tab').classList.remove('hidden'); 
+        }));
         
+        // Tabs
         cartTab?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); adminTab.classList.remove('active'); });
         ordersTab?.addEventListener('click', () => { cartSection.classList.add('hidden'); ordersSection.classList.remove('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.add('hidden'); ordersTab.classList.add('active'); cartTab.classList.remove('active'); sellerTab.classList.remove('active'); adminTab.classList.remove('active'); loadOrders(); });
         sellerTab?.addEventListener('click', () => { if (currentUserRole === 'seller') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.remove('hidden'); adminSection.classList.add('hidden'); sellerTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); adminTab.classList.remove('active'); loadSellerProducts(); loadSellerOrders(); } else alert('Anda harus menjadi seller'); });
         adminTab?.addEventListener('click', () => { if (currentUserRole === 'admin') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); adminSection.classList.remove('hidden'); adminTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); loadAdminData(); } else alert('Anda bukan admin'); });
+        
+        document.querySelectorAll('.admin-subtab').forEach(btn => btn.addEventListener('click', () => {
+          document.querySelectorAll('.admin-content').forEach(c => c.classList.add('hidden'));
+          document.getElementById(`admin${btn.dataset.subtab.charAt(0).toUpperCase() + btn.dataset.subtab.slice(1)}Container`).classList.remove('hidden');
+        }));
         
         document.querySelectorAll('.category-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active')); btn.classList.add('category-active'); activeCategory = btn.dataset.cat; renderProducts(); }));
         document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
