@@ -444,499 +444,505 @@
       const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
       console.log('✅ Supabase initialized');
       
-      // ==================== GLOBAL STATE ====================
-      let currentUser = null;
-      let currentUserRole = 'guest';
-      let currentUserProfile = null;
-      let products = [];
-      let cart = [];
-      let orders = [];
-      let notifications = [];
-      let activeCategory = 'all';
-      let searchTerm = '';
-      let selectedPayment = null;
-      
-      // ==================== DOM ELEMENTS ====================
-      const productGrid = document.getElementById('productGrid');
-      const searchInput = document.getElementById('searchInput');
-      const cartBadge = document.getElementById('cartBadge');
-      const cartIcon = document.getElementById('cartIcon');
-      const cartSection = document.getElementById('cartSection');
-      const ordersSection = document.getElementById('ordersSection');
-      const sellerSection = document.getElementById('sellerSection');
-      const cartTab = document.getElementById('cartTab');
-      const ordersTab = document.getElementById('ordersTab');
-      const sellerTab = document.getElementById('sellerTab');
-      const cartItemsContainer = document.getElementById('cartItemsContainer');
-      const cartSubtotalSpan = document.getElementById('cartSubtotal');
-      const checkoutBtn = document.getElementById('checkoutBtn');
-      const ordersContainer = document.getElementById('ordersContainer');
-      const sellerOrdersContainer = document.getElementById('sellerOrdersContainer');
-      const loginModal = document.getElementById('loginModal');
-      const loginFab = document.getElementById('loginFab');
-      const roleBadge = document.getElementById('roleBadge');
-      const sellerApplyBtn = document.getElementById('sellerApplyBtn');
-      const notificationBtn = document.getElementById('notificationBtn');
-      const notificationDropdown = document.getElementById('notificationDropdown');
-      const notificationList = document.getElementById('notificationList');
-      const notifBadge = document.getElementById('notifBadge');
-      const markAllReadBtn = document.getElementById('markAllReadBtn');
-      const profileSidebar = document.getElementById('profileSidebar');
-      const closeProfileSidebar = document.getElementById('closeProfileSidebar');
-      const profileSidebarOverlay = document.getElementById('profileSidebarOverlay');
-      const editProfileModal = document.getElementById('editProfileModal');
-      const editProfileOverlay = document.getElementById('editProfileOverlay');
-      const closeEditProfileBtn = document.getElementById('closeEditProfileBtn');
-      const editProfileBtn = document.getElementById('editProfileBtn');
-      const saveProfileChangesBtn = document.getElementById('saveProfileChangesBtn');
-      const sidebarAvatar = document.getElementById('sidebarAvatar');
-      const sidebarName = document.getElementById('sidebarName');
-      const sidebarUsername = document.getElementById('sidebarUsername');
-      const sidebarBio = document.getElementById('sidebarBio');
-      const sidebarBadge = document.getElementById('sidebarBadge');
-      const sidebarSellerApply = document.getElementById('sidebarSellerApply');
-      const sidebarDashboard = document.getElementById('sidebarDashboard');
-      const userProductsGrid = document.getElementById('userProductsGrid');
-      const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
-      const editFullName = document.getElementById('editFullName');
-      const editUsername = document.getElementById('editUsername');
-      const editBio = document.getElementById('editBio');
-      const editAvatar = document.getElementById('editAvatar');
-      const editProfileMessage = document.getElementById('editProfileMessage');
-      
-      // ==================== AUTH FUNCTIONS ====================
-      async function checkAuth() {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          currentUser = user;
+      // Test koneksi
+      (async function testConnection() {
+        const { error } = await supabase.from('profiles').select('count');
+        if (error) console.log('⚠️ Koneksi Supabase error:', error.message);
+        else console.log('✅ Supabase connected!');
+      })();
+    
+    // ==================== GLOBAL STATE ====================
+    let currentUser = null;
+    let currentUserRole = 'guest';
+    let currentUserProfile = null;
+    let products = [];
+    let cart = [];
+    let orders = [];
+    let notifications = [];
+    let activeCategory = 'all';
+    let searchTerm = '';
+    let selectedPayment = null;
+    
+    // ==================== DOM ELEMENTS ====================
+    const productGrid = document.getElementById('productGrid');
+    const searchInput = document.getElementById('searchInput');
+    const cartBadge = document.getElementById('cartBadge');
+    const cartIcon = document.getElementById('cartIcon');
+    const cartSection = document.getElementById('cartSection');
+    const ordersSection = document.getElementById('ordersSection');
+    const sellerSection = document.getElementById('sellerSection');
+    const cartTab = document.getElementById('cartTab');
+    const ordersTab = document.getElementById('ordersTab');
+    const sellerTab = document.getElementById('sellerTab');
+    const cartItemsContainer = document.getElementById('cartItemsContainer');
+    const cartSubtotalSpan = document.getElementById('cartSubtotal');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const ordersContainer = document.getElementById('ordersContainer');
+    const sellerOrdersContainer = document.getElementById('sellerOrdersContainer');
+    const loginModal = document.getElementById('loginModal');
+    const loginFab = document.getElementById('loginFab');
+    const roleBadge = document.getElementById('roleBadge');
+    const sellerApplyBtn = document.getElementById('sellerApplyBtn');
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    const notificationList = document.getElementById('notificationList');
+    const notifBadge = document.getElementById('notifBadge');
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    const profileSidebar = document.getElementById('profileSidebar');
+    const closeProfileSidebar = document.getElementById('closeProfileSidebar');
+    const profileSidebarOverlay = document.getElementById('profileSidebarOverlay');
+    const editProfileModal = document.getElementById('editProfileModal');
+    const editProfileOverlay = document.getElementById('editProfileOverlay');
+    const closeEditProfileBtn = document.getElementById('closeEditProfileBtn');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const saveProfileChangesBtn = document.getElementById('saveProfileChangesBtn');
+    const sidebarAvatar = document.getElementById('sidebarAvatar');
+    const sidebarName = document.getElementById('sidebarName');
+    const sidebarUsername = document.getElementById('sidebarUsername');
+    const sidebarBio = document.getElementById('sidebarBio');
+    const sidebarBadge = document.getElementById('sidebarBadge');
+    const sidebarSellerApply = document.getElementById('sidebarSellerApply');
+    const sidebarDashboard = document.getElementById('sidebarDashboard');
+    const userProductsGrid = document.getElementById('userProductsGrid');
+    const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+    const editFullName = document.getElementById('editFullName');
+    const editUsername = document.getElementById('editUsername');
+    const editBio = document.getElementById('editBio');
+    const editAvatar = document.getElementById('editAvatar');
+    const editProfileMessage = document.getElementById('editProfileMessage');
+    
+    // ==================== AUTH FUNCTIONS ====================
+    async function checkAuth() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        currentUser = user;
+        
+        if (user) {
+          const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
+          currentUserProfile = profile || { role: 'buyer', email: user.email };
+          currentUserRole = currentUserProfile.role || 'buyer';
           
-          if (user) {
-            const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-            currentUserProfile = profile || { role: 'buyer', email: user.email };
-            currentUserRole = currentUserProfile.role || 'buyer';
-            
-            roleBadge.classList.remove('hidden');
-            roleBadge.textContent = currentUserRole.toUpperCase();
-            
-            if (currentUserRole === 'buyer') sellerApplyBtn.classList.remove('hidden');
-            else sellerApplyBtn.classList.add('hidden');
-            
-            await loadCart();
-            await loadOrders();
-            await loadNotifications();
-            await updateSidebarUI();
-          } else {
-            currentUserRole = 'guest';
-            roleBadge.classList.add('hidden');
-            sellerApplyBtn.classList.add('hidden');
-            cart = [];
-            orders = [];
-            await updateSidebarUI();
-          }
-          lucide.createIcons();
-          return user;
-        } catch (error) {
-          console.error('Error checkAuth:', error);
-          return null;
-        }
-      }
-      
-      async function login(email, password) {
-        try {
-          const { error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
-          await checkAuth();
-          loginModal.classList.add('hidden');
-          alert('✅ Login berhasil!');
-        } catch (error) {
-          document.getElementById('loginMessage').textContent = 'Login gagal: ' + error.message;
-        }
-      }
-      
-      async function register(email, password) {
-        try {
-          const { data, error } = await supabase.auth.signUp({ email, password });
-          if (error) throw error;
-          if (data?.user) {
-            await supabase.from('profiles').insert({ id: data.user.id, email: email, role: 'buyer', username: email.split('@')[0] });
-          }
-          document.getElementById('registerMessage').textContent = '✅ Registrasi berhasil! Silakan login.';
-          setTimeout(() => document.querySelector('[data-tab="login"]').click(), 2000);
-        } catch (error) {
-          document.getElementById('registerMessage').textContent = 'Registrasi gagal: ' + error.message;
-        }
-      }
-      
-      async function logout() {
-        await supabase.auth.signOut();
-        window.location.reload();
-      }
-      
-      function openLoginModal() {
-        loginModal.classList.remove('hidden');
-        loginModal.classList.add('flex');
-      }
-      
-      // ==================== CART FUNCTIONS ====================
-      async function loadCart() {
-        if (!currentUser) { cart = []; renderCart(); updateCartBadge(); return; }
-        
-        const { data, error } = await supabase.from('carts').select(`*, products(*)`).eq('user_id', currentUser.id);
-        if (!error && data) {
-          cart = data.map(item => ({
-            cart_id: item.id, id: item.product_id, nama: item.products?.nama || 'Produk',
-            harga: item.products?.harga || 0, gambar: item.products?.gambar,
-            quantity: item.quantity, seller_id: item.products?.seller_id
-          }));
-          renderCart();
-          updateCartBadge();
-        }
-      }
-      
-      async function addToCart(productId, quantity = 1) {
-        if (!currentUser) { alert('Silakan login terlebih dahulu'); openLoginModal(); return false; }
-        
-        const existingItem = cart.find(item => item.id === productId);
-        if (existingItem) {
-          const newQuantity = existingItem.quantity + quantity;
-          const { error } = await supabase.from('carts').update({ quantity: newQuantity }).eq('id', existingItem.cart_id);
-          if (!error) await loadCart();
-        } else {
-          const { error } = await supabase.from('carts').insert({ user_id: currentUser.id, product_id: productId, quantity: quantity });
-          if (!error) await loadCart();
-        }
-        return true;
-      }
-      
-      async function updateCartQuantity(cartId, productId, newQuantity) {
-        if (newQuantity <= 0) { await removeFromCart(cartId); return; }
-        const { error } = await supabase.from('carts').update({ quantity: newQuantity }).eq('id', cartId);
-        if (!error) await loadCart();
-      }
-      
-      async function removeFromCart(cartId) {
-        const { error } = await supabase.from('carts').delete().eq('id', cartId);
-        if (!error) await loadCart();
-      }
-      
-      function updateCartBadge() {
-        const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-        if (totalQty > 0) { cartBadge.classList.remove('hidden'); cartBadge.textContent = totalQty > 99 ? '99+' : totalQty; }
-        else cartBadge.classList.add('hidden');
-      }
-      
-      function renderCart() {
-        if (!cartItemsContainer) return;
-        if (cart.length === 0) {
-          cartItemsContainer.innerHTML = `<div class="text-center text-blue-200/70 py-10"><i data-lucide="shopping-cart" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Keranjang belanja kosong</p></div>`;
-          if (cartSubtotalSpan) cartSubtotalSpan.textContent = 'Rp 0';
-          lucide.createIcons();
-          return;
-        }
-        
-        let subtotal = 0;
-        let html = '';
-        cart.forEach(item => {
-          const itemTotal = item.harga * item.quantity;
-          subtotal += itemTotal;
-          html += `<div class="flex gap-4 py-4 border-b border-blue-400/20">
-            <img src="${item.gambar || 'https://placehold.co/80x80/1e4f9c/white?text=Product'}" class="w-20 h-20 rounded-lg object-cover">
-            <div class="flex-1"><h4 class="font-semibold">${item.nama}</h4><p class="text-blue-300 text-sm">Rp ${item.harga.toLocaleString('id-ID')}</p>
-            <div class="flex items-center gap-2 mt-2">
-              <button class="cart-qty-minus bg-blue-600/30 hover:bg-blue-600 px-3 py-1 rounded-full text-sm" data-cart-id="${item.cart_id}" data-product-id="${item.id}">-</button>
-              <span class="w-8 text-center">${item.quantity}</span>
-              <button class="cart-qty-plus bg-blue-600/30 hover:bg-blue-600 px-3 py-1 rounded-full text-sm" data-cart-id="${item.cart_id}" data-product-id="${item.id}">+</button>
-              <button class="cart-remove text-red-400 hover:text-red-300 text-sm ml-2" data-cart-id="${item.cart_id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            </div></div>
-            <div class="text-right"><p class="font-bold">Rp ${itemTotal.toLocaleString('id-ID')}</p></div>
-          </div>`;
-        });
-        cartItemsContainer.innerHTML = html;
-        cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
-        
-        document.querySelectorAll('.cart-qty-plus').forEach(btn => btn.addEventListener('click', async () => {
-          const cartId = parseInt(btn.dataset.cartId), productId = parseInt(btn.dataset.productId);
-          const item = cart.find(i => i.id === productId);
-          if (item) await updateCartQuantity(cartId, productId, item.quantity + 1);
-        }));
-        document.querySelectorAll('.cart-qty-minus').forEach(btn => btn.addEventListener('click', async () => {
-          const cartId = parseInt(btn.dataset.cartId), productId = parseInt(btn.dataset.productId);
-          const item = cart.find(i => i.id === productId);
-          if (item) await updateCartQuantity(cartId, productId, item.quantity - 1);
-        }));
-        document.querySelectorAll('.cart-remove').forEach(btn => btn.addEventListener('click', async () => {
-          await removeFromCart(parseInt(btn.dataset.cartId));
-        }));
-        lucide.createIcons();
-      }
-      
-      // ==================== ORDER FUNCTIONS ====================
-      async function checkout(paymentMethod) {
-        if (!currentUser) { alert('Silakan login terlebih dahulu'); openLoginModal(); return false; }
-        if (cart.length === 0) { alert('Keranjang belanja kosong'); return false; }
-        
-        const orderNumber = `INV/${new Date().getFullYear()}/${Math.floor(Math.random() * 10000)}`;
-        const totalPrice = cart.reduce((sum, item) => sum + (item.harga * item.quantity), 0);
-        const status = paymentMethod === 'transfer' ? 'paid' : 'pending';
-        
-        try {
-          const { data: order, error: orderError } = await supabase.from('orders').insert({ 
-            order_number: orderNumber, user_id: currentUser.id, total_price: totalPrice, 
-            payment_method: paymentMethod, status: status 
-          }).select().single();
-          if (orderError) throw orderError;
+          roleBadge.classList.remove('hidden');
+          roleBadge.textContent = currentUserRole.toUpperCase();
           
-          const orderItems = cart.map(item => ({ 
-            order_id: order.id, product_id: item.id, seller_id: item.seller_id, 
-            quantity: item.quantity, price: item.harga, subtotal: item.harga * item.quantity 
-          }));
-          const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-          if (itemsError) throw itemsError;
-          
-          await supabase.from('carts').delete().eq('user_id', currentUser.id);
-          
-          for (const item of orderItems) {
-            if (item.seller_id) {
-              await supabase.from('notifications').insert({ 
-                user_id: item.seller_id, title: 'Pesanan Baru', 
-                message: `Anda mendapat pesanan baru: ${orderNumber}`, icon: 'shopping-bag', is_read: false 
-              });
-            }
-          }
+          if (currentUserRole === 'buyer') sellerApplyBtn.classList.remove('hidden');
+          else sellerApplyBtn.classList.add('hidden');
           
           await loadCart();
           await loadOrders();
-          alert(`✅ Pesanan berhasil dibuat!\n📦 No. Pesanan: ${orderNumber}\n💳 Status: ${status === 'paid' ? 'Sudah Dibayar' : 'Menunggu Pembayaran'}`);
-          return true;
-        } catch (error) {
-          console.error('Checkout error:', error);
-          alert('❌ Gagal checkout: ' + error.message);
-          return false;
-        }
-      }
-      
-      async function loadOrders() {
-        if (!currentUser) return;
-        const { data, error } = await supabase.from('orders').select(`*, order_items(*, products(*))`).eq('user_id', currentUser.id).order('created_at', { ascending: false });
-        if (!error && data) { orders = data; renderOrders(); }
-      }
-      
-      function renderOrders() {
-        if (!ordersContainer) return;
-        if (orders.length === 0) {
-          ordersContainer.innerHTML = `<div class="text-center text-blue-200/70 py-10"><i data-lucide="package" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Belum ada pesanan</p></div>`;
-          lucide.createIcons(); return;
-        }
-        
-        let html = '';
-        orders.forEach(order => {
-          const statusClass = { pending: 'status-pending', paid: 'status-paid', shipped: 'status-shipped', completed: 'status-completed' }[order.status] || 'status-pending';
-          html += `<div class="glass-panel p-6 mb-4">
-            <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
-              <div><p class="text-sm text-blue-300">No. Pesanan</p><p class="font-mono font-bold">${order.order_number}</p><p class="text-xs text-blue-400">${new Date(order.created_at).toLocaleDateString('id-ID')}</p></div>
-              <div><span class="px-3 py-1 rounded-full text-sm font-semibold ${statusClass}">${order.status.toUpperCase()}</span></div>
-            </div>
-            <div class="border-t border-blue-400/20 pt-4">
-              ${order.order_items.map(item => `<div class="flex gap-3 mb-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><p class="font-semibold">${item.products?.nama || 'Product'}</p><p class="text-sm text-blue-300">${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="text-right"><p class="font-bold">Rp ${item.subtotal.toLocaleString('id-ID')}</p></div></div>`).join('')}
-            </div>
-            <div class="border-t border-blue-400/20 pt-4 flex justify-between items-center"><p class="text-sm">Total Pesanan</p><p class="text-xl font-bold">Rp ${order.total_price.toLocaleString('id-ID')}</p></div>
-            ${order.status !== 'completed' ? `<div class="mt-4"><button class="complete-order w-full bg-green-600/30 hover:bg-green-600 border border-green-500 py-2 rounded-full transition" data-order-id="${order.id}">✅ Selesaikan Pesanan</button></div>` : ''}
-          </div>`;
-        });
-        ordersContainer.innerHTML = html;
-        document.querySelectorAll('.complete-order').forEach(btn => btn.addEventListener('click', async () => {
-          await supabase.from('orders').update({ status: 'completed' }).eq('id', parseInt(btn.dataset.orderId));
-          await loadOrders();
-          alert('✅ Pesanan telah diselesaikan!');
-        }));
-        lucide.createIcons();
-      }
-      
-      // ==================== SELLER FUNCTIONS ====================
-      async function loadSellerOrders() {
-        if (!currentUser || currentUserRole !== 'seller') return;
-        const { data, error } = await supabase.from('order_items').select(`*, orders(*), products(*)`).eq('seller_id', currentUser.id).order('created_at', { ascending: false });
-        if (!error && data) renderSellerOrders(data);
-      }
-      
-      function renderSellerOrders(orderItems) {
-        if (!sellerOrdersContainer) return;
-        const groupedOrders = {};
-        orderItems.forEach(item => { if (!groupedOrders[item.order_id]) groupedOrders[item.order_id] = { order: item.orders, items: [] }; groupedOrders[item.order_id].items.push(item); });
-        if (Object.keys(groupedOrders).length === 0) {
-          sellerOrdersContainer.innerHTML = `<div class="text-center text-blue-300 py-10"><i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Belum ada pesanan masuk</p></div>`;
-          lucide.createIcons(); return;
-        }
-        
-        let html = '';
-        for (const orderId in groupedOrders) {
-          const { order, items } = groupedOrders[orderId];
-          const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
-          html += `<div class="glass-panel p-6 mb-4">
-            <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
-              <div><p class="text-sm text-blue-300">No. Pesanan</p><p class="font-mono font-bold">${order.order_number}</p><p class="text-xs text-blue-400">${new Date(order.created_at).toLocaleDateString('id-ID')}</p></div>
-              <div><select class="update-status px-3 py-1 rounded-full text-sm bg-blue-600/50 border border-blue-400" data-order-id="${order.id}"><option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option><option value="paid" ${order.status === 'paid' ? 'selected' : ''}>💰 Paid</option><option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🚚 Shipped</option><option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Completed</option></select></div>
-            </div>
-            ${items.map(item => `<div class="flex gap-3 mb-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><p class="font-semibold">${item.products?.nama || 'Product'}</p><p class="text-sm text-blue-300">${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="text-right"><p class="font-bold">Rp ${item.subtotal.toLocaleString('id-ID')}</p></div></div>`).join('')}
-            <div class="border-t border-blue-400/20 pt-4 text-right"><p class="text-sm">Total dari toko Anda</p><p class="text-xl font-bold">Rp ${totalAmount.toLocaleString('id-ID')}</p></div>
-          </div>`;
-        }
-        sellerOrdersContainer.innerHTML = html;
-        document.querySelectorAll('.update-status').forEach(select => select.addEventListener('change', async () => {
-          await supabase.from('orders').update({ status: select.value }).eq('id', parseInt(select.dataset.orderId));
-          await loadSellerOrders();
-          alert(`✅ Status pesanan diubah menjadi ${select.value}`);
-        }));
-        lucide.createIcons();
-      }
-      
-      // ==================== PRODUCT FUNCTIONS ====================
-      async function loadProducts() {
-        const { data, error } = await supabase.from('products').select('*');
-        if (!error && data) { products = data; renderProducts(); }
-        else productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-red-400">❌ Gagal memuat produk</div>';
-      }
-      
-      function renderProducts() {
-        if (!products.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🛒 Belum ada produk</div>'; return; }
-        const filtered = products.filter(p => (activeCategory === 'all' || p.kategori === activeCategory) && p.nama?.toLowerCase().includes(searchTerm.toLowerCase()));
-        if (!filtered.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🔍 Produk tidak ditemukan</div>'; return; }
-        productGrid.innerHTML = filtered.map(p => `<div class="glass-panel p-4 flex flex-col hover-metallic"><img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover" onerror="this.src='https://placehold.co/400x300/1e4f9c/white?text=Produk'"><div class="mt-3 flex justify-between items-start"><div><h3 class="font-bold text-lg">${p.nama}</h3><p class="text-xs text-blue-200/80">${p.kategori || 'Umum'} • ⭐ ${p.rating || 0}</p></div><span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm">Rp ${(p.harga || 0).toLocaleString('id-ID')}</span></div><button class="add-to-cart mt-4 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full flex items-center justify-center gap-2" data-id="${p.id}"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah ke Keranjang</button></div>`).join('');
-        lucide.createIcons();
-        document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', async () => { await addToCart(parseInt(btn.dataset.id), 1); alert('✅ Produk ditambahkan ke keranjang!'); }));
-      }
-      
-      // ==================== NOTIFICATION FUNCTIONS ====================
-      async function loadNotifications() {
-        if (!currentUser) return;
-        const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
-        if (data) { notifications = data; renderNotifications(); }
-      }
-      
-      function renderNotifications() {
-        if (!notificationList) return;
-        const unreadCount = notifications.filter(n => !n.is_read).length;
-        if (unreadCount > 0) { notifBadge.classList.remove('hidden'); notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount; }
-        else notifBadge.classList.add('hidden');
-        if (notifications.length === 0) { notificationList.innerHTML = '<div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div>'; return; }
-        notificationList.innerHTML = notifications.map(n => `<div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer notification-item" data-id="${n.id}"><div class="flex items-start gap-2"><i data-lucide="${n.icon || 'bell'}" class="w-4 h-4 mt-1"></i><div class="flex-1"><p class="text-sm font-medium">${n.title}</p><p class="text-xs text-blue-300">${n.message}</p><p class="text-xs text-blue-400/70 mt-1">${new Date(n.created_at).toLocaleDateString('id-ID')}</p></div>${!n.is_read ? '<span class="w-2 h-2 bg-blue-400 rounded-full"></span>' : ''}</div></div>`).join('');
-        lucide.createIcons();
-        document.querySelectorAll('.notification-item').forEach(item => item.addEventListener('click', async () => { await supabase.from('notifications').update({ is_read: true }).eq('id', item.dataset.id); await loadNotifications(); }));
-      }
-      
-      async function markAllNotificationsAsRead() {
-        if (!currentUser) return;
-        await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false);
-        await loadNotifications();
-      }
-      
-      // ==================== PROFILE FUNCTIONS ====================
-      async function updateSidebarUI() {
-        if (!currentUser) {
-          sidebarName.textContent = 'Pengunjung'; sidebarUsername.textContent = '@pengunjung';
-          sidebarBio.innerHTML = '<p class="text-blue-200/80">Login untuk melihat profil</p>';
-          sidebarAvatar.src = 'https://placehold.co/96x96/1e4f9c/white?text=G';
-          sidebarBadge.innerHTML = ''; sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.add('hidden');
-          userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div>';
-          return;
-        }
-        sidebarName.textContent = currentUserProfile?.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
-        sidebarUsername.textContent = `@${currentUserProfile?.username || currentUser.email?.split('@')[0] || 'pengguna'}`;
-        sidebarBio.innerHTML = currentUserProfile?.bio ? `<p class="text-blue-200/80">${currentUserProfile.bio}</p>` : '<p class="text-blue-400/60 italic">Belum ada bio</p>';
-        sidebarAvatar.src = currentUserProfile?.avatar_url || `https://placehold.co/96x96/1e4f9c/white?text=${(sidebarName.textContent.charAt(0)).toUpperCase()}`;
-        if (currentUserRole === 'seller') {
-          sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
-          sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.remove('hidden'); await loadUserProducts();
+          await loadNotifications();
+          await updateSidebarUI();
         } else {
-          sidebarBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Pembeli</span>';
-          sidebarSellerApply.classList.remove('hidden'); sidebarDashboard.classList.add('hidden');
+          currentUserRole = 'guest';
+          roleBadge.classList.add('hidden');
+          sellerApplyBtn.classList.add('hidden');
+          cart = [];
+          orders = [];
+          await updateSidebarUI();
         }
         lucide.createIcons();
+        return user;
+      } catch (error) {
+        console.error('Error checkAuth:', error);
+        return null;
       }
-      
-      async function loadUserProducts() {
-        if (!currentUser || currentUserRole !== 'seller') {
-          userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">' + (currentUser ? 'Jadi penjual untuk mulai berjualan' : 'Login untuk melihat produk') + '</div>';
-          return;
-        }
-        const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id).limit(9);
-        if (data && data.length > 0) userProductsGrid.innerHTML = data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('');
-        else userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Belum ada produk</div>';
-      }
-      
-      async function saveProfileChanges() {
-        const fullName = editFullName.value, username = editUsername.value, bio = editBio.value, avatarFile = editAvatar.files[0];
-        let avatarUrl = currentUserProfile?.avatar_url;
-        if (avatarFile) {
-          const fileName = `${currentUser.id}_${Date.now()}.jpg`;
-          const { error } = await supabase.storage.from('avatars').upload(fileName, avatarFile);
-          if (!error) { const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName); avatarUrl = urlData.publicUrl; }
-        }
-        const { error } = await supabase.from('profiles').update({ full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
-        if (error) editProfileMessage.textContent = 'Gagal: ' + error.message;
-        else { editProfileMessage.textContent = 'Profil berhasil diperbarui!'; currentUserProfile = { ...currentUserProfile, full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }; updateSidebarUI(); setTimeout(() => { editProfileModal.classList.add('hidden'); editProfileMessage.textContent = ''; }, 1500); }
-      }
-      
-      async function submitSellerApplication() {
-        const fullName = document.getElementById('sellerFullName')?.value, nik = document.getElementById('sellerNIK')?.value, bank = document.getElementById('sellerBank')?.value, account = document.getElementById('sellerAccount')?.value, accountName = document.getElementById('sellerAccountName')?.value, phone = document.getElementById('sellerPhone')?.value, email = document.getElementById('sellerEmail')?.value;
-        if (!fullName || !nik || !bank || !account || !accountName || !phone || !email) { document.getElementById('sellerApplyMessage').textContent = 'Semua field harus diisi!'; return; }
-        const { error } = await supabase.from('seller_applications').insert({ user_id: currentUser.id, full_name: fullName, nik, bank_name: bank, bank_account: account, bank_account_name: accountName, phone, email, status: 'pending' });
-        const msg = document.getElementById('sellerApplyMessage');
-        if (error) msg.textContent = 'Gagal: ' + error.message;
-        else { msg.textContent = '✅ Pengajuan berhasil! Menunggu verifikasi admin.'; await supabase.from('notifications').insert({ user_id: currentUser.id, title: 'Pengajuan Penjual', message: 'Pengajuan Anda sedang diproses.', icon: 'store', is_read: false }); setTimeout(() => document.getElementById('sellerApplyModal')?.classList.add('hidden'), 2000); }
-      }
-      
-      // ==================== UI FUNCTIONS ====================
-      function openProfileSidebar() { profileSidebar.style.transform = 'translateX(0)'; document.body.style.overflow = 'hidden'; loadUserProducts(); }
-      function closeProfileSidebarFunc() { profileSidebar.style.transform = 'translateX(100%)'; document.body.style.overflow = ''; }
-      function openEditProfileModal() { editFullName.value = currentUserProfile?.full_name || ''; editUsername.value = currentUserProfile?.username || currentUser?.email?.split('@')[0] || ''; editBio.value = currentUserProfile?.bio || ''; editProfileModal.classList.remove('hidden'); editProfileModal.classList.add('flex'); }
-      
-      // ==================== EVENT LISTENERS ====================
-      function initEventListeners() {
-        cartTab?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); });
-        ordersTab?.addEventListener('click', () => { cartSection.classList.add('hidden'); ordersSection.classList.remove('hidden'); sellerSection.classList.add('hidden'); ordersTab.classList.add('active'); cartTab.classList.remove('active'); sellerTab.classList.remove('active'); loadOrders(); });
-        sellerTab?.addEventListener('click', () => { if (currentUserRole === 'seller') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.remove('hidden'); sellerTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); loadSellerOrders(); } else alert('Anda harus menjadi seller terlebih dahulu'); });
-        document.querySelectorAll('.category-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active')); btn.classList.add('category-active'); activeCategory = btn.dataset.cat; renderProducts(); }));
-        document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
-        searchInput?.addEventListener('input', (e) => { searchTerm = e.target.value; renderProducts(); });
-        cartIcon?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); window.scrollTo({ top: cartSection.offsetTop - 100, behavior: 'smooth' }); });
-        document.querySelectorAll('.payment-method').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedPayment = btn.dataset.method; const span = document.getElementById('selectedPayment'); if (span) span.textContent = `Metode dipilih: ${selectedPayment === 'cod' ? 'COD (Bayar di Tempat)' : 'Transfer Bank (Simulasi Pembayaran)'}`; }));
-        checkoutBtn?.addEventListener('click', async () => { if (!selectedPayment) { alert('Pilih metode pembayaran terlebih dahulu'); return; } await checkout(selectedPayment); });
-        document.getElementById('loginBtn')?.addEventListener('click', () => { const email = document.getElementById('loginEmail')?.value, pass = document.getElementById('loginPassword')?.value; if (email && pass) login(email, pass); else document.getElementById('loginMessage').textContent = 'Email dan password harus diisi'; });
-        document.getElementById('registerBtn')?.addEventListener('click', () => { const email = document.getElementById('regEmail')?.value, pass = document.getElementById('regPassword')?.value, confirm = document.getElementById('regConfirmPassword')?.value; if (!email || !pass || !confirm) document.getElementById('registerMessage').textContent = 'Semua field harus diisi!'; else if (pass !== confirm) document.getElementById('registerMessage').textContent = 'Password tidak cocok!'; else register(email, pass); });
-        document.getElementById('resetBtn')?.addEventListener('click', async () => { const email = document.getElementById('resetEmail')?.value; if (!email) { document.getElementById('resetMessage').textContent = 'Email harus diisi!'; return; } const { error } = await supabase.auth.resetPasswordForEmail(email); document.getElementById('resetMessage').textContent = error ? 'Gagal: ' + error.message : 'Link reset password telah dikirim ke email Anda.'; });
-        document.getElementById('googleLoginBtn')?.addEventListener('click', async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); });
-        document.querySelectorAll('.tab-login-btn').forEach(btn => btn.addEventListener('click', () => { const tabId = btn.dataset.tab; document.querySelectorAll('.login-tab-content').forEach(tab => tab.classList.add('hidden')); document.getElementById(tabId + 'Tab').classList.remove('hidden'); document.querySelectorAll('.tab-login-btn').forEach(b => { b.classList.remove('font-bold', 'text-white'); b.classList.add('text-blue-300'); }); btn.classList.add('font-bold', 'text-white'); }));
-        document.getElementById('closeLogin')?.addEventListener('click', () => loginModal.classList.add('hidden')); document.getElementById('loginOverlay')?.addEventListener('click', () => loginModal.classList.add('hidden'));
-        loginFab?.addEventListener('click', openLoginModal); document.getElementById('bantuanLink')?.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
-        sellerApplyBtn?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
-        document.getElementById('closeSellerApply')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
-        document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication); document.getElementById('sellerApplyOverlay')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
-        document.getElementById('complaintBtn')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.remove('hidden'); document.getElementById('complaintModal')?.classList.add('flex'); });
-        document.getElementById('closeComplaint')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.add('hidden'); });
-        document.getElementById('submitComplaint')?.addEventListener('click', () => { const type = document.getElementById('complaintType')?.value, desc = document.getElementById('complaintDesc')?.value; if (!desc) { alert('Harap isi deskripsi keluhan'); return; } alert(`✅ Pengaduan terkirim ke admin: shofiankurniady@gmail.com\n\nJenis: ${type}\nKeluhan: ${desc}`); document.getElementById('complaintModal')?.classList.add('hidden'); document.getElementById('complaintDesc').value = ''; });
-        document.getElementById('profileBtn')?.addEventListener('click', openProfileSidebar); closeProfileSidebar?.addEventListener('click', closeProfileSidebarFunc); profileSidebarOverlay?.addEventListener('click', closeProfileSidebarFunc);
-        editProfileBtn?.addEventListener('click', openEditProfileModal); closeEditProfileBtn?.addEventListener('click', () => editProfileModal.classList.add('hidden')); editProfileOverlay?.addEventListener('click', () => editProfileModal.classList.add('hidden')); saveProfileChangesBtn?.addEventListener('click', saveProfileChanges);
-        document.getElementById('sidebarSellerApplyBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
-        document.getElementById('sidebarDashboardBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); sellerTab?.click(); }); sidebarLogoutBtn?.addEventListener('click', logout);
-        notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); }); document.addEventListener('click', () => notificationDropdown?.classList.remove('show')); markAllReadBtn?.addEventListener('click', markAllNotificationsAsRead);
-        document.getElementById('explorePromo')?.addEventListener('click', () => { productGrid?.scrollIntoView({ behavior: 'smooth' }); });
-        document.getElementById('logoLink')?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-      }
-      
-      // ==================== INITIALIZATION ====================
-      async function init() {
+    }
+    
+    async function login(email, password) {
+      try {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
         await checkAuth();
-        await loadProducts();
-        initEventListeners();
-        cartTab.classList.add('active');
-        cartSection.classList.remove('hidden');
+        loginModal.classList.add('hidden');
+        alert('✅ Login berhasil!');
+      } catch (error) {
+        document.getElementById('loginMessage').textContent = 'Login gagal: ' + error.message;
+      }
+    }
+    
+    async function register(email, password) {
+      try {
+        const { data, error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        if (data?.user) {
+          await supabase.from('profiles').insert({ id: data.user.id, email: email, role: 'buyer', username: email.split('@')[0] });
+        }
+        document.getElementById('registerMessage').textContent = '✅ Registrasi berhasil! Silakan login.';
+        setTimeout(() => document.querySelector('[data-tab="login"]').click(), 2000);
+      } catch (error) {
+        document.getElementById('registerMessage').textContent = 'Registrasi gagal: ' + error.message;
+      }
+    }
+    
+    async function logout() {
+      await supabase.auth.signOut();
+      window.location.reload();
+    }
+    
+    function openLoginModal() {
+      loginModal.classList.remove('hidden');
+      loginModal.classList.add('flex');
+    }
+    
+    // ==================== CART FUNCTIONS ====================
+    async function loadCart() {
+      if (!currentUser) { cart = []; renderCart(); updateCartBadge(); return; }
+      
+      const { data, error } = await supabase.from('carts').select(`*, products(*)`).eq('user_id', currentUser.id);
+      if (!error && data) {
+        cart = data.map(item => ({
+          cart_id: item.id, id: item.product_id, nama: item.products?.nama || 'Produk',
+          harga: item.products?.harga || 0, gambar: item.products?.gambar,
+          quantity: item.quantity, seller_id: item.products?.seller_id
+        }));
+        renderCart();
+        updateCartBadge();
+      }
+    }
+    
+    async function addToCart(productId, quantity = 1) {
+      if (!currentUser) { alert('Silakan login terlebih dahulu'); openLoginModal(); return false; }
+      
+      const existingItem = cart.find(item => item.id === productId);
+      if (existingItem) {
+        const newQuantity = existingItem.quantity + quantity;
+        const { error } = await supabase.from('carts').update({ quantity: newQuantity }).eq('id', existingItem.cart_id);
+        if (!error) await loadCart();
+      } else {
+        const { error } = await supabase.from('carts').insert({ user_id: currentUser.id, product_id: productId, quantity: quantity });
+        if (!error) await loadCart();
+      }
+      return true;
+    }
+    
+    async function updateCartQuantity(cartId, productId, newQuantity) {
+      if (newQuantity <= 0) { await removeFromCart(cartId); return; }
+      const { error } = await supabase.from('carts').update({ quantity: newQuantity }).eq('id', cartId);
+      if (!error) await loadCart();
+    }
+    
+    async function removeFromCart(cartId) {
+      const { error } = await supabase.from('carts').delete().eq('id', cartId);
+      if (!error) await loadCart();
+    }
+    
+    function updateCartBadge() {
+      const totalQty = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+      if (totalQty > 0) { cartBadge.classList.remove('hidden'); cartBadge.textContent = totalQty > 99 ? '99+' : totalQty; }
+      else cartBadge.classList.add('hidden');
+    }
+    
+    function renderCart() {
+      if (!cartItemsContainer) return;
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = `<div class="text-center text-blue-200/70 py-10"><i data-lucide="shopping-cart" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Keranjang belanja kosong</p></div>`;
+        if (cartSubtotalSpan) cartSubtotalSpan.textContent = 'Rp 0';
         lucide.createIcons();
-        console.log('✅ Marketplace initialized successfully');
+        return;
       }
       
-      init();
-    })();
+      let subtotal = 0;
+      let html = '';
+      cart.forEach(item => {
+        const itemTotal = item.harga * item.quantity;
+        subtotal += itemTotal;
+        html += `<div class="flex gap-4 py-4 border-b border-blue-400/20">
+          <img src="${item.gambar || 'https://placehold.co/80x80/1e4f9c/white?text=Product'}" class="w-20 h-20 rounded-lg object-cover">
+          <div class="flex-1"><h4 class="font-semibold">${item.nama}</h4><p class="text-blue-300 text-sm">Rp ${item.harga.toLocaleString('id-ID')}</p>
+          <div class="flex items-center gap-2 mt-2">
+            <button class="cart-qty-minus bg-blue-600/30 hover:bg-blue-600 px-3 py-1 rounded-full text-sm" data-cart-id="${item.cart_id}" data-product-id="${item.id}">-</button>
+            <span class="w-8 text-center">${item.quantity}</span>
+            <button class="cart-qty-plus bg-blue-600/30 hover:bg-blue-600 px-3 py-1 rounded-full text-sm" data-cart-id="${item.cart_id}" data-product-id="${item.id}">+</button>
+            <button class="cart-remove text-red-400 hover:text-red-300 text-sm ml-2" data-cart-id="${item.cart_id}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div></div>
+          <div class="text-right"><p class="font-bold">Rp ${itemTotal.toLocaleString('id-ID')}</p></div>
+        </div>`;
+      });
+      cartItemsContainer.innerHTML = html;
+      cartSubtotalSpan.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
+      
+      document.querySelectorAll('.cart-qty-plus').forEach(btn => btn.addEventListener('click', async () => {
+        const cartId = parseInt(btn.dataset.cartId), productId = parseInt(btn.dataset.productId);
+        const item = cart.find(i => i.id === productId);
+        if (item) await updateCartQuantity(cartId, productId, item.quantity + 1);
+      }));
+      document.querySelectorAll('.cart-qty-minus').forEach(btn => btn.addEventListener('click', async () => {
+        const cartId = parseInt(btn.dataset.cartId), productId = parseInt(btn.dataset.productId);
+        const item = cart.find(i => i.id === productId);
+        if (item) await updateCartQuantity(cartId, productId, item.quantity - 1);
+      }));
+      document.querySelectorAll('.cart-remove').forEach(btn => btn.addEventListener('click', async () => {
+        await removeFromCart(parseInt(btn.dataset.cartId));
+      }));
+      lucide.createIcons();
+    }
+    
+    // ==================== ORDER FUNCTIONS ====================
+    async function checkout(paymentMethod) {
+      if (!currentUser) { alert('Silakan login terlebih dahulu'); openLoginModal(); return false; }
+      if (cart.length === 0) { alert('Keranjang belanja kosong'); return false; }
+      
+      const orderNumber = `INV/${new Date().getFullYear()}/${Math.floor(Math.random() * 10000)}`;
+      const totalPrice = cart.reduce((sum, item) => sum + (item.harga * item.quantity), 0);
+      const status = paymentMethod === 'transfer' ? 'paid' : 'pending';
+      
+      try {
+        const { data: order, error: orderError } = await supabase.from('orders').insert({ 
+          order_number: orderNumber, user_id: currentUser.id, total_price: totalPrice, 
+          payment_method: paymentMethod, status: status 
+        }).select().single();
+        if (orderError) throw orderError;
+        
+        const orderItems = cart.map(item => ({ 
+          order_id: order.id, product_id: item.id, seller_id: item.seller_id, 
+          quantity: item.quantity, price: item.harga, subtotal: item.harga * item.quantity 
+        }));
+        const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+        if (itemsError) throw itemsError;
+        
+        await supabase.from('carts').delete().eq('user_id', currentUser.id);
+        
+        for (const item of orderItems) {
+          if (item.seller_id) {
+            await supabase.from('notifications').insert({ 
+              user_id: item.seller_id, title: 'Pesanan Baru', 
+              message: `Anda mendapat pesanan baru: ${orderNumber}`, icon: 'shopping-bag', is_read: false 
+            });
+          }
+        }
+        
+        await loadCart();
+        await loadOrders();
+        alert(`✅ Pesanan berhasil dibuat!\n📦 No. Pesanan: ${orderNumber}\n💳 Status: ${status === 'paid' ? 'Sudah Dibayar' : 'Menunggu Pembayaran'}`);
+        return true;
+      } catch (error) {
+        console.error('Checkout error:', error);
+        alert('❌ Gagal checkout: ' + error.message);
+        return false;
+      }
+    }
+    
+    async function loadOrders() {
+      if (!currentUser) return;
+      const { data, error } = await supabase.from('orders').select(`*, order_items(*, products(*))`).eq('user_id', currentUser.id).order('created_at', { ascending: false });
+      if (!error && data) { orders = data; renderOrders(); }
+    }
+    
+    function renderOrders() {
+      if (!ordersContainer) return;
+      if (orders.length === 0) {
+        ordersContainer.innerHTML = `<div class="text-center text-blue-200/70 py-10"><i data-lucide="package" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Belum ada pesanan</p></div>`;
+        lucide.createIcons(); return;
+      }
+      
+      let html = '';
+      orders.forEach(order => {
+        const statusClass = { pending: 'status-pending', paid: 'status-paid', shipped: 'status-shipped', completed: 'status-completed' }[order.status] || 'status-pending';
+        html += `<div class="glass-panel p-6 mb-4">
+          <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+            <div><p class="text-sm text-blue-300">No. Pesanan</p><p class="font-mono font-bold">${order.order_number}</p><p class="text-xs text-blue-400">${new Date(order.created_at).toLocaleDateString('id-ID')}</p></div>
+            <div><span class="px-3 py-1 rounded-full text-sm font-semibold ${statusClass}">${order.status.toUpperCase()}</span></div>
+          </div>
+          <div class="border-t border-blue-400/20 pt-4">
+            ${order.order_items.map(item => `<div class="flex gap-3 mb-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><p class="font-semibold">${item.products?.nama || 'Product'}</p><p class="text-sm text-blue-300">${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="text-right"><p class="font-bold">Rp ${item.subtotal.toLocaleString('id-ID')}</p></div></div>`).join('')}
+          </div>
+          <div class="border-t border-blue-400/20 pt-4 flex justify-between items-center"><p class="text-sm">Total Pesanan</p><p class="text-xl font-bold">Rp ${order.total_price.toLocaleString('id-ID')}</p></div>
+          ${order.status !== 'completed' ? `<div class="mt-4"><button class="complete-order w-full bg-green-600/30 hover:bg-green-600 border border-green-500 py-2 rounded-full transition" data-order-id="${order.id}">✅ Selesaikan Pesanan</button></div>` : ''}
+        </div>`;
+      });
+      ordersContainer.innerHTML = html;
+      document.querySelectorAll('.complete-order').forEach(btn => btn.addEventListener('click', async () => {
+        await supabase.from('orders').update({ status: 'completed' }).eq('id', parseInt(btn.dataset.orderId));
+        await loadOrders();
+        alert('✅ Pesanan telah diselesaikan!');
+      }));
+      lucide.createIcons();
+    }
+    
+    // ==================== SELLER FUNCTIONS ====================
+    async function loadSellerOrders() {
+      if (!currentUser || currentUserRole !== 'seller') return;
+      const { data, error } = await supabase.from('order_items').select(`*, orders(*), products(*)`).eq('seller_id', currentUser.id).order('created_at', { ascending: false });
+      if (!error && data) renderSellerOrders(data);
+    }
+    
+    function renderSellerOrders(orderItems) {
+      if (!sellerOrdersContainer) return;
+      const groupedOrders = {};
+      orderItems.forEach(item => { if (!groupedOrders[item.order_id]) groupedOrders[item.order_id] = { order: item.orders, items: [] }; groupedOrders[item.order_id].items.push(item); });
+      if (Object.keys(groupedOrders).length === 0) {
+        sellerOrdersContainer.innerHTML = `<div class="text-center text-blue-300 py-10"><i data-lucide="inbox" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Belum ada pesanan masuk</p></div>`;
+        lucide.createIcons(); return;
+      }
+      
+      let html = '';
+      for (const orderId in groupedOrders) {
+        const { order, items } = groupedOrders[orderId];
+        const totalAmount = items.reduce((sum, item) => sum + item.subtotal, 0);
+        html += `<div class="glass-panel p-6 mb-4">
+          <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+            <div><p class="text-sm text-blue-300">No. Pesanan</p><p class="font-mono font-bold">${order.order_number}</p><p class="text-xs text-blue-400">${new Date(order.created_at).toLocaleDateString('id-ID')}</p></div>
+            <div><select class="update-status px-3 py-1 rounded-full text-sm bg-blue-600/50 border border-blue-400" data-order-id="${order.id}"><option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option><option value="paid" ${order.status === 'paid' ? 'selected' : ''}>💰 Paid</option><option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🚚 Shipped</option><option value="completed" ${order.status === 'completed' ? 'selected' : ''}>✅ Completed</option></select></div>
+          </div>
+          ${items.map(item => `<div class="flex gap-3 mb-3"><img src="${item.products?.gambar || 'https://placehold.co/60x60/1e4f9c/white?text=Product'}" class="w-16 h-16 rounded-lg object-cover"><div class="flex-1"><p class="font-semibold">${item.products?.nama || 'Product'}</p><p class="text-sm text-blue-300">${item.quantity} x Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="text-right"><p class="font-bold">Rp ${item.subtotal.toLocaleString('id-ID')}</p></div></div>`).join('')}
+          <div class="border-t border-blue-400/20 pt-4 text-right"><p class="text-sm">Total dari toko Anda</p><p class="text-xl font-bold">Rp ${totalAmount.toLocaleString('id-ID')}</p></div>
+        </div>`;
+      }
+      sellerOrdersContainer.innerHTML = html;
+      document.querySelectorAll('.update-status').forEach(select => select.addEventListener('change', async () => {
+        await supabase.from('orders').update({ status: select.value }).eq('id', parseInt(select.dataset.orderId));
+        await loadSellerOrders();
+        alert(`✅ Status pesanan diubah menjadi ${select.value}`);
+      }));
+      lucide.createIcons();
+    }
+    
+    // ==================== PRODUCT FUNCTIONS ====================
+    async function loadProducts() {
+      const { data, error } = await supabase.from('products').select('*');
+      if (!error && data) { products = data; renderProducts(); }
+      else productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-red-400">❌ Gagal memuat produk</div>';
+    }
+    
+    function renderProducts() {
+      if (!products.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🛒 Belum ada produk</div>'; return; }
+      const filtered = products.filter(p => (activeCategory === 'all' || p.kategori === activeCategory) && p.nama?.toLowerCase().includes(searchTerm.toLowerCase()));
+      if (!filtered.length) { productGrid.innerHTML = '<div class="col-span-full text-center py-16 text-blue-200/70">🔍 Produk tidak ditemukan</div>'; return; }
+      productGrid.innerHTML = filtered.map(p => `<div class="glass-panel p-4 flex flex-col hover-metallic"><img src="${p.gambar || 'https://placehold.co/400x300/1e4f9c/white?text=Produk'}" alt="${p.nama}" class="rounded-xl h-40 w-full object-cover" onerror="this.src='https://placehold.co/400x300/1e4f9c/white?text=Produk'"><div class="mt-3 flex justify-between items-start"><div><h3 class="font-bold text-lg">${p.nama}</h3><p class="text-xs text-blue-200/80">${p.kategori || 'Umum'} • ⭐ ${p.rating || 0}</p></div><span class="bg-[#0f3460] px-2 py-1 rounded-full text-sm">Rp ${(p.harga || 0).toLocaleString('id-ID')}</span></div><button class="add-to-cart mt-4 bg-[#1e4f9c] border border-blue-300 py-2 rounded-full flex items-center justify-center gap-2" data-id="${p.id}"><i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah ke Keranjang</button></div>`).join('');
+      lucide.createIcons();
+      document.querySelectorAll('.add-to-cart').forEach(btn => btn.addEventListener('click', async () => { await addToCart(parseInt(btn.dataset.id), 1); alert('✅ Produk ditambahkan ke keranjang!'); }));
+    }
+    
+    // ==================== NOTIFICATION FUNCTIONS ====================
+    async function loadNotifications() {
+      if (!currentUser) return;
+      const { data } = await supabase.from('notifications').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20);
+      if (data) { notifications = data; renderNotifications(); }
+    }
+    
+    function renderNotifications() {
+      if (!notificationList) return;
+      const unreadCount = notifications.filter(n => !n.is_read).length;
+      if (unreadCount > 0) { notifBadge.classList.remove('hidden'); notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount; }
+      else notifBadge.classList.add('hidden');
+      if (notifications.length === 0) { notificationList.innerHTML = '<div class="text-center text-blue-200/70 py-4">Tidak ada notifikasi</div>'; return; }
+      notificationList.innerHTML = notifications.map(n => `<div class="p-3 ${n.is_read ? 'bg-[#0f284a]' : 'bg-[#1e4f9c]'} rounded-lg cursor-pointer notification-item" data-id="${n.id}"><div class="flex items-start gap-2"><i data-lucide="${n.icon || 'bell'}" class="w-4 h-4 mt-1"></i><div class="flex-1"><p class="text-sm font-medium">${n.title}</p><p class="text-xs text-blue-300">${n.message}</p><p class="text-xs text-blue-400/70 mt-1">${new Date(n.created_at).toLocaleDateString('id-ID')}</p></div>${!n.is_read ? '<span class="w-2 h-2 bg-blue-400 rounded-full"></span>' : ''}</div></div>`).join('');
+      lucide.createIcons();
+      document.querySelectorAll('.notification-item').forEach(item => item.addEventListener('click', async () => { await supabase.from('notifications').update({ is_read: true }).eq('id', item.dataset.id); await loadNotifications(); }));
+    }
+    
+    async function markAllNotificationsAsRead() {
+      if (!currentUser) return;
+      await supabase.from('notifications').update({ is_read: true }).eq('user_id', currentUser.id).eq('is_read', false);
+      await loadNotifications();
+    }
+    
+    // ==================== PROFILE FUNCTIONS ====================
+    async function updateSidebarUI() {
+      if (!currentUser) {
+        sidebarName.textContent = 'Pengunjung'; sidebarUsername.textContent = '@pengunjung';
+        sidebarBio.innerHTML = '<p class="text-blue-200/80">Login untuk melihat profil</p>';
+        sidebarAvatar.src = 'https://placehold.co/96x96/1e4f9c/white?text=G';
+        sidebarBadge.innerHTML = ''; sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.add('hidden');
+        userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Login untuk melihat produk</div>';
+        return;
+      }
+      sidebarName.textContent = currentUserProfile?.full_name || currentUser.email?.split('@')[0] || 'Pengguna';
+      sidebarUsername.textContent = `@${currentUserProfile?.username || currentUser.email?.split('@')[0] || 'pengguna'}`;
+      sidebarBio.innerHTML = currentUserProfile?.bio ? `<p class="text-blue-200/80">${currentUserProfile.bio}</p>` : '<p class="text-blue-400/60 italic">Belum ada bio</p>';
+      sidebarAvatar.src = currentUserProfile?.avatar_url || `https://placehold.co/96x96/1e4f9c/white?text=${(sidebarName.textContent.charAt(0)).toUpperCase()}`;
+      if (currentUserRole === 'seller') {
+        sidebarBadge.innerHTML = '<span class="verified-badge"><i data-lucide="check-circle" class="w-3 h-3"></i> Penjual Terverifikasi</span>';
+        sidebarSellerApply.classList.add('hidden'); sidebarDashboard.classList.remove('hidden'); await loadUserProducts();
+      } else {
+        sidebarBadge.innerHTML = '<span class="buyer-badge"><i data-lucide="crown" class="w-3 h-3"></i> Pembeli</span>';
+        sidebarSellerApply.classList.remove('hidden'); sidebarDashboard.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+    
+    async function loadUserProducts() {
+      if (!currentUser || currentUserRole !== 'seller') {
+        userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">' + (currentUser ? 'Jadi penjual untuk mulai berjualan' : 'Login untuk melihat produk') + '</div>';
+        return;
+      }
+      const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id).limit(9);
+      if (data && data.length > 0) userProductsGrid.innerHTML = data.map(p => `<div class="aspect-square bg-[#0f284a] rounded-lg overflow-hidden"><img src="${p.gambar || 'https://placehold.co/150x150/1e4f9c/white?text=Produk'}" class="w-full h-full object-cover"></div>`).join('');
+      else userProductsGrid.innerHTML = '<div class="col-span-3 text-center text-blue-300 py-8">Belum ada produk</div>';
+    }
+    
+    async function saveProfileChanges() {
+      const fullName = editFullName.value, username = editUsername.value, bio = editBio.value, avatarFile = editAvatar.files[0];
+      let avatarUrl = currentUserProfile?.avatar_url;
+      if (avatarFile) {
+        const fileName = `${currentUser.id}_${Date.now()}.jpg`;
+        const { error } = await supabase.storage.from('avatars').upload(fileName, avatarFile);
+        if (!error) { const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName); avatarUrl = urlData.publicUrl; }
+      }
+      const { error } = await supabase.from('profiles').update({ full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }).eq('id', currentUser.id);
+      if (error) editProfileMessage.textContent = 'Gagal: ' + error.message;
+      else { editProfileMessage.textContent = 'Profil berhasil diperbarui!'; currentUserProfile = { ...currentUserProfile, full_name: fullName, username: username, bio: bio, avatar_url: avatarUrl }; updateSidebarUI(); setTimeout(() => { editProfileModal.classList.add('hidden'); editProfileMessage.textContent = ''; }, 1500); }
+    }
+    
+    async function submitSellerApplication() {
+      const fullName = document.getElementById('sellerFullName')?.value, nik = document.getElementById('sellerNIK')?.value, bank = document.getElementById('sellerBank')?.value, account = document.getElementById('sellerAccount')?.value, accountName = document.getElementById('sellerAccountName')?.value, phone = document.getElementById('sellerPhone')?.value, email = document.getElementById('sellerEmail')?.value;
+      if (!fullName || !nik || !bank || !account || !accountName || !phone || !email) { document.getElementById('sellerApplyMessage').textContent = 'Semua field harus diisi!'; return; }
+      const { error } = await supabase.from('seller_applications').insert({ user_id: currentUser.id, full_name: fullName, nik, bank_name: bank, bank_account: account, bank_account_name: accountName, phone, email, status: 'pending' });
+      const msg = document.getElementById('sellerApplyMessage');
+      if (error) msg.textContent = 'Gagal: ' + error.message;
+      else { msg.textContent = '✅ Pengajuan berhasil! Menunggu verifikasi admin.'; await supabase.from('notifications').insert({ user_id: currentUser.id, title: 'Pengajuan Penjual', message: 'Pengajuan Anda sedang diproses.', icon: 'store', is_read: false }); setTimeout(() => document.getElementById('sellerApplyModal')?.classList.add('hidden'), 2000); }
+    }
+    
+    // ==================== UI FUNCTIONS ====================
+    function openProfileSidebar() { profileSidebar.style.transform = 'translateX(0)'; document.body.style.overflow = 'hidden'; loadUserProducts(); }
+    function closeProfileSidebarFunc() { profileSidebar.style.transform = 'translateX(100%)'; document.body.style.overflow = ''; }
+    function openEditProfileModal() { editFullName.value = currentUserProfile?.full_name || ''; editUsername.value = currentUserProfile?.username || currentUser?.email?.split('@')[0] || ''; editBio.value = currentUserProfile?.bio || ''; editProfileModal.classList.remove('hidden'); editProfileModal.classList.add('flex'); }
+    
+    // ==================== EVENT LISTENERS ====================
+    function initEventListeners() {
+      cartTab?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); });
+      ordersTab?.addEventListener('click', () => { cartSection.classList.add('hidden'); ordersSection.classList.remove('hidden'); sellerSection.classList.add('hidden'); ordersTab.classList.add('active'); cartTab.classList.remove('active'); sellerTab.classList.remove('active'); loadOrders(); });
+      sellerTab?.addEventListener('click', () => { if (currentUserRole === 'seller') { cartSection.classList.add('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.remove('hidden'); sellerTab.classList.add('active'); cartTab.classList.remove('active'); ordersTab.classList.remove('active'); loadSellerOrders(); } else alert('Anda harus menjadi seller terlebih dahulu'); });
+      document.querySelectorAll('.category-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active')); btn.classList.add('category-active'); activeCategory = btn.dataset.cat; renderProducts(); }));
+      document.querySelector('.category-btn[data-cat="all"]')?.classList.add('category-active');
+      searchInput?.addEventListener('input', (e) => { searchTerm = e.target.value; renderProducts(); });
+      cartIcon?.addEventListener('click', () => { cartSection.classList.remove('hidden'); ordersSection.classList.add('hidden'); sellerSection.classList.add('hidden'); cartTab.classList.add('active'); ordersTab.classList.remove('active'); sellerTab.classList.remove('active'); window.scrollTo({ top: cartSection.offsetTop - 100, behavior: 'smooth' }); });
+      document.querySelectorAll('.payment-method').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.payment-method').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedPayment = btn.dataset.method; const span = document.getElementById('selectedPayment'); if (span) span.textContent = `Metode dipilih: ${selectedPayment === 'cod' ? 'COD (Bayar di Tempat)' : 'Transfer Bank (Simulasi Pembayaran)'}`; }));
+      checkoutBtn?.addEventListener('click', async () => { if (!selectedPayment) { alert('Pilih metode pembayaran terlebih dahulu'); return; } await checkout(selectedPayment); });
+      document.getElementById('loginBtn')?.addEventListener('click', () => { const email = document.getElementById('loginEmail')?.value, pass = document.getElementById('loginPassword')?.value; if (email && pass) login(email, pass); else document.getElementById('loginMessage').textContent = 'Email dan password harus diisi'; });
+      document.getElementById('registerBtn')?.addEventListener('click', () => { const email = document.getElementById('regEmail')?.value, pass = document.getElementById('regPassword')?.value, confirm = document.getElementById('regConfirmPassword')?.value; if (!email || !pass || !confirm) document.getElementById('registerMessage').textContent = 'Semua field harus diisi!'; else if (pass !== confirm) document.getElementById('registerMessage').textContent = 'Password tidak cocok!'; else register(email, pass); });
+      document.getElementById('resetBtn')?.addEventListener('click', async () => { const email = document.getElementById('resetEmail')?.value; if (!email) { document.getElementById('resetMessage').textContent = 'Email harus diisi!'; return; } const { error } = await supabase.auth.resetPasswordForEmail(email); document.getElementById('resetMessage').textContent = error ? 'Gagal: ' + error.message : 'Link reset password telah dikirim ke email Anda.'; });
+      document.getElementById('googleLoginBtn')?.addEventListener('click', async () => { await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); });
+      document.querySelectorAll('.tab-login-btn').forEach(btn => btn.addEventListener('click', () => { const tabId = btn.dataset.tab; document.querySelectorAll('.login-tab-content').forEach(tab => tab.classList.add('hidden')); document.getElementById(tabId + 'Tab').classList.remove('hidden'); document.querySelectorAll('.tab-login-btn').forEach(b => { b.classList.remove('font-bold', 'text-white'); b.classList.add('text-blue-300'); }); btn.classList.add('font-bold', 'text-white'); }));
+      document.getElementById('closeLogin')?.addEventListener('click', () => loginModal.classList.add('hidden')); document.getElementById('loginOverlay')?.addEventListener('click', () => loginModal.classList.add('hidden'));
+      loginFab?.addEventListener('click', openLoginModal); document.getElementById('bantuanLink')?.addEventListener('click', (e) => { e.preventDefault(); openLoginModal(); });
+      sellerApplyBtn?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
+      document.getElementById('closeSellerApply')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
+      document.getElementById('submitSellerApply')?.addEventListener('click', submitSellerApplication); document.getElementById('sellerApplyOverlay')?.addEventListener('click', () => { document.getElementById('sellerApplyModal')?.classList.add('hidden'); });
+      document.getElementById('complaintBtn')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.remove('hidden'); document.getElementById('complaintModal')?.classList.add('flex'); });
+      document.getElementById('closeComplaint')?.addEventListener('click', () => { document.getElementById('complaintModal')?.classList.add('hidden'); });
+      document.getElementById('submitComplaint')?.addEventListener('click', () => { const type = document.getElementById('complaintType')?.value, desc = document.getElementById('complaintDesc')?.value; if (!desc) { alert('Harap isi deskripsi keluhan'); return; } alert(`✅ Pengaduan terkirim ke admin: shofiankurniady@gmail.com\n\nJenis: ${type}\nKeluhan: ${desc}`); document.getElementById('complaintModal')?.classList.add('hidden'); document.getElementById('complaintDesc').value = ''; });
+      document.getElementById('profileBtn')?.addEventListener('click', openProfileSidebar); closeProfileSidebar?.addEventListener('click', closeProfileSidebarFunc); profileSidebarOverlay?.addEventListener('click', closeProfileSidebarFunc);
+      editProfileBtn?.addEventListener('click', openEditProfileModal); closeEditProfileBtn?.addEventListener('click', () => editProfileModal.classList.add('hidden')); editProfileOverlay?.addEventListener('click', () => editProfileModal.classList.add('hidden')); saveProfileChangesBtn?.addEventListener('click', saveProfileChanges);
+      document.getElementById('sidebarSellerApplyBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); document.getElementById('sellerApplyModal')?.classList.remove('hidden'); document.getElementById('sellerApplyModal')?.classList.add('flex'); });
+      document.getElementById('sidebarDashboardBtn')?.addEventListener('click', () => { closeProfileSidebarFunc(); sellerTab?.click(); }); sidebarLogoutBtn?.addEventListener('click', logout);
+      notificationBtn?.addEventListener('click', (e) => { e.stopPropagation(); notificationDropdown?.classList.toggle('show'); }); document.addEventListener('click', () => notificationDropdown?.classList.remove('show')); markAllReadBtn?.addEventListener('click', markAllNotificationsAsRead);
+      document.getElementById('explorePromo')?.addEventListener('click', () => { productGrid?.scrollIntoView({ behavior: 'smooth' }); });
+      document.getElementById('logoLink')?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    }
+    
+    // ==================== INITIALIZATION ====================
+    async function init() {
+      await checkAuth();
+      await loadProducts();
+      initEventListeners();
+      cartTab.classList.add('active');
+      cartSection.classList.remove('hidden');
+      lucide.createIcons();
+      console.log('✅ Marketplace initialized successfully');
+    }
+    
+    init();
   </script>
 </body>
 </html>
